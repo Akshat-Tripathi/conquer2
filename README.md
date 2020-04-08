@@ -1,7 +1,7 @@
 # conquer2
 
-To run the react page, go to frontend/conquer2 and then run:
+To run the react page, go to [frontend/conquer2] and then run:
 
-npm start
+### npm start
 
 N.B. You must have npm installed.
