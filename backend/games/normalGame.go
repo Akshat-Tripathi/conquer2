@@ -7,16 +7,18 @@ import (
 
 //NormalGame - basic test version
 type NormalGame struct {
-	id          string
-	state       map[string]gameState
-	conn        connectionManager
-	numPlayers  int32
-	playerLimit int32
+	id                  string
+	states              map[string]gameState //Maps countries to players / number of troops
+	playerTroops        map[string]int
+	conn                connectionManager
+	numPlayers          int32
+	maxPlayerNum        int32
+	startingTroopNumber int
 }
 
 //Handle - a handles all new players
 func (ng *NormalGame) Handle(w http.ResponseWriter, r *http.Request) {
-	if ng.numPlayers < ng.playerLimit {
+	if ng.numPlayers < ng.maxPlayerNum {
 		atomic.AddInt32(&ng.numPlayers, 1)
 		http.Redirect(w, r, "/gamefull", http.StatusFound)
 	}
@@ -29,5 +31,9 @@ func (ng *NormalGame) Handle(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	name := cookie.Value
+	if _, ok := ng.playerTroops[name]; ok {
+		name = generateFakeName(name)
+	}
+	ng.playerTroops[name] = ng.startingTroopNumber
 	ng.conn.Monitor(name, conn)
 }
