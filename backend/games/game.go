@@ -1,5 +1,7 @@
 package game
 
+import "net/http"
+
 /*
 Game types:
 Normal
@@ -14,9 +16,8 @@ When the game receives an action as input, it validates it then processes it, an
 
 //Game - the set of methods that every game should be able to perform
 type Game interface {
-	Create()
+	Handle(w http.ResponseWriter, r *http.Request) //When a game is created, http.addHandlerFunc this
 	processAction(*Action) bool
 	validateAction(*Action) bool
 	saveGameState()
-	addPlayer(string) bool
 }

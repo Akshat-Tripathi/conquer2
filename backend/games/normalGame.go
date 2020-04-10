@@ -8,7 +8,7 @@ import (
 //NormalGame - basic test version
 type NormalGame struct {
 	id                  string
-	states              map[string]gameState //Maps countries to players / number of troops
+	countryStates       map[string]countryState //Maps countries to players / number of troops
 	playerTroops        map[string]int
 	conn                connectionManager
 	numPlayers          int32
@@ -31,8 +31,10 @@ func (ng *NormalGame) Handle(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	name := cookie.Value
-	if _, ok := ng.playerTroops[name]; ok {
+	_, ok := ng.playerTroops[name]
+	for ok {
 		name = generateFakeName(name)
+		_, ok = ng.playerTroops[name]
 	}
 	ng.playerTroops[name] = ng.startingTroopNumber
 	ng.conn.Monitor(name, conn)
