@@ -17,7 +17,6 @@ When the game receives an action as input, it validates it then processes it, an
 //Game - the set of methods that every game should be able to perform
 type Game interface {
 	Handle(w http.ResponseWriter, r *http.Request) //When a game is created, http.addHandlerFunc this
-	processAction(*Action) bool
-	validateAction(*Action) bool
-	saveGameState()
+	processActions()
+	saveGame()
 }
