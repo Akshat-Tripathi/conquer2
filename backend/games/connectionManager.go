@@ -12,14 +12,13 @@ var (
 
 type connectionManager struct {
 	players map[string]chan Action //TODO - make specific outgoing msg structs if errors
-	msgs    chan Action
 }
 
 //Monitor - monitors a player's websocket
-func (c *connectionManager) Monitor(name string, conn *websocket.Conn) {
+func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
 	outboundMsgs := make(chan Action)
 	c.players[name] = outboundMsgs
-	var act Action
+	var act action
 	for {
 		err := conn.ReadJSON(&act)
 		if err != nil {
@@ -28,7 +27,7 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn) {
 			return
 		}
 		act.Player = name
-		c.msgs <- act
+		msgs <- act
 		select {
 		case msg := <-outboundMsgs:
 			err = conn.WriteJSON(msg)
