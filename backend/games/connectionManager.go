@@ -11,19 +11,20 @@ var (
 )
 
 type connectionManager struct {
-	players map[string]chan Action //TODO - make specific outgoing msg structs if errors
+	players map[string]chan UpdateMessage
 }
 
 //Monitor - monitors a player's websocket
 func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
-	outboundMsgs := make(chan Action)
+	outboundMsgs := make(chan UpdateMessage)
 	c.players[name] = outboundMsgs
-	var act action
+	var act Action
 	for {
 		err := conn.ReadJSON(&act)
 		if err != nil {
 			log.Fatal("User left")
 			delete(c.players, name)
+			msgs <- Action{ActionType: "removeUser", Player: name}
 			return
 		}
 		act.Player = name
@@ -34,18 +35,27 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan
 			if err != nil {
 				log.Fatal("User left")
 				delete(c.players, name)
+				msgs <- Action{ActionType: "removeUser", Player: name}
 				return
 			}
 		}
 	}
 }
 
-func (c *connectionManager) sendToAll(msg Action) {
+func (c *connectionManager) sendToAll(msg UpdateMessage) {
 	for _, v := range c.players {
 		v <- msg
 	}
 }
 
-func (c *connectionManager) sendToPlayer(msg Action, player string) {
+func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 	c.players[player] <- msg
+}
+
+//UpdateMessage - sent to client
+type UpdateMessage struct {
+	Troops  int
+	Type    string
+	Player  string
+	Country string
 }
