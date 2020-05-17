@@ -1,23 +1,5 @@
 package game
 
-import (
-	"regexp"
-	"strconv"
-)
-
-//TODO test this
-func generateFakeName(name string) string {
-	reg := regexp.MustCompile(`(\d+)"*$`)
-	newName := reg.ReplaceAllStringFunc(name, func(num string) string {
-		n, _ := strconv.Atoi(num)
-		return strconv.Itoa(n + 1)
-	})
-	if name == newName {
-		return newName + "1"
-	}
-	return newName
-}
-
 type countryState struct {
 	player string
 	troops int
@@ -28,6 +10,14 @@ type playerState struct {
 	troops    int
 	countries int
 	password  string
+}
+
+//Context - used to specify game parameters
+type Context struct {
+	ID                    string
+	MaxPlayerNumber       int32
+	StartingTroopNumber   int
+	StartingCountryNumber int
 }
 
 func sort(vals []int) []int {

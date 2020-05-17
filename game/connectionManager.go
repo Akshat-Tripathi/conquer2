@@ -22,7 +22,7 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan
 	for {
 		err := conn.ReadJSON(&act)
 		if err != nil {
-			log.Fatal("User left")
+			log.Fatal("User left - reading")
 			delete(c.players, name)
 			msgs <- Action{ActionType: "removeUser", Player: name}
 			return
@@ -33,7 +33,7 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan
 		case msg := <-outboundMsgs:
 			err = conn.WriteJSON(msg)
 			if err != nil {
-				log.Fatal("User left")
+				log.Fatal("User left - writing")
 				delete(c.players, name)
 				msgs <- Action{ActionType: "removeUser", Player: name}
 				return
