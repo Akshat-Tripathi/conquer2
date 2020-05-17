@@ -4,9 +4,9 @@ import "math/rand"
 
 type stateProcessor interface {
 	processAction(Action) (bool, UpdateMessage, UpdateMessage)
-	processTroops()
-	addPlayer(string, string)
-	checkPlayer(string, string) bool
+	//processTroops()
+	checkPlayer(string, string) int8
+	addPlayer(name, password string)
 }
 
 type defaultProcessor struct {
@@ -18,22 +18,25 @@ type defaultProcessor struct {
 	startingCountryNumber int
 }
 
-func (p *defaultProcessor) checkPlayer(name, password string) bool {
+func (p *defaultProcessor) checkPlayer(name, password string) int8 {
 	state, ok := p.playerTroops[name]
 	if !ok {
-		return false
+		return 0
 	}
-	return state.password == password
+	if state.password == password {
+		return 1
+	}
+	return 2
 }
 
 //PRE: the player name and password are unique
-func (p *defaultProcessor) addPlayer(name string, password string) {
+func (p *defaultProcessor) addPlayer(name, password string) {
 	p.playerTroops[name] = &playerState{troops: p.startingTroopNumber,
 		countries: p.startingCountryNumber,
 		password:  password} //TODO colour decision
 	country := ""
 	//Assign countries
-	for n := p.startingTroopNumber; n > 0; {
+	for n := p.startingCountryNumber; n > 0; {
 		country = p.countries[rand.Intn(len(p.countries))]
 		if p.countryStates[country].player != "" {
 			continue
@@ -100,18 +103,28 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 }
 
 func (p defaultProcessor) validateAttack(attack Action) bool {
-	src := p.countryStates[attack.Src]
-	destPlayer := p.countryStates[attack.Dest].player
+	src, ok := p.countryStates[attack.Src]
+	if !ok {
+		return false
+	}
+	dest, ok := p.countryStates[attack.Dest]
+	if !ok {
+		return false
+	}
+	//Must select neighbouring countries
+	if !p.areNeighbours(attack.Src, attack.Dest) {
+		return false
+	}
 	//Must own src
 	if src.player != attack.Player {
 		return false
 	}
 	//Mustn't own dest
-	if destPlayer == attack.Player {
+	if dest.player == attack.Player {
 		return false
 	}
 	//Can't attack self
-	if src.player == destPlayer {
+	if src.player == dest.player {
 		return false
 	}
 	//Must have at least 1 troop to attack
@@ -122,19 +135,38 @@ func (p defaultProcessor) validateAttack(attack Action) bool {
 }
 
 func (p defaultProcessor) validateDonate(donate Action) bool {
+	me, ok := p.playerTroops[donate.Player]
+	if !ok {
+		return false
+	}
+	them, ok := p.countryStates[donate.Dest]
+	if !ok {
+		return false
+	}
 	//Must have troops
-	if p.playerTroops[donate.Player].troops < donate.Troops {
+	if me.troops < donate.Troops {
 		return false
 	}
 	//Can't donate to self
-	if p.countryStates[donate.Dest].player == donate.Player {
+	if them.player == donate.Player {
 		return false
 	}
 	return true
 }
 
 func (p defaultProcessor) validateMove(move Action) bool {
-	src := p.countryStates[move.Src]
+	src, ok := p.countryStates[move.Src]
+	if !ok {
+		return false
+	}
+	dest, ok := p.countryStates[move.Dest]
+	if !ok {
+		return false
+	}
+	//Must select neighbouring countries
+	if !p.areNeighbours(move.Src, move.Dest) {
+		return false
+	}
 	//Must have troops
 	if src.troops < move.Troops {
 		return false
@@ -143,20 +175,43 @@ func (p defaultProcessor) validateMove(move Action) bool {
 		return false
 	}
 	//Must own dest
-	if p.countryStates[move.Dest].player == move.Player {
+	if dest.player == move.Player {
 		return false
 	}
 	return true
 }
 
 func (p defaultProcessor) validateDrop(drop Action) bool {
+	me, ok := p.playerTroops[drop.Player]
+	if !ok {
+		return false
+	}
+	them, ok := p.countryStates[drop.Dest]
+	if !ok {
+		return false
+	}
+	//Must select neighbouring countries
+	if !p.areNeighbours(drop.Src, drop.Dest) {
+		return false
+	}
 	//Must have troops
-	if p.playerTroops[drop.Player].troops < drop.Troops {
+	if me.troops < drop.Troops {
 		return false
 	}
 	//Can't donate to nil
-	if p.countryStates[drop.Dest].player != "" {
+	if them.player != "" {
 		return false
 	}
 	return true
+}
+
+//PRE: src and dest are valid strings
+func (p defaultProcessor) areNeighbours(src, dest string) bool {
+	neighbours := (*p.neighbours)[src]
+	for _, v := range neighbours {
+		if v == dest {
+			return true
+		}
+	}
+	return false
 }

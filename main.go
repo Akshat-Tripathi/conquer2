@@ -14,10 +14,6 @@ const (
 	cookieMaxAge = 365 * 24 * 60 * 60
 )
 
-var (
-	neighbours = loadMap()
-)
-
 func main() {
 	fmt.Println("build")
 
@@ -27,10 +23,12 @@ func main() {
 		port = "8080"
 	}
 
+	neighbours := loadMap()
+
 	games := make(map[string]game.Game)
-	games["test"] = new(game.RealTimeGame)
 
 	r := gin.Default()
+
 	r.Use(static.Serve("/static", static.LocalFile("./frontend", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
@@ -45,24 +43,33 @@ func main() {
 		thisGame, validID := games[id]
 		if !validID {
 			c.Redirect(http.StatusFound, "/")
+			c.Writer.WriteString(`<script>alert("Invalid game id")</script>`)
 			return
 		}
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-		//TODO add addPlayer logic
-		if !thisGame.CheckPlayer(username, password) {
+		switch thisGame.CheckPlayer(username, password) {
+		case 0:
 			c.SetCookie("username", username, cookieMaxAge, "/game/"+id,
 				"", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game/"+id,
-				"", true, true)
+				"", false, true)
 			thisGame.AddPlayer(username, password)
+			fallthrough
+		case 1:
+			c.Redirect(http.StatusFound, "/game/"+id)
+		default:
+			c.Writer.WriteString(`<script>alert("Invalid username password combo)"</script>`)
 		}
-		c.Redirect(http.StatusFound, "/game/"+id)
 	})
 
 	r.GET("/create/", func(c *gin.Context) {
 
+		test := game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+		ctx := Context{ID: "test", MaxPlayerNumber: 3, StartingTroopNumber: 5, StartingCountryNumber: 1}
+		test.Start(ctx, &neighbours)
+		games["test"] = &test
 	})
 
 	r.Run(":" + port)

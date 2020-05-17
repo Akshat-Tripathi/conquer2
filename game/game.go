@@ -13,24 +13,24 @@ Situation: Reenact different historical scenarios
 Historic: Time progression
 
 Responsibilities:
-A game object will be created by a player, when they choose to host a game.
+A DefaultGame object will be created by a player, when they choose to host a DefaultGame.
 The initialisation code will be run.
-When the game receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
+When the DefaultGame receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
 */
 
 const (
 	maxCountries = 20
 )
 
-//Game - the set of methods that every game should be able to perform
+//Game - the set of methods that every DefaultGame should be able to perform
 type Game interface {
-	Start(string)
-	CheckPlayer(string, string) bool
-	AddPlayer(string, string)
+	Start(Context, *map[string][]string)
+	CheckPlayer(string, string) int8
+	AddPlayer(string, string) bool
 }
 
-//game - basic test version
-type game struct {
+//DefaultGame - basic test version
+type DefaultGame struct {
 	id           string
 	conn         connectionManager
 	numPlayers   int32
@@ -39,16 +39,23 @@ type game struct {
 	processor    stateProcessor
 }
 
-func (g *game) CheckPlayer(name, password string) bool {
+//CheckPlayer - checks if a player exists - see stateprocessor.checkPlayer for more info
+func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 	return g.processor.checkPlayer(name, password)
 }
 
-func (g *game) AddPlayer(name, password string) {
+//AddPlayer - returns whether or not the player was successfully added
+func (g *DefaultGame) AddPlayer(name, password string) bool {
+	if g.numPlayers >= g.maxPlayerNum {
+		return false
+	}
+	atomic.AddInt32(&g.numPlayers, 1)
 	g.processor.addPlayer(name, password)
+	return true
 }
 
 //Existing players go here
-func (g *game) handleGame(w http.ResponseWriter, r *http.Request) {
+func (g *DefaultGame) handleGame(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		panic(err)
@@ -60,26 +67,8 @@ func (g *game) handleGame(w http.ResponseWriter, r *http.Request) {
 	g.conn.Monitor(username.Value, conn, g.actions)
 }
 
-//New players go here, then are redirected to handleGame
-//The playername will be distinct
-func (g *game) handleNewPlayer(w http.ResponseWriter, r *http.Request) {
-	if g.numPlayers >= g.maxPlayerNum {
-		http.Redirect(w, r, "/gamefull", http.StatusFound)
-	}
-	username, err := r.Cookie("username")
-	if err != nil {
-		panic(err)
-	}
-	password, err := r.Cookie("password")
-	if err != nil {
-		panic(err)
-	}
-	atomic.AddInt32(&g.numPlayers, 1)
-	g.processor.addPlayer(username.Value, password.Value)
-}
-
 //Takes actions from the websocket connections and processes them
-func (g *game) processActions() {
+func (g *DefaultGame) processActions() {
 	for action := range g.actions {
 		won, msg1, msg2 := g.processor.processAction(action)
 		g.send(msg1)
@@ -94,7 +83,7 @@ func (g *game) processActions() {
 }
 
 //Sends actions to the appropriate clients
-func (g *game) send(msg UpdateMessage) {
+func (g *DefaultGame) send(msg UpdateMessage) {
 	if msg.Type == "updateTroops" {
 		g.conn.sendToPlayer(msg, msg.Player)
 		return
