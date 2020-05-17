@@ -1,25 +1,46 @@
 package game
 
+import "math/rand"
+
 type stateProcessor interface {
 	processAction(Action) (bool, UpdateMessage, UpdateMessage)
 	processTroops()
-	addPlayer(string) string
+	addPlayer(string, string)
+	checkPlayer(string, string) bool
 }
 
 type defaultProcessor struct {
-	countryStates       map[string]*countryState //Maps countries to players / number of troops
-	playerTroops        map[string]*playerState
-	startingTroopNumber int
+	countries             []string
+	neighbours            *map[string][]string
+	countryStates         map[string]*countryState //Maps countries to players / number of troops
+	playerTroops          map[string]*playerState
+	startingTroopNumber   int
+	startingCountryNumber int
 }
 
-func (p *defaultProcessor) addPlayer(name string) string {
-	_, ok := p.playerTroops[name]
-	for ok {
-		name = generateFakeName(name)
-		_, ok = p.playerTroops[name]
+func (p *defaultProcessor) checkPlayer(name, password string) bool {
+	state, ok := p.playerTroops[name]
+	if !ok {
+		return false
 	}
-	p.playerTroops[name].troops = p.startingTroopNumber //May need to make .troops a pointer
-	return name
+	return state.password == password
+}
+
+//PRE: the player name and password are unique
+func (p *defaultProcessor) addPlayer(name string, password string) {
+	p.playerTroops[name] = &playerState{troops: p.startingTroopNumber,
+		countries: p.startingCountryNumber,
+		password:  password} //TODO colour decision
+	country := ""
+	//Assign countries
+	for n := p.startingTroopNumber; n > 0; {
+		country = p.countries[rand.Intn(len(p.countries))]
+		if p.countryStates[country].player != "" {
+			continue
+		}
+		p.countryStates[country].player = name
+		n--
+	}
 }
 
 func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, UpdateMessage) {

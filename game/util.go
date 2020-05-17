@@ -27,6 +27,7 @@ type playerState struct {
 	colour    int //Maybe change this to a string
 	troops    int
 	countries int
+	password  string
 }
 
 func sort(vals []int) []int {
