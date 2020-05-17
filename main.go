@@ -42,7 +42,8 @@ func main() {
 		req := c.Request
 		req.ParseForm()
 		id := req.FormValue("id")
-		if thisGame, validID := games[id]; !validID {
+		thisGame, validID := games[id]
+		if !validID {
 			c.Redirect(http.StatusFound, "/")
 			return
 		}
