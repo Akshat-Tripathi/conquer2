@@ -34,10 +34,10 @@ func main() {
 	r.Use(static.Serve("/static", static.LocalFile("./frontend", true)))
 
 	// r.LoadHTMLGlob("frontend/**/*.html")
-	r.LoadHTMLGlob("frontend/public/index.html")
+	r.LoadHTMLGlob("frontend/**/*.html")
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusOK, "blah.html", nil)
 	})
 	r.POST("/", func(c *gin.Context) {
 		req := c.Request
@@ -100,7 +100,7 @@ func main() {
 			thisGame, validID := games[id]
 			if !validID {
 				fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
-				c.HTML(http.StatusOK, "index.html", nil)
+				c.HTML(http.StatusOK, "blah.html", nil)
 				return
 			}
 
@@ -112,14 +112,14 @@ func main() {
 					"", false, true)
 				if !thisGame.AddPlayer(username, password) {
 					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
-					c.HTML(http.StatusOK, "index.html", nil)
+					c.HTML(http.StatusOK, "blah.html", nil)
 				}
 				fallthrough
 			case 1:
 				c.Redirect(http.StatusFound, "/game/"+id)
 			default:
 				fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
-				c.HTML(http.StatusOK, "index.html", nil)
+				c.HTML(http.StatusOK, "blah.html", nil)
 			}
 		}
 
