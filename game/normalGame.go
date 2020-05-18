@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -51,17 +52,17 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 	rtg.Router.GET("/game/"+ctx.ID+"/", func(c *gin.Context) {
 		username, err := c.Cookie("username")
 		if err != nil {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
 			c.Redirect(http.StatusFound, "/")
-			c.Writer.WriteString(`<script>alert("Please login")</script>`)
 		}
 		password, err := c.Cookie("password")
 		if err != nil {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
 			c.Redirect(http.StatusFound, "/")
-			c.Writer.WriteString(`<script>alert("Please login")</script>`)
 		}
 		if rtg.CheckPlayer(username, password) != 1 {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
 			c.Redirect(http.StatusFound, "/")
-			c.Writer.WriteString(`<script>alert("Please login")</script>`)
 		}
 		c.HTML(http.StatusFound, "game.html", nil)
 	})

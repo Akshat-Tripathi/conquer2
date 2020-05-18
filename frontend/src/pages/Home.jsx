@@ -35,7 +35,7 @@ function Title() {
       </Box>
       <Box color="white" align="center">
         <Typography variant="subtitle1" align="center">
-          by Shashwat Kansal and Akshat Tripathi
+          by Imperium Games
         </Typography>
       </Box>
     </div>
