@@ -1,3 +1,3 @@
 # conquer2
 
-The sequel to conquer
+The thrilling sequel to Conquer, it'll blast you away!
