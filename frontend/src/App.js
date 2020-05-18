@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
-import { MapDisplay } from "./pages/Map";
 import { UnderConstruction } from "./pages/UnderConstruction";
-import { Box } from "@material-ui/core";
+// import {} from "frontend/src/pages/SVG-World-Map/src/svg-world-map.js";
+import { svgWorldMap } from "frontend/src/pages/SVG-World-Map/src/svg-world-map.js";
 
 class App extends Component {
   render() {
@@ -12,10 +12,11 @@ class App extends Component {
       <React.Fragment>
         <Router>
           <Switch>
-              <div>
+            <div>
               <Route exact path="/" component={Home} />
-              <Route path="/map" component={MapDisplay} />
-              </div>
+              <Route path="/underdev" component={UnderConstruction} />
+              <Route path="/map" component={svgWorldMap} />
+            </div>
           </Switch>
         </Router>
       </React.Fragment>
