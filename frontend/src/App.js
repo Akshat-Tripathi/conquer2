@@ -13,8 +13,8 @@ class App extends Component {
         <Router>
           <Switch>
               <div>
-              <Route exact path="/" render={Home} />
-              <Route path="/map" render={MapDisplay} />
+              <Route exact path="/" component={Home} />
+              <Route path="/map" component={MapDisplay} />
               </div>
           </Switch>
         </Router>

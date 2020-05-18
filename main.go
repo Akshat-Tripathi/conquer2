@@ -63,6 +63,7 @@ func main() {
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/map", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
