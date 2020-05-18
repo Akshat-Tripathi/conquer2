@@ -110,27 +110,24 @@ function StartGameBox(props) {
     <div className="wrapper">
       <div className="form-wrapper">
         <h3 className="gamebox-title">Join the game!</h3>
-        <form noValidate>
-          <div className="username">
-            <label>Username</label>
-            <input
-              placeholder="Genghis Khan"
-              type="text"
-              name="username"
-              noValidate
-            />
-          </div>
-          <div className="gamemode">
-            <label>Game mode</label>
-            <input />
-          </div>
-          <div className="noOfPlayers">
-            <label>Number of Players</label>
-            <input />
-          </div>
-          <div className="commence-war">
-            <button type="submit">COMMENCE WAR</button>
-          </div>
+            <form action = "/" method="POST">
+                <div className="username"><input type="text" placeholder="Username" name = "username" required></input></div>
+                <div><input type ="password" placeholder="Password" name = "password" required></input></div>
+                <div><input type="text" placeholder="Game Id" name = "id"></input></div>
+                <input type="submit" name="submit" value="join"></input>
+            </form>
+
+        <form action = "/" method="POST">
+            <select className="gamemode" name="type" required>
+                <option value="realtime">Realtime game</option>
+            </select>
+            <div><input type="text" placeholder="Username" name = "username" required></input></div>
+            <div><input type ="password" placeholder="Password" name = "password" required></input></div>
+            <div><input className="noOfPlayers" type="number" placeholder="maxPlayers" name = "maxPlayers" required></input></div>
+            <div><input type="number" placeholder="startingTroops" name = "startingTroops" required></input></div>
+            <div><input type="number" placeholder="startingCountries" name = "startingCountries" required></input></div>
+            <div><input type="number" placeholder="interval" name = "troopInterval" required></input></div>
+            <input type="submit" name="submit" value="create"></input>
         </form>
       </div>
     </div>

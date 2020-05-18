@@ -51,7 +51,7 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 		rtg.handleGame(c.Writer, c.Request)
 	})
 
-	rtg.Router.GET("/game/"+ctx.ID+"/", func(c *gin.Context) {
+	rtg.Router.GET("/game/", func(c *gin.Context) {
 		username, err := c.Cookie("username")
 		if err != nil {
 			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
