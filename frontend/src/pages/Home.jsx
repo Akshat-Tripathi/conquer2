@@ -110,14 +110,15 @@ function StartGameBox(props) {
     <div className="wrapper">
       <div className="form-wrapper">
         <h3 className="gamebox-title">Join the game!</h3>
-            <form action = "/" method="POST">
-                <div className="username"><input type="text" placeholder="Username" name = "username" required></input></div>
-                <div><input type ="password" placeholder="Password" name = "password" required></input></div>
-                <div><input type="text" placeholder="Game Id" name = "id"></input></div>
-                <input type="submit" name="submit" value="join"></input>
-            </form>
+        
+        <form action = "/join" method="POST">
+            <div className="username"><input type="text" placeholder="Username" name = "username" required></input></div>
+            <div><input type ="password" placeholder="Password" name = "password" required></input></div>
+            <div><input type="text" placeholder="Game Id" name = "id"></input></div>
+            <input type="submit" name="submit" value="join"></input>
+        </form>
 
-        <form action = "/" method="POST">
+        <form action = "/create" method="POST">
             <select className="gamemode" name="type" required>
                 <option value="realtime">Realtime game</option>
             </select>

@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -49,23 +47,5 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 
 	rtg.Router.GET("/game/"+ctx.ID+"/ws", func(c *gin.Context) {
 		rtg.handleGame(c.Writer, c.Request)
-	})
-
-	rtg.Router.GET("/game/", func(c *gin.Context) {
-		username, err := c.Cookie("username")
-		if err != nil {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-		}
-		password, err := c.Cookie("password")
-		if err != nil {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-		}
-		if rtg.CheckPlayer(username, password) != 1 {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-		}
-		c.HTML(http.StatusFound, "game.html", nil)
 	})
 }

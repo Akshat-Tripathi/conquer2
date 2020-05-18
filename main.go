@@ -63,48 +63,38 @@ func main() {
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+
 	r.Use(static.Serve("/map", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
-	r.GET("/map", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-
-	r.GET("/", func(c *gin.Context) {
-		c.Header("a", "b")
-		c.Set("c", "d")
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-	r.POST("/", func(c *gin.Context) {
+	r.POST("/form", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
-
+		
 		var id string
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-
 		if req.FormValue("submit") == "create" {
 			id = genID()
 			for _, ok := games[id]; ok; _, ok = games[id] {
 				id = genID()
 			}
-
 			maxPlayers, err := strconv.Atoi(req.FormValue("maxPlayers"))
 			if err != nil {
 				log.Fatal(err)
 			}
-
+			
 			startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
 			if err != nil {
 				log.Fatal(err)
 			}
-
+			
 			startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
 			if err != nil {
 				log.Fatal(err)
 			}
-
+			
 			troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
 			if err != nil {
 				log.Fatal(err)
@@ -113,7 +103,7 @@ func main() {
 			if maxCountries < startingCountries {
 				startingCountries = maxCountries
 			}
-
+			
 			ctx := game.Context{
 				ID:                    id,
 				MaxPlayerNumber:       int32(maxPlayers),
@@ -121,7 +111,7 @@ func main() {
 				StartingCountryNumber: startingCountries,
 				TroopInterval: time.Duration(troopInterval) * time.Minute,
 			}
-
+			
 			var g game.Game
 			switch req.FormValue("type") {
 			case "realtime":
@@ -132,37 +122,35 @@ func main() {
 
 			c.SetCookie("username", username, cookieMaxAge, "/game/",
 				"", false, true)
-			c.SetCookie("password", password, cookieMaxAge, "/game/",
+				c.SetCookie("password", password, cookieMaxAge, "/game/",
 				"", false, true)
 			c.SetCookie("id", id, cookieMaxAge, "/game/", //Sets a cookie for the current game id
-				"", false, true) //Avoids the issue of opening loads of connections
+			"", false, true) //Avoids the issue of opening loads of connections
 
 			games[id].AddPlayer(username, password)
 			c.Redirect(http.StatusFound, "/game/")
-
-		} else {
-			id = req.FormValue("id")
-			thisGame, validID := games[id]
-			if !validID {
-				fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
-				c.HTML(http.StatusOK, "index.html", nil)
-				return
+			
+			} else {
+				id = req.FormValue("id")
+				thisGame, validID := games[id]
+				if !validID {
+					fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
+					c.HTML(http.StatusOK, "index.html", nil)
+					return
 			}
-
+			
 			switch thisGame.CheckPlayer(username, password) {
 			case 0:
-				c.SetCookie("username", username, cookieMaxAge, "/game/",
+				c.SetCookie("username", username, cookieMaxAge, "/game",
 					"", false, true)
-				c.SetCookie("password", password, cookieMaxAge, "/game/",
+					c.SetCookie("password", password, cookieMaxAge, "/game",
 					"", false, true)
-				c.SetCookie("id", id, cookieMaxAge, "/game/",
+				c.SetCookie("id", id, cookieMaxAge, "/game",
 					"", false, true)
-		
-
-				if !thisGame.AddPlayer(username, password) {
-					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
-					c.HTML(http.StatusOK, "index.html", nil)
-				}
+					if !thisGame.AddPlayer(username, password) {
+						fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
+						c.HTML(http.StatusOK, "index.html", nil)
+					}
 				fallthrough
 			case 1:
 				c.Redirect(http.StatusFound, "/game/")
@@ -171,6 +159,38 @@ func main() {
 				c.HTML(http.StatusOK, "index.html", nil)
 			}
 		}
+	})
+	
+	r.GET("/game", func(c *gin.Context) {
+		id, err := c.Cookie("id")
+		if err != nil {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+		username, err := c.Cookie("username")
+		if err != nil {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+		password, err := c.Cookie("password")
+		if err != nil {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+		g := games[id]
+		if g.CheckPlayer(username, password) != 1 {
+			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+		c.HTML(http.StatusFound, "game.html", nil)
+	})
+	
+	r.GET("/map", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.Run(":" + port)
 }
