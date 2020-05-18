@@ -12,10 +12,10 @@ class App extends Component {
       <React.Fragment>
         <Router>
           <Switch>
-            <body>
-              <Route exact path="/" component={Home} />
-              <Route path="/map" component={MapDisplay} />
-            </body>
+              <div>
+              <Route exact path="/" render={Home} />
+              <Route path="/map" render={MapDisplay} />
+              </div>
           </Switch>
         </Router>
       </React.Fragment>
