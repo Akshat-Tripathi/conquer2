@@ -63,6 +63,6 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 			c.Redirect(http.StatusFound, "/")
 			c.Writer.WriteString(`<script>alert("Please login")</script>`)
 		}
-		c.HTML(http.StatusOK, "game.html", nil)
+		c.HTML(http.StatusFound, "game.html", nil)
 	})
 }
