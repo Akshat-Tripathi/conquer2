@@ -7,6 +7,10 @@ class App extends React.Component {
       }
     }
   }
+/*
+  class Map extends React.Component {
+
+  }*/
 
   class Home extends React.Component {
     render() {
