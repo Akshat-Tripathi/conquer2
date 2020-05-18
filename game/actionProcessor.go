@@ -1,10 +1,12 @@
 package game
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type stateProcessor interface {
 	processAction(Action) (bool, UpdateMessage, UpdateMessage)
-	//processTroops()
+	processTroops() []UpdateMessage
 	checkPlayer(string, string) int8
 	addPlayer(name, password string)
 }
@@ -16,6 +18,20 @@ type defaultProcessor struct {
 	playerTroops          map[string]*playerState
 	startingTroopNumber   int
 	startingCountryNumber int
+	maxPlayerNum          int32
+}
+
+func (p *defaultProcessor) processTroops() []UpdateMessage {
+	msgs := make([]UpdateMessage, p.maxPlayerNum)
+	i := 0
+	deltaTroops := 0
+	for name, vals := range p.playerTroops {
+		deltaTroops = 3 + vals.countries/3
+		msgs[i] = UpdateMessage{Type: "updateTroops", Troops: deltaTroops, Player: name}
+		vals.troops += deltaTroops //Might lead to break
+		i++
+	}
+	return msgs
 }
 
 func (p *defaultProcessor) checkPlayer(name, password string) int8 {

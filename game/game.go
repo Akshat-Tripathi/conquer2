@@ -90,3 +90,9 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 	}
 	g.conn.sendToAll(msg)
 }
+
+func (g *DefaultGame) processTroops() {
+	for _, v := range g.processor.processTroops() {
+		g.conn.sendToPlayer(v, v.Player)
+	}
+}
