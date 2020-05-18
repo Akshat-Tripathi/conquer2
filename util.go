@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 )
@@ -25,4 +27,8 @@ func loadMap() map[string][]string {
 	}
 
 	return worldMap
+}
+
+func genID() string {
+	return fmt.Sprintf("%06x", rand.Intn(10000))
 }

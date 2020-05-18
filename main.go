@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/Akshat-Tripathi/conquer2/game"
 	"github.com/gin-gonic/contrib/static"
@@ -24,6 +26,7 @@ func main() {
 	}
 
 	neighbours := loadMap()
+	fmt.Println(neighbours)
 
 	games := make(map[string]game.Game)
 
@@ -39,37 +42,83 @@ func main() {
 	r.POST("/", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
-		id := req.FormValue("id")
-		thisGame, validID := games[id]
-		if !validID {
-			c.Redirect(http.StatusFound, "/")
-			c.Writer.WriteString(`<script>alert("Invalid game id")</script>`)
-			return
-		}
 
+		var id string
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-		switch thisGame.CheckPlayer(username, password) {
-		case 0:
+
+		if req.FormValue("submit") == "create" {
+			id = genID()
+			for _, ok := games[id]; ok; _, ok = games[id] {
+				id = genID()
+			}
+
+			maxPlayers, err := strconv.Atoi(req.FormValue("maxPlayers"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			ctx := game.Context{
+				ID:                    id,
+				MaxPlayerNumber:       int32(maxPlayers),
+				StartingTroopNumber:   startingTroops,
+				StartingCountryNumber: startingCountries,
+			}
+
+			var g game.Game
+			switch req.FormValue("type") {
+			case "realtime":
+				g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+			}
+			g.Start(ctx, neighbours)
+			games[id] = g
+
 			c.SetCookie("username", username, cookieMaxAge, "/game/"+id,
 				"", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game/"+id,
 				"", false, true)
-			thisGame.AddPlayer(username, password)
-			fallthrough
-		case 1:
+
+			games[id].AddPlayer(username, password)
 			c.Redirect(http.StatusFound, "/game/"+id)
-		default:
-			c.Writer.WriteString(`<script>alert("Invalid username password combo)"</script>`)
+
+		} else {
+			id = req.FormValue("id")
+			thisGame, validID := games[id]
+			if !validID {
+				fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
+				c.HTML(http.StatusOK, "index.html", nil)
+				return
+			}
+
+			switch thisGame.CheckPlayer(username, password) {
+			case 0:
+				c.SetCookie("username", username, cookieMaxAge, "/game/"+id,
+					"", false, true)
+				c.SetCookie("password", password, cookieMaxAge, "/game/"+id,
+					"", false, true)
+				if !thisGame.AddPlayer(username, password) {
+					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
+					c.HTML(http.StatusOK, "index.html", nil)
+				}
+				fallthrough
+			case 1:
+				c.Redirect(http.StatusFound, "/game/"+id)
+			default:
+				fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
+				c.HTML(http.StatusOK, "index.html", nil)
+			}
 		}
-	})
 
-	r.GET("/create/", func(c *gin.Context) {
-
-		test := game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
-		ctx := Context{ID: "test", MaxPlayerNumber: 3, StartingTroopNumber: 5, StartingCountryNumber: 1}
-		test.Start(ctx, &neighbours)
-		games["test"] = &test
 	})
 
 	r.Run(":" + port)
