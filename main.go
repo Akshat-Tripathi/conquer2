@@ -33,7 +33,8 @@ func main() {
 
 	r.Use(static.Serve("/static", static.LocalFile("./frontend", true)))
 
-	r.LoadHTMLGlob("frontend/**/*.html")
+	// r.LoadHTMLGlob("frontend/**/*.html")
+	r.LoadHTMLGlob("frontend/public/index.html")
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
