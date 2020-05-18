@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useRef } from "react";
+/*import React, { Component, useEffect, useRef } from "react";
 import videoSource from "../media/HomeBackgroundVideo.mp4";
 import {
   Typography,
@@ -10,7 +10,7 @@ import {
   FormControl,
 } from "@material-ui/core";
 import "./Home.css";
-
+*/
 //TODO: ADD A FUNCTIONING FORM - FORMIK?
 
 function Credits() {
@@ -88,7 +88,6 @@ class gameForm extends React.Component {
   handleChange(event) {
     const target = event.target;
     const ign = target.username;
-    const gamemode
   }
 }
 
@@ -139,7 +138,7 @@ function StartGameBox(props) {
 }
 
 function Video() {
-  useEffect(() => {
+    React.useEffect(() => {
     attemptPlay();
   }, []);
 
@@ -169,10 +168,10 @@ function Video() {
   );
 }
 
-export default class Home extends Component {
-  render() {
-    return (
-      <div className="home-page">
+class Home1 extends React.Component {
+    render() {
+        return (
+            <div className="home-page">
         <Video />
         <Title />
         <StartGameBox />
@@ -181,3 +180,10 @@ export default class Home extends Component {
     );
   }
 }
+class App extends React.Component {
+    render() {
+        return (<Video />);
+    }
+  }
+
+  ReactDOM.render(<App />, document.getElementById('app'));
