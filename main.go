@@ -18,6 +18,23 @@ const (
 )
 
 func main() {
+	router := gin.Default()
+	// Serve frontend static files
+	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+
+	// Setup route group for the API
+	api := router.Group("/api")
+	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
+	}
+	router.Run(":5000")
+}
+
+func pain() {
 
 	port := os.Getenv("PORT")
 
@@ -31,9 +48,21 @@ func main() {
 
 	r := gin.Default()
 
+	ctx := game.Context{
+		ID:                    "test",
+		MaxPlayerNumber:       5,
+		StartingTroopNumber:   1,
+		StartingCountryNumber: 3,
+	}
+
+	//TEST CODE - REMOVE IN PRODUCTION
+	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+	g.Start(ctx, neighbours)
+	games["test"] = g
+	games["test"].AddPlayer("Akshat", "asdf")
+
 	r.Use(static.Serve("/static", static.LocalFile("./frontend", true)))
 
-	// r.LoadHTMLGlob("frontend/**/*.html")
 	r.LoadHTMLGlob("frontend/**/*.html")
 
 	r.GET("/", func(c *gin.Context) {

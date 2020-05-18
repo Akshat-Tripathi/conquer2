@@ -1,8 +1,8 @@
 package game
 
 type countryState struct {
-	player string
-	troops int
+	player string //Player that owns the country
+	troops int    //Troops in country
 }
 
 type playerState struct {

@@ -9,6 +9,7 @@ type stateProcessor interface {
 	processTroops() []UpdateMessage
 	checkPlayer(string, string) int8
 	addPlayer(name, password string)
+	getState(string) []UpdateMessage
 }
 
 type defaultProcessor struct {
@@ -19,6 +20,27 @@ type defaultProcessor struct {
 	startingTroopNumber   int
 	startingCountryNumber int
 	maxPlayerNum          int32
+}
+
+//PRE: Username is valid ie it is in playerTroops
+func (p *defaultProcessor) getState(username string) []UpdateMessage {
+	msgs := make([]UpdateMessage, len(p.countries)+1)
+	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done
+	//TODO send colours
+	i := 0
+	for country, state := range p.countryStates {
+		msgs[i] = UpdateMessage{
+			Troops:  state.troops,
+			Type:    "updateCountry",
+			Player:  state.player,
+			Country: country}
+		i++
+	}
+	msgs[i] = UpdateMessage{
+		Troops: p.playerTroops[username].troops,
+		Type:   "updateTroops",
+		Player: username}
+	return msgs
 }
 
 func (p *defaultProcessor) processTroops() []UpdateMessage {

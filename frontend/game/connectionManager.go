@@ -50,8 +50,8 @@ func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 
 //UpdateMessage - sent to client
 type UpdateMessage struct {
-	Troops  int
-	Type    string
-	Player  string
+	Troops  int    //delta troops
+	Type    string //Type of update: updateCountry or updateTroops
+	Player  string //Player that owns the country / dest player
 	Country string
 }
