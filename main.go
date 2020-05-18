@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	cookieMaxAge = 365 * 24 * 60 * 60
+	cookieMaxAge   = 365 * 24 * 60 * 60
+	totalCountries = 200
 )
 
 func main() {
-	fmt.Println("build")
 
 	port := os.Getenv("PORT")
 
@@ -26,7 +26,6 @@ func main() {
 	}
 
 	neighbours := loadMap()
-	fmt.Println(neighbours)
 
 	games := make(map[string]game.Game)
 
@@ -66,6 +65,10 @@ func main() {
 			startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
 			if err != nil {
 				log.Fatal(err)
+			}
+			var maxCountries int = totalCountries / maxPlayers
+			if maxCountries < startingCountries {
+				startingCountries = maxCountries
 			}
 
 			ctx := game.Context{
