@@ -17,7 +17,7 @@ const (
 	totalCountries = 200
 )
 
-func main() {
+func pain() {
 	router := gin.Default()
 	// Serve frontend static files
 	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
@@ -34,7 +34,7 @@ func main() {
 	router.Run(":5000")
 }
 
-func pain() {
+func main() {
 
 	port := os.Getenv("PORT")
 
@@ -61,12 +61,12 @@ func pain() {
 	games["test"] = g
 	games["test"].AddPlayer("Akshat", "asdf")
 
-	r.Use(static.Serve("/static", static.LocalFile("./frontend", true)))
+	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "blah.html", nil)
+		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.POST("/", func(c *gin.Context) {
 		req := c.Request
@@ -129,7 +129,7 @@ func pain() {
 			thisGame, validID := games[id]
 			if !validID {
 				fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
-				c.HTML(http.StatusOK, "blah.html", nil)
+				c.HTML(http.StatusOK, "index.html", nil)
 				return
 			}
 
@@ -141,14 +141,14 @@ func pain() {
 					"", false, true)
 				if !thisGame.AddPlayer(username, password) {
 					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
-					c.HTML(http.StatusOK, "blah.html", nil)
+					c.HTML(http.StatusOK, "index.html", nil)
 				}
 				fallthrough
 			case 1:
 				c.Redirect(http.StatusFound, "/game/"+id)
 			default:
 				fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
-				c.HTML(http.StatusOK, "blah.html", nil)
+				c.HTML(http.StatusOK, "index.html", nil)
 			}
 		}
 
