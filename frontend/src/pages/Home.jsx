@@ -88,7 +88,6 @@ class gameForm extends React.Component {
   handleChange(event) {
     const target = event.target;
     const ign = target.username;
-    const gamemode
   }
 }
 
