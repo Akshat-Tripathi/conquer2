@@ -45,6 +45,6 @@ export const MapDisplay = () => (
   </div>
 );
 
-const MapSVG = () => (
+// const MapSVG = () => (
 
-);
+// );
