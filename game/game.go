@@ -31,12 +31,13 @@ type Game interface {
 
 //DefaultGame - basic test version
 type DefaultGame struct {
-	id           string
-	conn         connectionManager
-	numPlayers   int32
-	maxPlayerNum int32
-	actions      chan Action
-	processor    stateProcessor
+	id            string
+	conn          connectionManager
+	numPlayers    int32
+	maxPlayerNum  int32
+	actions       chan Action
+	processor     stateProcessor
+	troopInterval time.Duration
 }
 
 //CheckPlayer - checks if a player exists - see stateprocessor.checkPlayer for more info
@@ -96,6 +97,7 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for {
+		time.Sleep(g.troopInterval)
 		for _, v := range g.processor.processTroops() {
 			g.conn.sendToPlayer(v, v.Player)
 		}

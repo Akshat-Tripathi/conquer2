@@ -154,7 +154,7 @@ function Video() {
 
   return (
     <div className="video">
-      <video loop muted autoPlay className="home-video" id="home-video">
+      <video muted autoPlay className="home-video" id="home-video">
         <source
           playsInline
           src={videoSource}

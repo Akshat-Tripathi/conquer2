@@ -43,7 +43,9 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 	rtg.conn = connectionManager{make(map[string]chan UpdateMessage)}
 	rtg.actions = make(chan Action)
 	rtg.processor = &processor
+	rtg.troopInterval = ctx.TroopInterval
 	go rtg.processActions()
+	go rtg.processTroops()
 
 	rtg.Router.GET("/game/"+ctx.ID+"/ws", func(c *gin.Context) {
 		rtg.handleGame(c.Writer, c.Request)

@@ -1,5 +1,9 @@
 package game
 
+import (
+	"time"
+)
+
 type countryState struct {
 	player string //Player that owns the country
 	troops int    //Troops in country
@@ -18,6 +22,7 @@ type Context struct {
 	MaxPlayerNumber       int32
 	StartingTroopNumber   int
 	StartingCountryNumber int
+	TroopInterval			time.Duration
 }
 
 func sort(vals []int) []int {
