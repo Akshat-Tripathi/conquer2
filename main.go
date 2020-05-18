@@ -68,97 +68,101 @@ func main() {
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
-	r.POST("/form", func(c *gin.Context) {
+	r.POST("/create", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
 		
-		var id string
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-		if req.FormValue("submit") == "create" {
+		id := genID()
+		for _, ok := games[id]; ok; _, ok = games[id] {
 			id = genID()
-			for _, ok := games[id]; ok; _, ok = games[id] {
-				id = genID()
-			}
-			maxPlayers, err := strconv.Atoi(req.FormValue("maxPlayers"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			
-			startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			
-			startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			
-			troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			var maxCountries int = totalCountries / maxPlayers
-			if maxCountries < startingCountries {
-				startingCountries = maxCountries
-			}
-			
-			ctx := game.Context{
-				ID:                    id,
-				MaxPlayerNumber:       int32(maxPlayers),
-				StartingTroopNumber:   startingTroops,
-				StartingCountryNumber: startingCountries,
-				TroopInterval: time.Duration(troopInterval) * time.Minute,
-			}
-			
-			var g game.Game
-			switch req.FormValue("type") {
-			case "realtime":
-				g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
-			}
-			g.Start(ctx, neighbours)
-			games[id] = g
-
-			c.SetCookie("username", username, cookieMaxAge, "/game/",
-				"", false, true)
-				c.SetCookie("password", password, cookieMaxAge, "/game/",
-				"", false, true)
-			c.SetCookie("id", id, cookieMaxAge, "/game/", //Sets a cookie for the current game id
-			"", false, true) //Avoids the issue of opening loads of connections
-
-			games[id].AddPlayer(username, password)
-			c.Redirect(http.StatusFound, "/game/")
-			
-			} else {
-				id = req.FormValue("id")
-				thisGame, validID := games[id]
-				if !validID {
-					fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
-					c.HTML(http.StatusOK, "index.html", nil)
-					return
-			}
-			
-			switch thisGame.CheckPlayer(username, password) {
-			case 0:
-				c.SetCookie("username", username, cookieMaxAge, "/game",
-					"", false, true)
-					c.SetCookie("password", password, cookieMaxAge, "/game",
-					"", false, true)
-				c.SetCookie("id", id, cookieMaxAge, "/game",
-					"", false, true)
-					if !thisGame.AddPlayer(username, password) {
-						fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
-						c.HTML(http.StatusOK, "index.html", nil)
-					}
-				fallthrough
-			case 1:
-				c.Redirect(http.StatusFound, "/game/")
-			default:
-				fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
-				c.HTML(http.StatusOK, "index.html", nil)
-			}
 		}
+		maxPlayers, err := strconv.Atoi(req.FormValue("maxPlayers"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		var maxCountries int = totalCountries / maxPlayers
+		if maxCountries < startingCountries {
+			startingCountries = maxCountries
+		}
+		
+		ctx := game.Context{
+			ID:                    id,
+			MaxPlayerNumber:       int32(maxPlayers),
+			StartingTroopNumber:   startingTroops,
+			StartingCountryNumber: startingCountries,
+			TroopInterval: time.Duration(troopInterval) * time.Minute,
+		}
+		
+		var g game.Game
+		switch req.FormValue("type") {
+		case "realtime":
+			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+		}
+		g.Start(ctx, neighbours)
+		games[id] = g
+
+		c.SetCookie("username", username, cookieMaxAge, "/game/",
+			"", false, true)
+			c.SetCookie("password", password, cookieMaxAge, "/game/",
+			"", false, true)
+		c.SetCookie("id", id, cookieMaxAge, "/game/", //Sets a cookie for the current game id
+		"", false, true) //Avoids the issue of opening loads of connections
+
+		games[id].AddPlayer(username, password)
+		c.Redirect(http.StatusFound, "/game/")
+	})
+
+	r.POST("/join", func(c *gin.Context) {
+		req := c.Request
+		req.ParseForm()
+		
+		username := req.FormValue("username")
+		password := req.FormValue("password")
+	
+		id := req.FormValue("id")
+		thisGame, validID := games[id]
+		if !validID {
+			fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
+			c.HTML(http.StatusOK, "index.html", nil)
+			return
+		}
+		switch thisGame.CheckPlayer(username, password) {
+		case 0:
+			c.SetCookie("username", username, cookieMaxAge, "/game",
+				"", false, true)
+				c.SetCookie("password", password, cookieMaxAge, "/game",
+				"", false, true)
+			c.SetCookie("id", id, cookieMaxAge, "/game",
+				"", false, true)
+				if !thisGame.AddPlayer(username, password) {
+					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
+					c.HTML(http.StatusOK, "index.html", nil)
+				}
+			fallthrough
+		case 1:
+			c.Redirect(http.StatusFound, "/game/")
+		default:
+			fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
+			c.HTML(http.StatusOK, "index.html", nil)
+		}
+
 	})
 	
 	r.GET("/game", func(c *gin.Context) {
