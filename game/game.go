@@ -24,7 +24,7 @@ const (
 
 //Game - the set of methods that every DefaultGame should be able to perform
 type Game interface {
-	Start(Context, *map[string][]string)
+	Start(Context, map[string][]string)
 	CheckPlayer(string, string) int8
 	AddPlayer(string, string) bool
 }

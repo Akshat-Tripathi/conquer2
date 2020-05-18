@@ -16,13 +16,13 @@ type RealTimeGame struct {
 }
 
 //Start - starts a DefaultGame
-func (rtg *RealTimeGame) Start(ctx Context, neighbours *map[string][]string) {
+func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 
-	countries := make([]string, len(*neighbours))
+	countries := make([]string, len(neighbours))
 	countryStates := make(map[string]*countryState)
 
 	i := 0
-	for k := range *neighbours {
+	for k := range neighbours {
 		countries[i] = k
 		countryStates[k] = new(countryState)
 		i++
@@ -44,11 +44,11 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours *map[string][]string) {
 	rtg.processor = &processor
 	go rtg.processActions()
 
-	rtg.Router.GET("/game/"+id+"/ws", func(c *gin.Context) {
+	rtg.Router.GET("/game/"+ctx.ID+"/ws", func(c *gin.Context) {
 		rtg.handleGame(c.Writer, c.Request)
 	})
 
-	rtg.Router.GET("/game/"+id+"/", func(c *gin.Context) {
+	rtg.Router.GET("/game/"+ctx.ID+"/", func(c *gin.Context) {
 		username, err := c.Cookie("username")
 		if err != nil {
 			c.Redirect(http.StatusFound, "/")

@@ -7,17 +7,29 @@ class App extends React.Component {
             <h1>Conquer 2</h1>
             <p>The best game you've ever played</p>
             <p>Enter a username and password</p>
+
             <form action = "/" method="POST">
                 <div><input type="text" placeholder="Username" name = "username" required></input></div>
                 <div><input type ="password" placeholder="Password" name = "password" required></input></div>
-                <div><input type="text" placeholder="Game Id" name = "id" required></input></div>
-                <input type="submit" value="Join game"></input>
+                <div><input type="text" placeholder="Game Id" name = "id"></input></div>
+                <input type="submit" name="submit" value="join"></input>
             </form>
-            <a href="/create" className="btn btn-primary btn-lg btn-login btn-block">Create</a>
+
+            <form action = "/" method="POST">
+                <select name="type" required>
+                    <option value="realtime">Realtime game</option>
+                </select>
+                <div><input type="text" placeholder="Username" name = "username" required></input></div>
+                <div><input type ="password" placeholder="Password" name = "password" required></input></div>
+                <div><input type="number" placeholder="maxPlayers" name = "maxPlayers" required></input></div>
+                <div><input type="number" placeholder="startingTroops" name = "startingTroops" required></input></div>
+                <div><input type="number" placeholder="startingCountries" name = "startingCountries" required></input></div>
+                <input type="submit" name="submit" value="create"></input>
+            </form>
           </div>
         </div>
       )
     }
-  }
+  }            
 
   ReactDOM.render(<App />, document.getElementById('app'));
