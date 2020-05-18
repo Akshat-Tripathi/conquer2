@@ -6,6 +6,7 @@ class App extends React.Component {
           <div className="col-xs-8 col-xs-offset-2 jumbotron text-center">
             <h1>Conquer 2</h1>
             <p>The best game you've ever played</p>
+            <p>By Akshat Tripathi and Shashwat Kansal</p>
             <p>Enter a username and password</p>
 
             <form action = "/" method="POST">
