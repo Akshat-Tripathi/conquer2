@@ -22,6 +22,7 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan
 		if err != nil {
 			//log.Fatal("User left - reading")
 			delete(c.players, name)
+			return
 			//msgs <- Action{ActionType: "removeUser", Player: name}
 		}
 		act.Player = name
@@ -32,6 +33,7 @@ func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan
 			if err != nil {
 				//log.Fatal("User left - writing")
 				delete(c.players, name)
+				return
 				//msgs <- Action{ActionType: "removeUser", Player: name}
 			}
 		}

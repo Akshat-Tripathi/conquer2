@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 	"strconv"
 
 	"github.com/Akshat-Tripathi/conquer2/game"
@@ -65,6 +66,10 @@ func main() {
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
+	r.GET("/map", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
@@ -96,6 +101,11 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
+			if err != nil {
+				log.Fatal(err)
+			}
 			var maxCountries int = totalCountries / maxPlayers
 			if maxCountries < startingCountries {
 				startingCountries = maxCountries
@@ -106,6 +116,7 @@ func main() {
 				MaxPlayerNumber:       int32(maxPlayers),
 				StartingTroopNumber:   startingTroops,
 				StartingCountryNumber: startingCountries,
+				TroopInterval: time.Duration(troopInterval) * time.Minute,
 			}
 
 			var g game.Game
@@ -151,8 +162,6 @@ func main() {
 				c.HTML(http.StatusOK, "index.html", nil)
 			}
 		}
-
 	})
-
 	r.Run(":" + port)
 }
