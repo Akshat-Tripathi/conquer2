@@ -72,6 +72,8 @@ func main() {
 	})
 
 	r.GET("/", func(c *gin.Context) {
+		c.Header("a", "b")
+		c.Set("c", "d")
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.POST("/", func(c *gin.Context) {
@@ -128,13 +130,15 @@ func main() {
 			g.Start(ctx, neighbours)
 			games[id] = g
 
-			c.SetCookie("username", username, cookieMaxAge, "/game/"+id,
+			c.SetCookie("username", username, cookieMaxAge, "/game/",
 				"", false, true)
-			c.SetCookie("password", password, cookieMaxAge, "/game/"+id,
+			c.SetCookie("password", password, cookieMaxAge, "/game/",
 				"", false, true)
+			c.SetCookie("id", id, cookieMaxAge, "/game/", //Sets a cookie for the current game id
+				"", false, true) //Avoids the issue of opening loads of connections
 
 			games[id].AddPlayer(username, password)
-			c.Redirect(http.StatusFound, "/game/"+id)
+			c.Redirect(http.StatusFound, "/game/")
 
 		} else {
 			id = req.FormValue("id")
@@ -147,17 +151,21 @@ func main() {
 
 			switch thisGame.CheckPlayer(username, password) {
 			case 0:
-				c.SetCookie("username", username, cookieMaxAge, "/game/"+id,
+				c.SetCookie("username", username, cookieMaxAge, "/game/",
 					"", false, true)
-				c.SetCookie("password", password, cookieMaxAge, "/game/"+id,
+				c.SetCookie("password", password, cookieMaxAge, "/game/",
 					"", false, true)
+				c.SetCookie("id", id, cookieMaxAge, "/game/",
+					"", false, true)
+		
+
 				if !thisGame.AddPlayer(username, password) {
 					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
 					c.HTML(http.StatusOK, "index.html", nil)
 				}
 				fallthrough
 			case 1:
-				c.Redirect(http.StatusFound, "/game/"+id)
+				c.Redirect(http.StatusFound, "/game/")
 			default:
 				fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
 				c.HTML(http.StatusOK, "index.html", nil)
