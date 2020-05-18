@@ -17,7 +17,6 @@ type RealTimeGame struct {
 
 //Start - starts a DefaultGame
 func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
-
 	countries := make([]string, len(neighbours))
 	countryStates := make(map[string]*countryState)
 
@@ -35,6 +34,7 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 		playerTroops:          make(map[string]*playerState),
 		startingTroopNumber:   ctx.StartingTroopNumber,
 		startingCountryNumber: ctx.StartingCountryNumber,
+		maxPlayerNum:          ctx.MaxPlayerNumber,
 	}
 
 	rtg.id = ctx.ID
