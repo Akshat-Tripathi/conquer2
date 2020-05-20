@@ -6,6 +6,7 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import ReactTooltip from "react-tooltip";
+import "./Map.css";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -14,14 +15,26 @@ function MapDisplay() {
   const [state, setState] = useState("");
   return (
     <div>
+      <SideBar />
       <MapSettings setTooltipContent={setState} />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
   );
 }
 
+function SideBar() {
+  return (
+    <div className="map-sidebar-wrapper">
+      <div className="map-sidebar-info-wrapper">
+        <h1>GameInfo</h1>
+      </div>
+    </div>
+  );
+}
+
 const getWealth = (GDP_MD_EST, POP_EST) => {
-  var wealth = Math.round(GDP_MD_EST);
+  var actual_GDP = GDP_MD_EST * Math.pow(10, 6);
+  var wealth = Math.round(actual_GDP);
   if (wealth > Math.pow(10, 12)) {
     wealth = wealth / Math.pow(10, 12) + " Trillion";
   } else if (wealth > Math.pow(10, 9)) {
@@ -34,7 +47,7 @@ const getWealth = (GDP_MD_EST, POP_EST) => {
 
 const MapSettings = ({ setTooltipContent }) => {
   return (
-    <div>
+    <div className="map-wrapper">
       <ComposableMap data-tip="">
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
@@ -43,6 +56,8 @@ const MapSettings = ({ setTooltipContent }) => {
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
+                  fill="#DDD"
+                  stroke="#FFF"
                   onMouseEnter={() => {
                     const { NAME, POP_EST, GDP_MD_EST } = geo.properties;
                     setTooltipContent(
@@ -52,6 +67,7 @@ const MapSettings = ({ setTooltipContent }) => {
                   onMouseLeave={() => {
                     setTooltipContent("");
                   }}
+                  onClick={() => {}}
                   style={{
                     default: {
                       fill: "#D6D6DA",
