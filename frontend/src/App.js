@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import "./App.css";
-import Home from "./pages/Home";
+import Home from "./pages/Home.jsx";
 import { UnderConstruction } from "./pages/UnderConstruction";
 import MapDisplay from "./pages/Map.jsx";
 
