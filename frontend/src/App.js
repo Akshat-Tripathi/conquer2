@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
 import { UnderConstruction } from "./pages/UnderConstruction";
-// import {} from "frontend/src/pages/SVG-World-Map/src/svg-world-map.js";
-import { svgWorldMap } from "frontend/src/pages/SVG-World-Map/src/svg-world-map.js";
+import MapDisplay from "./pages/Map.jsx";
 
 class App extends Component {
   render() {
@@ -15,7 +14,7 @@ class App extends Component {
             <div>
               <Route exact path="/" component={Home} />
               <Route path="/underdev" component={UnderConstruction} />
-              <Route path="/map" component={svgWorldMap} />
+              <Route path="/game" component={MapDisplay} />
             </div>
           </Switch>
         </Router>
