@@ -64,7 +64,7 @@ func main() {
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
-	r.Use(static.Serve("/map", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
@@ -157,7 +157,7 @@ func main() {
 				}
 			fallthrough
 		case 1:
-			c.Redirect(http.StatusFound, "/game/")
+			c.Redirect(http.StatusFound, "/game")
 		default:
 			fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
 			c.HTML(http.StatusOK, "index.html", nil)
