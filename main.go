@@ -64,7 +64,7 @@ func main() {
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
-	r.Use(static.Serve("/map", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
@@ -157,7 +157,7 @@ func main() {
 				}
 			fallthrough
 		case 1:
-			c.Redirect(http.StatusFound, "/game/")
+			c.Redirect(http.StatusFound, "/game")
 		default:
 			fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
 			c.HTML(http.StatusOK, "index.html", nil)
@@ -165,35 +165,11 @@ func main() {
 
 	})
 	
-	r.GET("/game", func(c *gin.Context) {
-		id, err := c.Cookie("id")
-		if err != nil {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-		username, err := c.Cookie("username")
-		if err != nil {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-		password, err := c.Cookie("password")
-		if err != nil {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-		g := games[id]
-		if g.CheckPlayer(username, password) != 1 {
-			fmt.Fprint(c.Writer, `<script>alert("Please Login")</script>`)
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-		c.HTML(http.StatusFound, "game.html", nil)
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
 	})
-	
-	r.GET("/map", func(c *gin.Context) {
+
+	r.GET("/game", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.Run(":" + port)
