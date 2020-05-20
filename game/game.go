@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"net/http"
 	"sync/atomic"
 	"time"
@@ -68,6 +69,7 @@ func (g *DefaultGame) handleGame(w http.ResponseWriter, r *http.Request) {
 	for _, msg := range g.processor.getState(username.Value) {
 		g.conn.sendToPlayer(msg, username.Value)
 	}
+	log.Fatal("Connected")
 	g.conn.Monitor(username.Value, conn, g.actions)
 }
 

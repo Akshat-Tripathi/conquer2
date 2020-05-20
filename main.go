@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"strconv"
+	"time"
 
 	"github.com/Akshat-Tripathi/conquer2/game"
 	"github.com/gin-gonic/contrib/static"
@@ -58,9 +58,9 @@ func main() {
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
-	g.Start(ctx, neighbours)
 	games["test"] = g
 	games["test"].AddPlayer("Akshat", "asdf")
+	games["test"].Start(ctx, neighbours)
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
@@ -71,7 +71,7 @@ func main() {
 	r.POST("/create", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
-		
+
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 		id := genID()
@@ -82,17 +82,17 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
 		if err != nil {
 			log.Fatal(err)
@@ -101,15 +101,15 @@ func main() {
 		if maxCountries < startingCountries {
 			startingCountries = maxCountries
 		}
-		
+
 		ctx := game.Context{
 			ID:                    id,
 			MaxPlayerNumber:       int32(maxPlayers),
 			StartingTroopNumber:   startingTroops,
 			StartingCountryNumber: startingCountries,
-			TroopInterval: time.Duration(troopInterval) * time.Minute,
+			TroopInterval:         time.Duration(troopInterval) * time.Minute,
 		}
-		
+
 		var g game.Game
 		switch req.FormValue("type") {
 		case "realtime":
@@ -117,7 +117,7 @@ func main() {
 		}
 		g.Start(ctx, neighbours)
 		games[id] = g
-		
+
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
 		c.SetCookie("id", id, cookieMaxAge, "/game/", "", false, false)
@@ -131,10 +131,10 @@ func main() {
 	r.POST("/join", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
-		
+
 		username := req.FormValue("username")
 		password := req.FormValue("password")
-	
+
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
 		if !validID {
@@ -156,21 +156,21 @@ func main() {
 		}
 
 	})
-	
+
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
 	r.GET("/game", func(c *gin.Context) {
-		id, err := c.Cookie("id");
+		id, err := c.Cookie("id")
 		if err != nil {
 			redirect("No game ID specified", c)
 		}
-		username, err := c.Cookie("username");
+		username, err := c.Cookie("username")
 		if err != nil {
 			redirect("No username specified", c)
 		}
-		password, err := c.Cookie("password");
+		password, err := c.Cookie("password")
 		if err != nil {
 			redirect("No password specified", c)
 		}
@@ -191,7 +191,7 @@ func main() {
 
 func redirect(msg string, c *gin.Context) {
 	fmt.Fprint(c.Writer, `<script>
-			alert(` + msg + `);
+			alert(`+msg+`);
 			window.location.replace(window.location.href.replace("/join", ""));
 			</script>`)
 }
