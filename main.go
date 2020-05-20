@@ -139,28 +139,33 @@ func main() {
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
 		if !validID {
-			fmt.Fprint(c.Writer, `<script>alert("Invalid ID")</script>`)
-			c.HTML(http.StatusOK, "index.html", nil)
-			return
+			fmt.Fprint(c.Writer, `<script>
+								alert("Invalid ID");
+								window.location.replace(window.location.href.replace("/join", ""));
+								</script>`)
 		}
 		switch thisGame.CheckPlayer(username, password) {
 		case 0:
+			if !thisGame.AddPlayer(username, password) {
+				fmt.Fprint(c.Writer, `<script>
+								alert("Game full");
+								window.location.replace(window.location.href.replace("/join", ""));
+								</script>`)
+			}
 			c.SetCookie("username", username, cookieMaxAge, "/game",
 				"", false, true)
 				c.SetCookie("password", password, cookieMaxAge, "/game",
 				"", false, true)
 			c.SetCookie("id", id, cookieMaxAge, "/game",
 				"", false, true)
-				if !thisGame.AddPlayer(username, password) {
-					fmt.Fprint(c.Writer, `<script>alert("Game full")</script>`)
-					c.HTML(http.StatusOK, "index.html", nil)
-				}
 			fallthrough
 		case 1:
 			c.Redirect(http.StatusFound, "/game")
 		default:
-			fmt.Fprint(c.Writer, `<script>alert("Invalid username/password")</script>`)
-			c.HTML(http.StatusOK, "index.html", nil)
+			fmt.Fprint(c.Writer, `<script>
+								alert("Invalid username/password combo");
+								window.location.replace(window.location.href.replace("/join", ""));
+								</script>`)
 		}
 
 	})
