@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//Loads the map: Data from https://github.com/FnTm/country-neighbors
 func loadMap() map[string][]string {
 	file, err := os.Open("map.txt")
 	if err != nil {
