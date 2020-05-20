@@ -6,6 +6,7 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import ReactTooltip from "react-tooltip";
+import { useSpring, animated } from "react-spring";
 import "./Map.css";
 
 const geoUrl =
@@ -16,7 +17,7 @@ const socketURL = "ws://localhost:8080/game/" + id + "ws";
 
 class GameMap extends Component {
   socket = new WebSocket(socketURL + id + "ws");
-  componenetDidMount() {
+  componentDidMount() {
     this.socket.onopen = () => {
       console.log("Connection Successful");
     };
@@ -47,14 +48,23 @@ function MapDisplay() {
   );
 }
 
-function SideBar() {
-  return (
-    <div className="map-sidebar-wrapper">
-      <div className="map-sidebar-info-wrapper">
-        <h1>GameInfo</h1>
+class SideBar extends Component {
+  constructor() {
+    super();
+  }
+  render() {
+    return (
+      <div className="map-sidebar-wrapper">
+        <div className="map-sidebar-info-wrapper">
+          <h1>Welcome Commander!</h1>
+          <p>
+            This is your war control room. Help us attain victory over our
+            enemies. The Gods are on our side!
+          </p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 const getWealth = (GDP_MD_EST, POP_EST) => {
