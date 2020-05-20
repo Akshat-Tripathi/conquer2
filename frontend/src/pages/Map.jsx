@@ -21,7 +21,7 @@ function MapDisplay() {
 }
 
 const getWealth = (GDP_MD_EST, POP_EST) => {
-  var wealth = Math.round(GDP_MD_EST / POP_EST);
+  var wealth = Math.round(GDP_MD_EST);
   if (wealth > Math.pow(10, 12)) {
     wealth = wealth / Math.pow(10, 12) + " Trillion";
   } else if (wealth > Math.pow(10, 9)) {
