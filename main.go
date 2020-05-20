@@ -138,18 +138,12 @@ func main() {
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
 		if !validID {
-			fmt.Fprint(c.Writer, `<script>
-								alert("Invalid ID");
-								window.location.replace(window.location.href.replace("/join", ""));
-								</script>`)
+			redirect("Invalid game ID", c)
 		}
 		switch thisGame.CheckPlayer(username, password) {
 		case 0:
 			if !thisGame.AddPlayer(username, password) {
-				fmt.Fprint(c.Writer, `<script>
-								alert("Game full");
-								window.location.replace(window.location.href.replace("/join", ""));
-								</script>`)
+				redirect("Game full", c)
 			}
 			fallthrough
 		case 1:
@@ -158,10 +152,7 @@ func main() {
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.Redirect(http.StatusFound, "/game")
 		default:
-			fmt.Fprint(c.Writer, `<script>
-								alert("Invalid username/password combo");
-								window.location.replace(window.location.href.replace("/join", ""));
-								</script>`)
+			redirect("Invalid username/password combo", c)
 		}
 
 	})
@@ -171,8 +162,36 @@ func main() {
 	})
 
 	r.GET("/game", func(c *gin.Context) {
-		//TODO add checking and maybe stop the sql injection
+		id, err := c.Cookie("id");
+		if err != nil {
+			redirect("No game ID specified", c)
+		}
+		username, err := c.Cookie("username");
+		if err != nil {
+			redirect("No username specified", c)
+		}
+		password, err := c.Cookie("password");
+		if err != nil {
+			redirect("No password specified", c)
+		}
+		thisGame, ok := games[id]
+		if !ok {
+			redirect("Invalid game ID", c)
+		}
+		switch thisGame.CheckPlayer(username, password) {
+		case 0:
+			fallthrough
+		case 2:
+			redirect("Not a member of this game", c)
+		}
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.Run(":" + port)
+}
+
+func redirect(msg string, c *gin.Context) {
+	fmt.Fprint(c.Writer, `<script>
+			alert(` + msg + `);
+			window.location.replace(window.location.href.replace("/join", ""));
+			</script>`)
 }
