@@ -117,13 +117,12 @@ func main() {
 		}
 		g.Start(ctx, neighbours)
 		games[id] = g
-
-		c.SetCookie("username", username, cookieMaxAge, "/game/",
-			"", false, true)
-			c.SetCookie("password", password, cookieMaxAge, "/game/",
-			"", false, true)
-		c.SetCookie("id", id, cookieMaxAge, "/game/", //Sets a cookie for the current game id
-		"", false, true) //Avoids the issue of opening loads of connections
+		
+		//Sets a cookie for the current game id
+		//Avoids the issue of opening loads of connections
+		c.SetCookie("id", id, cookieMaxAge, "/game/", "", false, false)
+		c.SetCookie("username", username, cookieMaxAge, "/game/", "", false, true)
+		c.SetCookie("password", password, cookieMaxAge, "/game/", "", false, true)
 
 		games[id].AddPlayer(username, password)
 		c.Redirect(http.StatusFound, "/game/")
@@ -152,14 +151,11 @@ func main() {
 								window.location.replace(window.location.href.replace("/join", ""));
 								</script>`)
 			}
-			c.SetCookie("username", username, cookieMaxAge, "/game",
-				"", false, true)
-				c.SetCookie("password", password, cookieMaxAge, "/game",
-				"", false, true)
-			c.SetCookie("id", id, cookieMaxAge, "/game",
-				"", false, true)
 			fallthrough
 		case 1:
+			c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
+			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
+			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.Redirect(http.StatusFound, "/game")
 		default:
 			fmt.Fprint(c.Writer, `<script>
@@ -175,6 +171,7 @@ func main() {
 	})
 
 	r.GET("/game", func(c *gin.Context) {
+		//TODO add checking and maybe stop the sql injection
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.Run(":" + port)
