@@ -11,6 +11,31 @@ import "./Map.css";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
+const id = "test";
+const socketURL = "ws://localhost:8080/game/" + id + "ws";
+
+class GameMap extends Component {
+  socket = new WebSocket(socketURL + id + "ws");
+  componenetDidMount() {
+    this.socket.onopen = () => {
+      console.log("Connection Successful");
+    };
+
+    this.socket.onmessage = (msg) => {
+      const message = JSON.parse(msg.data);
+      console.log(msg);
+    };
+
+    this.socket.onclose = () => {
+      console.log("Disconnected");
+    };
+  }
+
+  render() {
+    return <MapDisplay />;
+  }
+}
+
 function MapDisplay() {
   const [state, setState] = useState("");
   return (
@@ -92,4 +117,4 @@ const MapSettings = ({ setTooltipContent }) => {
   );
 };
 
-export default MapDisplay;
+export default GameMap;
