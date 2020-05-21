@@ -10,8 +10,7 @@ import {
   FormControl,
 } from "@material-ui/core";
 import "./Home.css";
-
-//TODO: ADD A FUNCTIONING FORM - FORMIK?
+import { useForm } from "react-hook-form";
 
 function Credits() {
   return (
@@ -52,7 +51,7 @@ const gamemodes = [
     value: "EW",
   },
   {
-    label: "American Independence War - 1776",
+    label: "American War of Independence- 1776",
     value: "ACW",
   },
   {
@@ -67,10 +66,14 @@ const gamemodes = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+//TODO: asynchronous doesn't matter here, no need for concurrency
+
 const onSubmit = async (values) => {
   await sleep(300);
   window.alert(JSON.stringify(values, 0, 2));
 };
+
+//TODO: Improve or delete this junk code
 
 class gameForm extends React.Component {
   constructor(props) {
@@ -110,27 +113,158 @@ function StartGameBox(props) {
     <div className="wrapper">
       <div className="form-wrapper">
         <h3 className="gamebox-title">Join the game!</h3>
-        
-        <form action = "/join" method="POST">
-            <div className="username"><input type="text" placeholder="Username" name = "username" required></input></div>
-            <div><input type ="password" placeholder="Password" name = "password" required></input></div>
-            <div><input type="text" placeholder="Game Id" name = "id"></input></div>
-            <input type="submit" name="submit" value="join"></input>
+
+        <form action="/join" method="POST">
+          <div className="username">
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              required
+            ></input>
+          </div>
+          <div>
+            <input type="text" placeholder="Game Id" name="id"></input>
+          </div>
+          <input type="submit" name="submit" value="join"></input>
         </form>
 
-        <form action = "/create" method="POST">
-            <select className="gamemode" name="type" required>
-                <option value="realtime">Realtime game</option>
-            </select>
-            <div><input type="text" placeholder="Username" name = "username" required></input></div>
-            <div><input type ="password" placeholder="Password" name = "password" required></input></div>
-            <div><input className="noOfPlayers" type="number" placeholder="maxPlayers" name = "maxPlayers" required></input></div>
-            <div><input type="number" placeholder="startingTroops" name = "startingTroops" required></input></div>
-            <div><input type="number" placeholder="startingCountries" name = "startingCountries" required></input></div>
-            <div><input type="number" placeholder="interval" name = "troopInterval" required></input></div>
-            <input type="submit" name="submit" value="create"></input>
+        <form action="/create" method="POST">
+          <select className="gamemode" name="type" required>
+            <option value="realtime">Realtime game</option>
+          </select>
+          <div>
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              className="noOfPlayers"
+              type="number"
+              placeholder="maxPlayers"
+              name="maxPlayers"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              type="number"
+              placeholder="startingTroops"
+              name="startingTroops"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              type="number"
+              placeholder="startingCountries"
+              name="startingCountries"
+              required
+            ></input>
+          </div>
+          <div>
+            <input
+              type="number"
+              placeholder="interval"
+              name="troopInterval"
+              required
+            ></input>
+          </div>
+          <input type="submit" name="submit" value="create"></input>
         </form>
       </div>
+    </div>
+  );
+}
+
+//FIXME: Names/id of each of the inputs needs to be fixed according to GO API.
+//TODO: Replace forms, fit inside <div> tag, then improve UI (MaterialUI??)
+
+function LoginToExistingGame() {
+  const { register, handleSubmit, errors } = useForm();
+  const onSubmit = (data) => console.log(data);
+  console.log(errors);
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="text"
+          placeholder="Username"
+          name="username"
+          ref={register({ required: true, maxLength: 80 })}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          name="Password"
+          ref={register({ required: true, maxLength: 80 })}
+        />
+        <input
+          type="text"
+          placeholder="GameID"
+          name="id"
+          ref={register({ required: true, pattern: /^\S+@\S+$/i })}
+        />
+
+        <input type="submit" />
+      </form>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="number"
+          placeholder="Number Of Players"
+          name="Number Of Players"
+          ref={register({ required: true, max: 8, min: 2 })}
+        />
+        <input
+          type="number"
+          placeholder="Number of Starting Troops"
+          name="Number of Starting Troops"
+          ref={register({ required: true })}
+        />
+        <input
+          type="number"
+          placeholder="Troop Interval"
+          name="Troop Interval"
+          ref={register({ required: true })}
+        />
+        <select name="Gamemode" ref={register({ required: true })}>
+          <option value="World Conquest - 2025">World Conquest - 2025</option>
+          <option value="World War I - 1914">World War I - 1914</option>
+          <option value="American War of Independence- 1776">
+            American War of Independence- 1776
+          </option>
+          <option value="Genghis Khan's Expedition - 1333">
+            Genghis Khan's Expedition - 1333
+          </option>
+          <option value="The Mahabharata - 3200BCE">
+            The Mahabharata - 3200BCE
+          </option>
+        </select>
+
+        <input type="submit" />
+      </form>
     </div>
   );
 }

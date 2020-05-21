@@ -6,31 +6,36 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import ReactTooltip from "react-tooltip";
+import { useSpring, animated } from "react-spring";
 import "./Map.css";
+import { connect } from "frontend/src/api/index.js";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-const id = "test/";
-const socketURL = "ws://localhost:8080/game/" + id + "ws";
+//NOTE: For API, please see src/api/index.js;
 
 class GameMap extends Component {
-  componenetDidMount() {
-    let socket = new WebSocket(socketURL);
+  // componenetDidMount() {
+  //   let socket = new WebSocket(socketURL);
 
-    socket.onopen = () => {
-        console.log("Connection Successful");
-    };
-    
-    socket.onmessage = (msg) => {
-        const message = JSON.parse(msg.data);
-        console.log(msg);
-    };
-    
-    socket.onclose = () => {
-        console.log("Disconnected");
-    };
-    
+  //   socket.onopen = () => {
+  //     console.log("Connection Successful");
+  //   };
+
+  //   socket.onmessage = (msg) => {
+  //     const message = JSON.parse(msg.data);
+  //     console.log(msg);
+  //   };
+
+  //   socket.onclose = () => {
+  //     console.log("Disconnected");
+  //   };
+  // }
+
+  constructor() {
+    super();
+    connect();
   }
 
   render() {
@@ -39,40 +44,75 @@ class GameMap extends Component {
 }
 
 function MapDisplay() {
-  const [state, setState] = useState("");
   return (
     <div>
       <SideBar />
-      <MapSettings setTooltipContent={setState} />
+    </div>
+  );
+}
+
+//Variables for each country to display for Sidebar
+var country;
+var pop_est;
+var gdp;
+var subrg;
+var continent;
+var displayCountryDetails = false;
+var troopsInLand;
+var yourland;
+
+const CountryDetails = (props) => {
+  return (
+    <div>
+      <h2>Spy Report On {country}:</h2>
+      <h3>Population: {pop_est}</h3>
+      <h3>GDP: {gdp}</h3>
+      <h3>Subregion: {subrg}</h3>
+      <h3>Continent: {continent}</h3>
+    </div>
+  );
+};
+
+function SideBar() {
+  const [state, setState] = useState("");
+  const [spydata, setSpydata] = useState({
+    Country: "",
+    Population: "",
+    GDP: "",
+    Subregion: "",
+    Continent: "",
+  });
+  return (
+    <div>
+      <div className="map-sidebar-wrapper">
+        <div className="map-sidebar-info-wrapper">
+          <h1>Welcome Commander!</h1>
+          <p>
+            This is your war control room. Help us attain victory over our
+            enemies. The Gods are on our side!
+          </p>
+          {displayCountryDetails ? <CountryDetails /> : null}
+        </div>
+      </div>
+      <MapSettings setTooltipContent={setState} setSpydata={setSpydata} />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
   );
 }
 
-function SideBar() {
-  return (
-    <div className="map-sidebar-wrapper">
-      <div className="map-sidebar-info-wrapper">
-        <h1>GameInfo</h1>
-      </div>
-    </div>
-  );
-}
-
-const getWealth = (GDP_MD_EST, POP_EST) => {
-  var actual_GDP = GDP_MD_EST * Math.pow(10, 6);
-  var wealth = Math.round(actual_GDP);
-  if (wealth > Math.pow(10, 12)) {
-    wealth = wealth / Math.pow(10, 12) + " Trillion";
-  } else if (wealth > Math.pow(10, 9)) {
-    wealth = wealth / Math.pow(10, 9) + " Billion";
-  } else if (wealth > Math.pow(10, 6)) {
-    wealth = wealth / Math.pow(10, 6) + " Million";
+const getnum = (num) => {
+  var num = Math.round(num);
+  if (num > Math.pow(10, 12)) {
+    num = num / Math.pow(10, 12) + " Trillion";
+  } else if (num > Math.pow(10, 9)) {
+    num = num / Math.pow(10, 9) + " Billion";
+  } else if (num > Math.pow(10, 6)) {
+    num = num / Math.pow(10, 6) + " Million";
   }
-  return wealth;
+  return num;
 };
 
-const MapSettings = ({ setTooltipContent }) => {
+const MapSettings = ({ setTooltipContent, setSpydata }) => {
   return (
     <div className="map-wrapper">
       <ComposableMap data-tip="">
@@ -83,18 +123,46 @@ const MapSettings = ({ setTooltipContent }) => {
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill="#DDD"
+                  fill="#AAA"
                   stroke="#FFF"
                   onMouseEnter={() => {
-                    const { NAME, POP_EST, GDP_MD_EST } = geo.properties;
+                    const {
+                      NAME,
+                      POP_EST,
+                      GDP_MD_EST,
+                      SUBREGION,
+                      CONTINENT,
+                    } = geo.properties;
                     setTooltipContent(
-                      `${NAME} - ${getWealth(GDP_MD_EST, POP_EST)}`
+                      `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
                     );
+                    country = NAME;
+                    pop_est = getnum(POP_EST);
+                    gdp = getnum(GDP_MD_EST * Math.pow(10, 6));
+                    subrg = SUBREGION;
+                    continent = CONTINENT;
+                    // setSpydata(NAME, POP_EST, GDP_MD_EST, SUBREGION, CONTINENT);
+                    displayCountryDetails = true;
                   }}
                   onMouseLeave={() => {
                     setTooltipContent("");
+                    // setSpydata("", "", "", "", "");
+                    displayCountryDetails = false;
                   }}
-                  onClick={() => {}}
+                  onClick={() => {
+                    const {
+                      NAME,
+                      POP_EST,
+                      GDP_MD_EST,
+                      SUBREGION,
+                      CONTINENT,
+                    } = geo.properties;
+                    country = NAME;
+                    pop_est = getnum(POP_EST);
+                    gdp = getnum(GDP_MD_EST * Math.pow(10, 6));
+                    subrg = SUBREGION;
+                    continent = CONTINENT;
+                  }}
                   style={{
                     default: {
                       fill: "#D6D6DA",
@@ -105,7 +173,7 @@ const MapSettings = ({ setTooltipContent }) => {
                       outline: "none",
                     },
                     pressed: {
-                      fill: "#E42",
+                      fill: "#D6D6DA",
                       outline: "none",
                     },
                   }}
