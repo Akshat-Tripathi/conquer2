@@ -1,9 +1,9 @@
 const id = "test/";
 const socketURL = "ws://localhost:8080/game/" + id + "ws";
 
-var socket = new WebSocket(socketURL);
 
 let connect = () => {
+  var socket = new WebSocket(socketURL);
   console.log("Attempting Connection...");
 
   socket.onopen = () => {
