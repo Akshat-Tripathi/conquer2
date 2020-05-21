@@ -12,8 +12,6 @@ import {
 import "./Home.css";
 import { useForm } from "react-hook-form";
 
-//TODO: ADD A FUNCTIONING FORM - FORMIK?
-
 function Credits() {
   return (
     <div className="credits">
@@ -68,10 +66,14 @@ const gamemodes = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+//TODO: asynchronous doesn't matter here, no need for concurrency
+
 const onSubmit = async (values) => {
   await sleep(300);
   window.alert(JSON.stringify(values, 0, 2));
 };
+
+//TODO: Improve or delete this junk code
 
 class gameForm extends React.Component {
   constructor(props) {
@@ -194,6 +196,9 @@ function StartGameBox(props) {
     </div>
   );
 }
+
+//FIXME: Names/id of each of the inputs needs to be fixed according to GO API.
+//TODO: Replace forms, fit inside <div> tag, then improve UI (MaterialUI??)
 
 function LoginToExistingGame() {
   const { register, handleSubmit, errors } = useForm();
