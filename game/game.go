@@ -66,18 +66,22 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	}
 	username, err := c.Cookie("username")
 	if err != nil {
+		log.Println("no username")
 		redirect(conn)
 		return
 	}
 	password, err := c.Cookie("password")
 	if err != nil {
+		log.Println("no password")
 		redirect(conn)
 		return
 	}
+	log.Println(password)
 	switch g.CheckPlayer(username, password) {
 	case 0:
 		fallthrough
 	case 2:
+		log.Println("no player exists")
 		redirect(conn)
 		return
 	}

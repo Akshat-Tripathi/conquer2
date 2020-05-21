@@ -120,12 +120,12 @@ func main() {
 
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
-		c.SetCookie("id", id, cookieMaxAge, "/game/", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game/", "", false, true)
-		c.SetCookie("password", password, cookieMaxAge, "/game/", "", false, true)
+		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
+		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 
 		games[id].AddPlayer(username, password)
-		c.Redirect(http.StatusFound, "/game/")
+		c.Redirect(http.StatusFound, "/game")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -169,7 +169,7 @@ func main() {
 
 func redirect(msg string, c *gin.Context) {
 	fmt.Fprint(c.Writer, `<script>
-			alert(`+msg+`);
+			alert("`+msg+`");
 			window.location.replace(window.location.href.replace("/join", ""));
 			</script>`)
 }
