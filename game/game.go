@@ -66,11 +66,12 @@ func (g *DefaultGame) handleGame(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	for _, msg := range g.processor.getState(username.Value) {
+	g.conn.register(username.Value)
+	for _, msg := range g.processor.getState(username.Value)[:1] {
+		log.Println(msg)
 		g.conn.sendToPlayer(msg, username.Value)
 	}
-	log.Fatal("Connected")
-	g.conn.Monitor(username.Value, conn, g.actions)
+	g.conn.monitor(username.Value, conn, g.actions)
 }
 
 //Takes actions from the websocket connections and processes them
@@ -99,7 +100,7 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for {
-		time.Sleep(g.troopInterval)
+		time.Sleep(g.troopInterval * 1000)
 		for _, v := range g.processor.processTroops() {
 			g.conn.sendToPlayer(v, v.Player)
 		}
