@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"math/rand"
 )
 
@@ -59,11 +60,13 @@ func (p *defaultProcessor) processTroops() []UpdateMessage {
 func (p *defaultProcessor) checkPlayer(name, password string) int8 {
 	state, ok := p.playerTroops[name]
 	if !ok {
+		log.Println(p.playerTroops)
 		return 0
 	}
 	if state.password == password {
 		return 1
 	}
+	log.Println(p.playerTroops, name, password, state.password)
 	return 2
 }
 
