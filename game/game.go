@@ -76,7 +76,6 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 		redirect(conn)
 		return
 	}
-	log.Println(password)
 	switch g.CheckPlayer(username, password) {
 	case 0:
 		fallthrough
