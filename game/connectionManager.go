@@ -1,6 +1,9 @@
 package game
 
 import (
+	"log"
+	"time"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -12,42 +15,46 @@ type connectionManager struct {
 	players map[string]chan UpdateMessage
 }
 
+func (c *connectionManager) register(name string) {
+	c.players[name] = make(chan UpdateMessage)
+}
+
 //Monitor - monitors a player's websocket
-func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
-	outboundMsgs := make(chan UpdateMessage)
-	c.players[name] = outboundMsgs
+func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
+	outboundMsgs := c.players[name]
 	var act Action
 	for {
-		err := conn.ReadJSON(&act)
-		if err != nil {
-			//log.Fatal("User left - reading")
-			delete(c.players, name)
-			return
-			//msgs <- Action{ActionType: "removeUser", Player: name}
-		}
-		act.Player = name
-		msgs <- act
-		select {
-		case msg := <-outboundMsgs:
-			err = conn.WriteJSON(msg)
+		if len(c.players) > 0 {
+			err := conn.ReadJSON(&act)
 			if err != nil {
-				//log.Fatal("User left - writing")
-				delete(c.players, name)
-				return
-				//msgs <- Action{ActionType: "removeUser", Player: name}
+				log.Fatal("read", err)
+			}
+			act.Player = name
+			msgs <- act
+			select {
+			case msg := <-outboundMsgs:
+				err = conn.WriteJSON(msg)
+				if err != nil {
+					log.Fatal("write", err)
+				}
 			}
 		}
+		time.Sleep(time.Millisecond * 100) //TODO find a better solution with channels
 	}
 }
 
 func (c *connectionManager) sendToAll(msg UpdateMessage) {
 	for _, v := range c.players {
-		v <- msg
+		go func() {
+			v <- msg
+		}()
 	}
 }
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
-	c.players[player] <- msg
+	go func() {
+		c.players[player] <- msg
+	}()
 }
 
 //UpdateMessage - sent to client

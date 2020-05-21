@@ -183,6 +183,8 @@ func main() {
 			fallthrough
 		case 2:
 			redirect("Not a member of this game", c)
+		default:
+			log.Fatal("What")
 		}
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
