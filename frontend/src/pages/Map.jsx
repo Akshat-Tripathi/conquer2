@@ -8,29 +8,34 @@ import {
 import ReactTooltip from "react-tooltip";
 import { useSpring, animated } from "react-spring";
 import "./Map.css";
+import { connect } from "frontend/src/api/index.js";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-const id = "test/";
-const socketURL = "ws://localhost:8080/game/" + id + "ws";
+//NOTE: For API, please see src/api/index.js;
 
 class GameMap extends Component {
-  componenetDidMount() {
-    let socket = new WebSocket(socketURL);
+  // componenetDidMount() {
+  //   let socket = new WebSocket(socketURL);
 
-    socket.onopen = () => {
-      console.log("Connection Successful");
-    };
+  //   socket.onopen = () => {
+  //     console.log("Connection Successful");
+  //   };
 
-    socket.onmessage = (msg) => {
-      const message = JSON.parse(msg.data);
-      console.log(msg);
-    };
+  //   socket.onmessage = (msg) => {
+  //     const message = JSON.parse(msg.data);
+  //     console.log(msg);
+  //   };
 
-    socket.onclose = () => {
-      console.log("Disconnected");
-    };
+  //   socket.onclose = () => {
+  //     console.log("Disconnected");
+  //   };
+  // }
+
+  constructor() {
+    super();
+    connect();
   }
 
   render() {
