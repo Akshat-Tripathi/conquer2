@@ -12,22 +12,23 @@ import "./Map.css";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-const id = "test";
+const id = "test/";
 const socketURL = "ws://localhost:8080/game/" + id + "ws";
 
 class GameMap extends Component {
-  socket = new WebSocket(socketURL + id + "ws");
-  componentDidMount() {
-    this.socket.onopen = () => {
+  componenetDidMount() {
+    let socket = new WebSocket(socketURL);
+
+    socket.onopen = () => {
       console.log("Connection Successful");
     };
 
-    this.socket.onmessage = (msg) => {
+    socket.onmessage = (msg) => {
       const message = JSON.parse(msg.data);
       console.log(msg);
     };
 
-    this.socket.onclose = () => {
+    socket.onclose = () => {
       console.log("Disconnected");
     };
   }
