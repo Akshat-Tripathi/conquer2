@@ -2,7 +2,6 @@ package game
 
 import (
 	"log"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -32,23 +31,33 @@ func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
 
 //Monitor - monitors a player's websocket
 func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
-	outboundMsgs := c.players[name]
+	go func() {
+		for {
+			var act Action
+			err := conn.ReadJSON(&act)
+			if err != nil {
+				log.Println("read ", err)
+				delete(c.players, name)
+				return
+			}
+			act.Player = name
+			msgs <- act
+		}
+	}()
 	for {
 		if len(c.players) > 0 {
 			select {
-			case msg := <-outboundMsgs:
-				log.Println("Message to be delivered")
+			case msg := <-c.players[name]:
 				err := conn.WriteJSON(msg)
 				if err != nil {
-					log.Println("write ", err)
+					//log.Println("write ", err)
+					delete(c.players, name)
+					return
 				}
-			case msgs <- c.read(name, conn):
-
 			}
 		} else {
 			log.Println("zero players")
 		}
-		time.Sleep(time.Millisecond * 100) //TODO find a better solution with channels
 	}
 }
 

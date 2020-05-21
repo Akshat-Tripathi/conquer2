@@ -59,8 +59,8 @@ func main() {
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
-	games["test"].AddPlayer("Akshat", "asdf")
 	games["test"].Start(ctx, neighbours)
+	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
@@ -162,34 +162,11 @@ func main() {
 	})
 
 	r.GET("/game", func(c *gin.Context) {
-		id, err := c.Cookie("id")
-		if err != nil {
-			redirect("No game ID specified", c)
-		}
-		username, err := c.Cookie("username")
-		if err != nil {
-			redirect("No username specified", c)
-		}
-		password, err := c.Cookie("password")
-		if err != nil {
-			redirect("No password specified", c)
-		}
-		thisGame, ok := games[id]
-		if !ok {
-			redirect("Invalid game ID", c)
-		}
-		switch thisGame.CheckPlayer(username, password) {
-		case 0:
-			fallthrough
-		case 2:
-			redirect("Not a member of this game", c)
-		default:
-			log.Fatal("What")
-		}
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.Run(":" + port)
 }
+
 func redirect(msg string, c *gin.Context) {
 	fmt.Fprint(c.Writer, `<script>
 			alert(`+msg+`);
