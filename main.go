@@ -190,7 +190,6 @@ func main() {
 	})
 	r.Run(":" + port)
 }
-
 func redirect(msg string, c *gin.Context) {
 	fmt.Fprint(c.Writer, `<script>
 			alert(`+msg+`);

@@ -19,25 +19,34 @@ func (c *connectionManager) register(name string) {
 	c.players[name] = make(chan UpdateMessage)
 }
 
+func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
+	var act Action
+	err := conn.ReadJSON(&act)
+	if err != nil {
+		log.Println("read ", err)
+		delete(c.players, name)
+	}
+	act.Player = name
+	return act
+}
+
 //Monitor - monitors a player's websocket
 func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
 	outboundMsgs := c.players[name]
-	var act Action
 	for {
 		if len(c.players) > 0 {
-			err := conn.ReadJSON(&act)
-			if err != nil {
-				log.Fatal("read", err)
-			}
-			act.Player = name
-			msgs <- act
 			select {
 			case msg := <-outboundMsgs:
-				err = conn.WriteJSON(msg)
+				log.Println("Message to be delivered")
+				err := conn.WriteJSON(msg)
 				if err != nil {
-					log.Fatal("write", err)
+					log.Println("write ", err)
 				}
+			case msgs <- c.read(name, conn):
+
 			}
+		} else {
+			log.Println("zero players")
 		}
 		time.Sleep(time.Millisecond * 100) //TODO find a better solution with channels
 	}
@@ -52,9 +61,7 @@ func (c *connectionManager) sendToAll(msg UpdateMessage) {
 }
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
-	go func() {
-		c.players[player] <- msg
-	}()
+	c.players[player] <- msg
 }
 
 //UpdateMessage - sent to client

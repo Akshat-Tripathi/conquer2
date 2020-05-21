@@ -8,7 +8,7 @@ import {
 import ReactTooltip from "react-tooltip";
 import { useSpring, animated } from "react-spring";
 import "./Map.css";
-import { connect } from "frontend/src/api/index.js";
+import { connect } from "../api/index.js";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -35,10 +35,10 @@ class GameMap extends Component {
 
   constructor() {
     super();
-    connect();
-  }
+}
 
-  render() {
+render() {
+    connect();
     return <MapDisplay />;
   }
 }

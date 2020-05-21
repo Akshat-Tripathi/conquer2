@@ -67,11 +67,11 @@ func (g *DefaultGame) handleGame(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	g.conn.register(username.Value)
+	go g.conn.monitor(username.Value, conn, g.actions)
 	for _, msg := range g.processor.getState(username.Value)[:1] {
-		log.Println(msg)
 		g.conn.sendToPlayer(msg, username.Value)
+		log.Println(msg)
 	}
-	g.conn.monitor(username.Value, conn, g.actions)
 }
 
 //Takes actions from the websocket connections and processes them

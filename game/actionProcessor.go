@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"math/rand"
 )
 
@@ -36,6 +37,7 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 			Country: country}
 		i++
 	}
+	log.Println(p.playerTroops)
 	msgs[i] = UpdateMessage{
 		Troops: p.playerTroops[username].troops,
 		Type:   "updateTroops",
