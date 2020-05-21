@@ -200,8 +200,11 @@ function StartGameBox(props) {
 //FIXME: Names/id of each of the inputs needs to be fixed according to GO API.
 //TODO: Replace forms, fit inside <div> tag, then improve UI (MaterialUI??)
 
-function LoginToExistingGame() {
+function LoginToGame() {
   const { register, handleSubmit, errors } = useForm();
+
+  //TODO: Route onSubmit to GO API
+
   const onSubmit = (data) => console.log(data);
   console.log(errors);
 
