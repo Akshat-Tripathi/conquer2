@@ -10,7 +10,7 @@ import {
   FormControl,
 } from "@material-ui/core";
 import "./Home.css";
-import { useForm } from "react-hook-form";
+// import { useForm } from "react-hook-form";
 
 function Credits() {
   return (
