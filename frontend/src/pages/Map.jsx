@@ -6,7 +6,7 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import ReactTooltip from "react-tooltip";
-import { useSpring, animated } from "react-spring";
+// import { useSpring, animated } from "react-spring";
 import "./Map.css";
 import { connect } from "../api/index.js";
 
