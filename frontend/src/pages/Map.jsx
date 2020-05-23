@@ -35,10 +35,10 @@ class GameMap extends Component {
 
   constructor() {
     super();
-    connect();
-  }
+}
 
-  render() {
+render() {
+    connect();
     return <MapDisplay />;
   }
 }
