@@ -46,7 +46,5 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 	go rtg.processTroops()
 
 	//TODO abstract the router out of this struct
-	rtg.Router.GET("/game/"+ctx.ID+"/ws", func(c *gin.Context) {
-		rtg.handleGame(c.Writer, c.Request)
-	})
+	rtg.Router.GET("/game/"+ctx.ID+"/ws", rtg.handleGame)
 }

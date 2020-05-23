@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -12,37 +14,58 @@ type connectionManager struct {
 	players map[string]chan UpdateMessage
 }
 
-//Monitor - monitors a player's websocket
-func (c *connectionManager) Monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
-	outboundMsgs := make(chan UpdateMessage)
-	c.players[name] = outboundMsgs
+func (c *connectionManager) register(name string) {
+	c.players[name] = make(chan UpdateMessage)
+}
+
+func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
 	var act Action
-	for {
-		err := conn.ReadJSON(&act)
-		if err != nil {
-			//log.Fatal("User left - reading")
-			delete(c.players, name)
-			return
-			//msgs <- Action{ActionType: "removeUser", Player: name}
-		}
-		act.Player = name
-		msgs <- act
-		select {
-		case msg := <-outboundMsgs:
-			err = conn.WriteJSON(msg)
+	err := conn.ReadJSON(&act)
+	if err != nil {
+		log.Println("read ", err)
+		delete(c.players, name)
+	}
+	act.Player = name
+	return act
+}
+
+//Monitor - monitors a player's websocket
+func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
+	go func() {
+		for {
+			var act Action
+			err := conn.ReadJSON(&act)
 			if err != nil {
-				//log.Fatal("User left - writing")
+				log.Println("read ", err)
 				delete(c.players, name)
 				return
-				//msgs <- Action{ActionType: "removeUser", Player: name}
 			}
+			act.Player = name
+			msgs <- act
+		}
+	}()
+	for {
+		if len(c.players) > 0 {
+			select {
+			case msg := <-c.players[name]:
+				err := conn.WriteJSON(msg)
+				if err != nil {
+					//log.Println("write ", err)
+					delete(c.players, name)
+					return
+				}
+			}
+		} else {
+			log.Println("zero players")
 		}
 	}
 }
 
 func (c *connectionManager) sendToAll(msg UpdateMessage) {
 	for _, v := range c.players {
-		v <- msg
+		go func() {
+			v <- msg
+		}()
 	}
 }
 

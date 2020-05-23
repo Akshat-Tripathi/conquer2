@@ -2,9 +2,11 @@ package game
 
 import (
 	"log"
-	"net/http"
 	"sync/atomic"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 /*
@@ -57,20 +59,41 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 }
 
 //Existing players go here
-func (g *DefaultGame) handleGame(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+func (g *DefaultGame) handleGame(c *gin.Context) {
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		panic(err)
+		log.Println("Error establishing a websocket connection")
 	}
-	username, err := r.Cookie("username")
+	username, err := c.Cookie("username")
 	if err != nil {
-		panic(err)
+		log.Println("no username")
+		redirect(conn)
+		return
 	}
-	for _, msg := range g.processor.getState(username.Value) {
-		g.conn.sendToPlayer(msg, username.Value)
+	password, err := c.Cookie("password")
+	if err != nil {
+		log.Println("no password")
+		redirect(conn)
+		return
 	}
-	log.Fatal("Connected")
-	g.conn.Monitor(username.Value, conn, g.actions)
+	switch g.CheckPlayer(username, password) {
+	case 0:
+		fallthrough
+	case 2:
+		log.Println("no player exists")
+		redirect(conn)
+		return
+	}
+	g.conn.register(username)
+	go g.conn.monitor(username, conn, g.actions)
+	for _, msg := range g.processor.getState(username) {
+		g.conn.sendToPlayer(msg, username)
+		log.Println(msg)
+	}
+}
+
+func redirect(conn *websocket.Conn) {
+	conn.WriteMessage(websocket.CloseMessage, nil)
 }
 
 //Takes actions from the websocket connections and processes them
@@ -99,7 +122,7 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for {
-		time.Sleep(g.troopInterval)
+		time.Sleep(g.troopInterval * 1000)
 		for _, v := range g.processor.processTroops() {
 			g.conn.sendToPlayer(v, v.Player)
 		}
