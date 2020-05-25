@@ -16,28 +16,25 @@ Situation: Reenact different historical scenarios
 Historic: Time progression
 
 Responsibilities:
-A DefaultGame object will be created by a player, when they choose to host a DefaultGame.
+A game object will be created by a player, when they choose to host a game.
 The initialisation code will be run.
-When the DefaultGame receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
+When the game receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
 */
-
-const (
-	maxCountries = 20
-)
 
 //Game - the set of methods that every DefaultGame should be able to perform
 type Game interface {
-	Start(Context, map[string][]string)
+	Start(Context)
 	CheckPlayer(string, string) int8
 	AddPlayer(string, string) bool
 }
 
 //DefaultGame - basic test version
 type DefaultGame struct {
+	colours       []string
 	id            string
 	conn          connectionManager
 	numPlayers    int32
-	maxPlayerNum  int32
+	maxPlayerNum  int
 	actions       chan Action
 	processor     stateProcessor
 	troopInterval time.Duration
@@ -50,11 +47,11 @@ func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 
 //AddPlayer - returns whether or not the player was successfully added
 func (g *DefaultGame) AddPlayer(name, password string) bool {
-	if g.numPlayers >= g.maxPlayerNum {
+	if g.numPlayers >= int32(g.maxPlayerNum) {
 		return false
 	}
+	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	atomic.AddInt32(&g.numPlayers, 1)
-	g.processor.addPlayer(name, password)
 	return true
 }
 
@@ -87,8 +84,11 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	g.conn.register(username)
 	go g.conn.monitor(username, conn, g.actions)
 	for _, msg := range g.processor.getState(username) {
-		g.conn.sendToPlayer(msg, username)
-		log.Println(msg)
+		if msg.Player == username {
+			g.conn.sendToAll(msg)
+		} else {
+			g.conn.sendToPlayer(msg, username)
+		}
 	}
 }
 
@@ -122,7 +122,7 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for {
-		time.Sleep(g.troopInterval * 1000)
+		time.Sleep(g.troopInterval)
 		for _, v := range g.processor.processTroops() {
 			g.conn.sendToPlayer(v, v.Player)
 		}

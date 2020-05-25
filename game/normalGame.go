@@ -15,20 +15,25 @@ type RealTimeGame struct {
 }
 
 //Start - starts a DefaultGame
-func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
-	countries := make([]string, len(neighbours))
+func (rtg *RealTimeGame) Start(ctx Context) {
+	countries := make([]string, len(ctx.Situation))
 	countryStates := make(map[string]*countryState)
 
 	i := 0
-	for k := range neighbours {
+	for k := range ctx.Situation {
 		countries[i] = k
 		countryStates[k] = new(countryState)
 		i++
 	}
 
+	maxCountries := len(countries) / ctx.MaxPlayerNumber
+	if maxCountries < ctx.StartingCountryNumber {
+		ctx.StartingCountryNumber = maxCountries
+	}
+
 	processor := defaultProcessor{
 		countries:             countries,
-		neighbours:            neighbours,
+		situation:             ctx.Situation,
 		countryStates:         countryStates,
 		playerTroops:          make(map[string]*playerState),
 		startingTroopNumber:   ctx.StartingTroopNumber,
@@ -38,6 +43,7 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 
 	rtg.id = ctx.ID
 	rtg.maxPlayerNum = ctx.MaxPlayerNumber
+	rtg.colours = ctx.Colours //TODO shuffle these
 	rtg.conn = connectionManager{make(map[string]chan UpdateMessage)}
 	rtg.actions = make(chan Action)
 	rtg.processor = &processor

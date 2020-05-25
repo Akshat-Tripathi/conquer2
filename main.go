@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	cookieMaxAge   = 365 * 24 * 60 * 60
-	totalCountries = 200
+	cookieMaxAge = 365 * 24 * 60 * 60
 )
 
 func pain() {
@@ -43,7 +42,7 @@ func main() {
 		port = "8080"
 	}
 
-	neighbours := loadMap()
+	situations := loadMaps()
 
 	games := make(map[string]game.Game)
 
@@ -54,17 +53,18 @@ func main() {
 		MaxPlayerNumber:       5,
 		StartingTroopNumber:   1,
 		StartingCountryNumber: 3,
+		Situation:             situations["world"],
 	}
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
-	games["test"].Start(ctx, neighbours)
+	games["test"].Start(ctx)
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
-
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/game_intro", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
@@ -74,6 +74,12 @@ func main() {
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
+		situation := req.FormValue("situation")
+
+		if situation == "" {
+			situation = "world"
+		}
+
 		id := genID()
 		for _, ok := games[id]; ok; _, ok = games[id] {
 			id = genID()
@@ -97,17 +103,14 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var maxCountries int = totalCountries / maxPlayers
-		if maxCountries < startingCountries {
-			startingCountries = maxCountries
-		}
 
 		ctx := game.Context{
 			ID:                    id,
-			MaxPlayerNumber:       int32(maxPlayers),
+			MaxPlayerNumber:       maxPlayers,
 			StartingTroopNumber:   startingTroops,
 			StartingCountryNumber: startingCountries,
 			TroopInterval:         time.Duration(troopInterval) * time.Minute,
+			Situation:             situations[situation],
 		}
 
 		var g game.Game
@@ -115,7 +118,7 @@ func main() {
 		case "realtime":
 			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 		}
-		g.Start(ctx, neighbours)
+		g.Start(ctx)
 		games[id] = g
 
 		//Sets a cookie for the current game id
@@ -123,9 +126,10 @@ func main() {
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
 		games[id].AddPlayer(username, password)
-		c.Redirect(http.StatusFound, "/game")
+		c.Redirect(http.StatusFound, "/game_intro")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -134,6 +138,7 @@ func main() {
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
+		situation := req.FormValue("situation")
 
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
@@ -150,7 +155,8 @@ func main() {
 			c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
-			c.Redirect(http.StatusFound, "/game")
+			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
+			c.Redirect(http.StatusFound, "/game_intro")
 		default:
 			redirect("Invalid username/password combo", c)
 		}
@@ -164,6 +170,10 @@ func main() {
 	r.GET("/game", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
+	r.GET("/game_intro", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	r.Run(":" + port)
 }
 
