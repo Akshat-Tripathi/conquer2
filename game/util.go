@@ -10,7 +10,7 @@ type countryState struct {
 }
 
 type playerState struct {
-	colour    int //Maybe change this to a string
+	colour    string
 	troops    int
 	countries int
 	password  string
@@ -24,6 +24,7 @@ type Context struct {
 	StartingCountryNumber int
 	TroopInterval         time.Duration
 	Situation             map[string][]string
+	Colours               []string
 }
 
 func sort(vals []int) []int {

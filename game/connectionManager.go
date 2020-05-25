@@ -76,7 +76,7 @@ func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 //UpdateMessage - sent to client
 type UpdateMessage struct {
 	Troops  int    //delta troops
-	Type    string //Type of update: updateCountry or updateTroops
+	Type    string //Type of update: updateCountry or updateTroops or newPlayer
 	Player  string //Player that owns the country / dest player
-	Country string
+	Country string //Could be the colour iff the type is newPlayer
 }

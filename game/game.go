@@ -30,6 +30,7 @@ type Game interface {
 
 //DefaultGame - basic test version
 type DefaultGame struct {
+	colours       []string
 	id            string
 	conn          connectionManager
 	numPlayers    int32
@@ -49,8 +50,8 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 	if g.numPlayers >= int32(g.maxPlayerNum) {
 		return false
 	}
+	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	atomic.AddInt32(&g.numPlayers, 1)
-	g.processor.addPlayer(name, password)
 	return true
 }
 
