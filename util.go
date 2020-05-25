@@ -11,11 +11,11 @@ import (
 //Loads the map: Data from https://github.com/FnTm/country-neighbors
 func loadMaps() map[string]map[string][]string {
 
-	const mapTypes = []string{"world", "cold", "asia", "europe"}
-	var maps map[string]map[string][]string
+	var mapTypes = []string{"world", "cold", "asia", "europe"}
+	maps := make(map[string]map[string][]string)
 
 	for _, v := range mapTypes {
-		file, err := os.Open(v + ".txt")
+		file, err := os.Open("./maps/" + v + ".txt")
 		if err != nil {
 			panic(err)
 		}

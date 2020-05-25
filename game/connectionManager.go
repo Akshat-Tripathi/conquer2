@@ -63,9 +63,9 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan
 
 func (c *connectionManager) sendToAll(msg UpdateMessage) {
 	for _, v := range c.players {
-		go func() {
+		go func(v chan UpdateMessage) {
 			v <- msg
-		}()
+		}(v)
 	}
 }
 

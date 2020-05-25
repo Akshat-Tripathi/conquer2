@@ -26,6 +26,11 @@ func (rtg *RealTimeGame) Start(ctx Context) {
 		i++
 	}
 
+	maxCountries := len(countries) / ctx.MaxPlayerNumber
+	if maxCountries < ctx.StartingCountryNumber {
+		ctx.StartingCountryNumber = maxCountries
+	}
+
 	processor := defaultProcessor{
 		countries:             countries,
 		situation:             ctx.Situation,

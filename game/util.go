@@ -19,7 +19,7 @@ type playerState struct {
 //Context - used to specify game parameters
 type Context struct {
 	ID                    string
-	MaxPlayerNumber       int32
+	MaxPlayerNumber       int
 	StartingTroopNumber   int
 	StartingCountryNumber int
 	TroopInterval         time.Duration

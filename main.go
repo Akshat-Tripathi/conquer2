@@ -63,7 +63,6 @@ func main() {
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
-
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
@@ -74,6 +73,12 @@ func main() {
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
+		situation := req.FormValue("situation")
+
+		if situation == "" {
+			situation = "world"
+		}
+
 		id := genID()
 		for _, ok := games[id]; ok; _, ok = games[id] {
 			id = genID()
@@ -97,17 +102,14 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var maxCountries int = totalCountries / maxPlayers
-		if maxCountries < startingCountries {
-			startingCountries = maxCountries
-		}
 
 		ctx := game.Context{
 			ID:                    id,
-			MaxPlayerNumber:       int32(maxPlayers),
+			MaxPlayerNumber:       maxPlayers,
 			StartingTroopNumber:   startingTroops,
 			StartingCountryNumber: startingCountries,
 			TroopInterval:         time.Duration(troopInterval) * time.Minute,
+			Situation:             situations[situation],
 		}
 
 		var g game.Game
@@ -123,6 +125,7 @@ func main() {
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
 		games[id].AddPlayer(username, password)
 		c.Redirect(http.StatusFound, "/game")
@@ -134,6 +137,7 @@ func main() {
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
+		situation := req.FormValue("situation")
 
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
@@ -150,6 +154,7 @@ func main() {
 			c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 			c.Redirect(http.StatusFound, "/game")
 		default:
 			redirect("Invalid username/password combo", c)
