@@ -1,9 +1,7 @@
-/*const id = "test/";
-const socketURL = "ws://localhost:8080/game/" + id + "ws";*/
-
 let connect = () => {
   const id = document.cookie.split("; ")[0].replace("id=", "");
-  const socketURL = window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
+  const socketURL =
+    window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
   var socket = new WebSocket(socketURL);
   console.log("Attempting Connection...");
 
@@ -25,5 +23,12 @@ let connect = () => {
     console.log("Socket Error: ", error);
   };
 };
+
+// const id = document.cookie.split("; ")[0].replace("id=", "");
+// const socketURL =
+//   window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
+// class Sockets {
+//   constructor(socket = new WebSocket(socketURL), ee = new EventEmitter())
+// }
 
 export { connect };
