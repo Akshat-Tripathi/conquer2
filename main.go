@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	cookieMaxAge   = 365 * 24 * 60 * 60
-	totalCountries = 200
+	cookieMaxAge = 365 * 24 * 60 * 60
 )
 
 func pain() {
@@ -43,7 +42,7 @@ func main() {
 		port = "8080"
 	}
 
-	neighbours := loadMap()
+	situations := loadMaps()
 
 	games := make(map[string]game.Game)
 
@@ -54,12 +53,13 @@ func main() {
 		MaxPlayerNumber:       5,
 		StartingTroopNumber:   1,
 		StartingCountryNumber: 3,
+		Situation:             situations["world"],
 	}
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
-	games["test"].Start(ctx, neighbours)
+	games["test"].Start(ctx)
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
@@ -115,7 +115,7 @@ func main() {
 		case "realtime":
 			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 		}
-		g.Start(ctx, neighbours)
+		g.Start(ctx)
 		games[id] = g
 
 		//Sets a cookie for the current game id

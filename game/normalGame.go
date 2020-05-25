@@ -15,12 +15,12 @@ type RealTimeGame struct {
 }
 
 //Start - starts a DefaultGame
-func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
-	countries := make([]string, len(neighbours))
+func (rtg *RealTimeGame) Start(ctx Context) {
+	countries := make([]string, len(ctx.Situation))
 	countryStates := make(map[string]*countryState)
 
 	i := 0
-	for k := range neighbours {
+	for k := range ctx.Situation {
 		countries[i] = k
 		countryStates[k] = new(countryState)
 		i++
@@ -28,7 +28,7 @@ func (rtg *RealTimeGame) Start(ctx Context, neighbours map[string][]string) {
 
 	processor := defaultProcessor{
 		countries:             countries,
-		neighbours:            neighbours,
+		situation:             ctx.Situation,
 		countryStates:         countryStates,
 		playerTroops:          make(map[string]*playerState),
 		startingTroopNumber:   ctx.StartingTroopNumber,

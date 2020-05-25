@@ -16,18 +16,14 @@ Situation: Reenact different historical scenarios
 Historic: Time progression
 
 Responsibilities:
-A DefaultGame object will be created by a player, when they choose to host a DefaultGame.
+A game object will be created by a player, when they choose to host a game.
 The initialisation code will be run.
-When the DefaultGame receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
+When the game receives an action as input, it validates it then processes it, and finally sends the action to the appropriate clients
 */
-
-const (
-	maxCountries = 20
-)
 
 //Game - the set of methods that every DefaultGame should be able to perform
 type Game interface {
-	Start(Context, map[string][]string)
+	Start(Context)
 	CheckPlayer(string, string) int8
 	AddPlayer(string, string) bool
 }
@@ -122,7 +118,7 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for {
-		time.Sleep(g.troopInterval * 1000)
+		time.Sleep(g.troopInterval)
 		for _, v := range g.processor.processTroops() {
 			g.conn.sendToPlayer(v, v.Player)
 		}

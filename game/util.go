@@ -22,7 +22,8 @@ type Context struct {
 	MaxPlayerNumber       int32
 	StartingTroopNumber   int
 	StartingCountryNumber int
-	TroopInterval			time.Duration
+	TroopInterval         time.Duration
+	Situation             map[string][]string
 }
 
 func sort(vals []int) []int {

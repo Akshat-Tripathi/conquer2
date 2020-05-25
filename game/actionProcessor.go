@@ -14,7 +14,7 @@ type stateProcessor interface {
 
 type defaultProcessor struct {
 	countries             []string
-	neighbours            map[string][]string
+	situation             map[string][]string
 	countryStates         map[string]*countryState //Maps countries to players / number of troops
 	playerTroops          map[string]*playerState
 	startingTroopNumber   int
@@ -103,7 +103,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				p.playerTroops[dest.player].countries--
 
 				won := false
-				if p.playerTroops[action.Player].countries == maxCountries {
+				if p.playerTroops[action.Player].countries == len(p.countries) {
 					won = true
 				}
 				return won, UpdateMessage{Type: "updateCountry", Player: action.Player, Country: action.Dest},
@@ -246,8 +246,8 @@ func (p defaultProcessor) validateDrop(drop Action) bool {
 
 //PRE: src and dest are valid strings
 func (p defaultProcessor) areNeighbours(src, dest string) bool {
-	neighbours := p.neighbours[src]
-	for _, v := range neighbours {
+	situation := p.situation[src]
+	for _, v := range situation {
 		if v == dest {
 			return true
 		}
