@@ -15,24 +15,10 @@ import { username } from "./Home.jsx";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-//NOTE: For API, please see src/api/index.js;
-
 class GameMap extends Component {
   constructor() {
     super();
     connect();
-  }
-
-  state = {
-    redirect: false,
-  };
-
-  componentDidMount() {
-    this.id = setTimeout(() => this.setState({ redirect: true }), 5000);
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.id);
   }
 
   render() {
@@ -104,6 +90,18 @@ const getnum = (num) => {
   return num;
 };
 
+//Countries to not display
+function notThisCountry(country) {
+  const { NAME } = country.properties;
+  return NAME !== "";
+}
+
+//TODO: Add read country data file here;
+function countryColors(country) {
+  const { NAME, ISO_A2 } = country.properties;
+  return "#AAA";
+}
+
 const MapSettings = ({
   setTooltipContent,
   setname,
@@ -119,51 +117,56 @@ const MapSettings = ({
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#AAA"
-                  stroke="#FFF"
-                  onMouseEnter={() => {
-                    const {
-                      NAME,
-                      POP_EST,
-                      GDP_MD_EST,
-                      SUBREGION,
-                      CONTINENT,
-                    } = geo.properties;
-                    // setTooltipContent(
-                    //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-                    // );
-                    setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-                    setname(NAME);
-                    setpop_est(getnum(POP_EST));
-                    setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-                    setsubrg(SUBREGION);
-                    setcontinent(CONTINENT);
-                    setdisplay(true);
-                  }}
-                  onMouseLeave={() => {
-                    setTooltipContent("");
-                    setdisplay(false);
-                  }}
-                  style={{
-                    default: {
-                      fill: "#D6D6DA",
-                      outline: "none",
-                    },
-                    hover: {
-                      fill: "#F53",
-                      outline: "none",
-                    },
-                    pressed: {
-                      fill: "#D6D6DA",
-                      outline: "none",
-                    },
-                  }}
-                />
-              ))
+              geographies.map((geo) =>
+                notThisCountry(geo) ? (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={countryColors(geo)}
+                    stroke="#FFF"
+                    onMouseEnter={() => {
+                      const {
+                        NAME,
+                        POP_EST,
+                        GDP_MD_EST,
+                        SUBREGION,
+                        CONTINENT,
+                        ISO_A2,
+                      } = geo.properties;
+                      // setTooltipContent(
+                      //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
+                      // );
+
+                      setTooltipContent(`${NAME} - ENEMY TERRITORY`);
+                      setname(NAME);
+                      setpop_est(getnum(POP_EST));
+                      setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
+                      setsubrg(SUBREGION);
+                      setcontinent(CONTINENT);
+                      setdisplay(true);
+                    }}
+                    onMouseLeave={() => {
+                      setTooltipContent("");
+                      setdisplay(false);
+                    }}
+                    style={{
+                      default: {
+                        fill: "#D6D6DA",
+                        outline: "none",
+                      },
+                      hover: {
+                        fill: "#F53",
+                        outline: "none",
+                      },
+                      pressed: {
+                        fill: "#D6D6DA",
+                        outline: "none",
+                      },
+                    }}
+                    onClick={() => {}}
+                  />
+                ) : null
+              )
             }
           </Geographies>
         </ZoomableGroup>
