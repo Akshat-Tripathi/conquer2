@@ -41,6 +41,25 @@ function Title() {
   );
 }
 
+function fancyTitle() {
+  return (
+    <>
+      <div className="rainbow-text">
+        <div className="title-text">
+          <span className="letters">C</span>
+          <span className="letters">O</span>
+          <span className="letters">N</span>
+          <span className="letters">Q</span>
+          <span className="letters">U</span>
+          <span className="letters">E</span>
+          <span className="letters">R </span>
+          <span className="letters">2.0</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
 const gamemodes = [
   {
     label: "World Conquest - 2025",
@@ -197,13 +216,11 @@ function StartGameBox(props) {
   );
 }
 
-//FIXME: Names/id of each of the inputs needs to be fixed according to GO API.
+//FIXME: Names/id of each of the inputs needs to be fixed
 //TODO: Replace forms, fit inside <div> tag, then improve UI (MaterialUI??)
 
 function LoginToGame() {
   const { register, handleSubmit, errors } = useForm();
-
-  //TODO: Route onSubmit to GO API
 
   const onSubmit = (data) => console.log(data);
   console.log(errors);

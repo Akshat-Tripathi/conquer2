@@ -9,6 +9,7 @@ import ReactTooltip from "react-tooltip";
 // import { useSpring, animated } from "react-spring";
 import "./Map.css";
 import { connect } from "../api/index.js";
+import Intro2 from "../shashgonenuts/intro2";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -16,85 +17,75 @@ const geoUrl =
 //NOTE: For API, please see src/api/index.js;
 
 class GameMap extends Component {
-  // componenetDidMount() {
-  //   let socket = new WebSocket(socketURL);
-
-  //   socket.onopen = () => {
-  //     console.log("Connection Successful");
-  //   };
-
-  //   socket.onmessage = (msg) => {
-  //     const message = JSON.parse(msg.data);
-  //     console.log(msg);
-  //   };
-
-  //   socket.onclose = () => {
-  //     console.log("Disconnected");
-  //   };
-  // }
-
   constructor() {
     super();
-}
-
-render() {
     connect();
-    return <MapDisplay />;
+  }
+
+  state = {
+    redirect: false,
+  };
+
+  componentDidMount() {
+    this.id = setTimeout(() => this.setState({ redirect: true }), 5000);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.id);
+  }
+
+  render() {
+    return <SideBar />;
   }
 }
 
-function MapDisplay() {
-  return (
-    <div>
-      <SideBar />
-    </div>
-  );
-}
-
-//Variables for each country to display for Sidebar
-var country;
-var pop_est;
-var gdp;
-var subrg;
-var continent;
-var displayCountryDetails = false;
-var troopsInLand;
-var yourland;
-
-const CountryDetails = (props) => {
-  return (
-    <div>
-      <h2>Spy Report On {country}:</h2>
-      <h3>Population: {pop_est}</h3>
-      <h3>GDP: {gdp}</h3>
-      <h3>Subregion: {subrg}</h3>
-      <h3>Continent: {continent}</h3>
-    </div>
-  );
-};
-
 function SideBar() {
+  //Fetch #troops, attack, move options, fix data vals
   const [state, setState] = useState("");
-  const [spydata, setSpydata] = useState({
-    Country: "",
-    Population: "",
-    GDP: "",
-    Subregion: "",
-    Continent: "",
-  });
+
+  const [name, setname] = useState("");
+  const [pop_est, setpop_est] = useState("");
+  const [gdp, setgdp] = useState("");
+  const [subrg, setsubrg] = useState("");
+  const [continent, setcontinent] = useState("");
+  const [display, setdisplay] = useState(false);
+
+  const CountryDetails = () => {
+    return (
+      <div>
+        <h2>Spy Report On {name}:</h2>
+        <h3>Population: {pop_est}</h3>
+        <h3>GDP (PPP): {gdp}</h3>
+        {continent !== "South America" && <h3>Subregion: {subrg}</h3>}
+        <h3>Continent: {continent}</h3>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="map-sidebar-wrapper">
         <div className="map-sidebar-info-wrapper">
-          <h1>Welcome Commander!</h1>
+          <div>
+            <h1>START THE CONQUEST!</h1>
+            <h2>Welcome Commander!</h2>
+          </div>
           <p>
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
           </p>
-          {displayCountryDetails ? <CountryDetails /> : null}
+          {display && <CountryDetails />}
         </div>
       </div>
-      <MapSettings setTooltipContent={setState} setSpydata={setSpydata} />
+      <MapSettings
+        setTooltipContent={setState}
+        setname={setname}
+        setgdp={setgdp}
+        setpop_est={setpop_est}
+        setdisplay={setdisplay}
+        setcontinent={setcontinent}
+        setsubrg={setsubrg}
+      />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
   );
@@ -112,7 +103,15 @@ const getnum = (num) => {
   return num;
 };
 
-const MapSettings = ({ setTooltipContent, setSpydata }) => {
+const MapSettings = ({
+  setTooltipContent,
+  setname,
+  setpop_est,
+  setsubrg,
+  setcontinent,
+  setgdp,
+  setdisplay,
+}) => {
   return (
     <div className="map-wrapper">
       <ComposableMap data-tip="">
@@ -136,32 +135,16 @@ const MapSettings = ({ setTooltipContent, setSpydata }) => {
                     setTooltipContent(
                       `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
                     );
-                    country = NAME;
-                    pop_est = getnum(POP_EST);
-                    gdp = getnum(GDP_MD_EST * Math.pow(10, 6));
-                    subrg = SUBREGION;
-                    continent = CONTINENT;
-                    // setSpydata(NAME, POP_EST, GDP_MD_EST, SUBREGION, CONTINENT);
-                    displayCountryDetails = true;
+                    setname(NAME);
+                    setpop_est(getnum(POP_EST));
+                    setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
+                    setsubrg(SUBREGION);
+                    setcontinent(CONTINENT);
+                    setdisplay(true);
                   }}
                   onMouseLeave={() => {
                     setTooltipContent("");
-                    // setSpydata("", "", "", "", "");
-                    displayCountryDetails = false;
-                  }}
-                  onClick={() => {
-                    const {
-                      NAME,
-                      POP_EST,
-                      GDP_MD_EST,
-                      SUBREGION,
-                      CONTINENT,
-                    } = geo.properties;
-                    country = NAME;
-                    pop_est = getnum(POP_EST);
-                    gdp = getnum(GDP_MD_EST * Math.pow(10, 6));
-                    subrg = SUBREGION;
-                    continent = CONTINENT;
+                    setdisplay(false);
                   }}
                   style={{
                     default: {
