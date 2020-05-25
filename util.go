@@ -8,6 +8,22 @@ import (
 	"strings"
 )
 
+func loadColours() []string {
+	file, err := os.Open("./colours.txt")
+	if err != nil {
+		panic(err)
+	}
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+
+	cols := make([]string, 10)
+	i := 0
+	for scanner.Scan() {
+		cols[i] = scanner.Text()
+	}
+	return cols
+}
+
 //Loads the map: Data from https://github.com/FnTm/country-neighbors
 func loadMaps() map[string]map[string][]string {
 
