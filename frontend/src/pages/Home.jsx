@@ -113,20 +113,12 @@ class gameForm extends React.Component {
   }
 }
 
+var username;
+
 function StartGameBox(props) {
   //Collect form information
-  const state = {
-    username: "Genghis Khan",
-    gamemode: "WC",
-    noOfPlayers: 6,
-  };
 
   //List the gamemode options
-  const [war, setWar] = React.useState("World Conquest 2025");
-
-  const handleChange = (event) => {
-    setWar(event.target.value);
-  };
 
   return (
     <div className="wrapper">
@@ -140,6 +132,7 @@ function StartGameBox(props) {
               placeholder="Username"
               name="username"
               required
+              onChange={username}
             ></input>
           </div>
           <div>
@@ -320,7 +313,7 @@ function Video() {
   );
 }
 
-export default class Home extends Component {
+class Home extends Component {
   render() {
     return (
       <div className="home-page">
@@ -332,3 +325,6 @@ export default class Home extends Component {
     );
   }
 }
+
+export default Home;
+export { username };
