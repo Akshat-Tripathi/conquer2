@@ -10,6 +10,7 @@ import ReactTooltip from "react-tooltip";
 import "./Map.css";
 import { connect } from "../api/index.js";
 import Intro2 from "../shashgonenuts/intro2";
+import { username } from "./Home.jsx";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -68,7 +69,7 @@ function SideBar() {
         <div className="map-sidebar-info-wrapper">
           <div>
             <h1>START THE CONQUEST!</h1>
-            <h2>Welcome Commander!</h2>
+            <h2>Welcome Commander {username}!</h2>
           </div>
           <p>
             This is your war control room. Help us attain victory over our
@@ -132,9 +133,10 @@ const MapSettings = ({
                       SUBREGION,
                       CONTINENT,
                     } = geo.properties;
-                    setTooltipContent(
-                      `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-                    );
+                    // setTooltipContent(
+                    //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
+                    // );
+                    setTooltipContent(`${NAME} - ENEMY TERRITORY`);
                     setname(NAME);
                     setpop_est(getnum(POP_EST));
                     setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));

@@ -1,24 +1,11 @@
 import React from "react";
 import "./intro.scss";
 import { Redirect } from "react-router-dom";
+import audioPlayer from "./audioplayer.jsx";
 
 class Intro2 extends React.Component {
-  state = {
-    redirect: false,
-  };
-
-  componentDidMount() {
-    this.id = setTimeout(() => this.setState({ redirect: true }), 15000);
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.id);
-  }
-
   render() {
-    return this.state.redirect ? (
-      <Redirect to="/game" />
-    ) : (
+    return (
       <>
         <div className="intro2">
           <div
@@ -39,10 +26,7 @@ class Intro2 extends React.Component {
                 />
                 <param name="allowFullScreen" value="true" />
                 <param name="allowscriptaccess" value="always" />
-                <iframe src="./intro.mp3" allow="autoplay" id="audio"></iframe>
-                <audio id="player" autoplay loop>
-                  <source src="audio/source.mp3" type="audio/mp3" />
-                </audio>
+                <audioPlayer />
               </object>
             </div>
           </div>
@@ -61,7 +45,18 @@ class Intro2 extends React.Component {
               </p>
               <p>
                 You, a young chap in this chaotic, mindless world, have decided
-                it is time for vengeance.
+                it is time for change. In your duty to free the people from
+                freedom, you decide you must be generous and liberate the world
+                from their own rule and accept their fates - your supreme
+                leadership.{" "}
+              </p>
+
+              <p>
+                You must quell the rebellious and stubborn nature of the other
+                foolish players who dare stand in your path, with the
+                compansionship of your loyal army and precious lands, to restore
+                order and justice to the world so that they may see the same
+                bright vision you embrace.
               </p>
             </div>
           </div>
