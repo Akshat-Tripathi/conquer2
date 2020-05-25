@@ -28,8 +28,8 @@ for country in data.keys():
 neigh = neigh[:-1]
 names = names[:-1]
 
-with open("../map.txt", 'w') as file:
+with open("../maps/world.txt", 'w') as file:
 	file.write(neigh)
 
-with open("../names.txt", 'w') as file:
+with open("./names.txt", 'w') as file:
 	file.write(names)

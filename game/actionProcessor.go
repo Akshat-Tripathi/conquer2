@@ -19,7 +19,7 @@ type defaultProcessor struct {
 	playerTroops          map[string]*playerState
 	startingTroopNumber   int
 	startingCountryNumber int
-	maxPlayerNum          int32
+	maxPlayerNum          int
 }
 
 //PRE: Username is valid ie it is in playerTroops

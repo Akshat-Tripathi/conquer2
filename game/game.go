@@ -33,7 +33,7 @@ type DefaultGame struct {
 	id            string
 	conn          connectionManager
 	numPlayers    int32
-	maxPlayerNum  int32
+	maxPlayerNum  int
 	actions       chan Action
 	processor     stateProcessor
 	troopInterval time.Duration
@@ -46,7 +46,7 @@ func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 
 //AddPlayer - returns whether or not the player was successfully added
 func (g *DefaultGame) AddPlayer(name, password string) bool {
-	if g.numPlayers >= g.maxPlayerNum {
+	if g.numPlayers >= int32(g.maxPlayerNum) {
 		return false
 	}
 	atomic.AddInt32(&g.numPlayers, 1)
@@ -83,8 +83,11 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	g.conn.register(username)
 	go g.conn.monitor(username, conn, g.actions)
 	for _, msg := range g.processor.getState(username) {
-		g.conn.sendToPlayer(msg, username)
-		log.Println(msg)
+		if msg.Player == username {
+			g.conn.sendToAll(msg)
+		} else {
+			g.conn.sendToPlayer(msg, username)
+		}
 	}
 }
 
