@@ -8,7 +8,7 @@ type stateProcessor interface {
 	processAction(Action) (bool, UpdateMessage, UpdateMessage)
 	processTroops() []UpdateMessage
 	checkPlayer(string, string) int8
-	addPlayer(name, password string)
+	addPlayer(name, password, colour string)
 	getState(string) []UpdateMessage
 }
 
@@ -24,9 +24,8 @@ type defaultProcessor struct {
 
 //PRE: Username is valid ie it is in playerTroops
 func (p *defaultProcessor) getState(username string) []UpdateMessage {
-	msgs := make([]UpdateMessage, len(p.countries)+1)
-	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done
-	//TODO send colours
+	msgs := make([]UpdateMessage, len(p.countries)+1+len(p.playerTroops))
+	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done probably with a mutex
 	i := 0
 	for country, state := range p.countryStates {
 		msgs[i] = UpdateMessage{
@@ -40,6 +39,15 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 		Troops: p.playerTroops[username].troops,
 		Type:   "updateTroops",
 		Player: username}
+	i++
+	for player, state := range p.playerTroops {
+		msgs[i] = UpdateMessage{
+			Type:    "newPlayer",
+			Player:  player,
+			Country: state.colour,
+		}
+		i++
+	}
 	return msgs
 }
 
@@ -68,10 +76,12 @@ func (p *defaultProcessor) checkPlayer(name, password string) int8 {
 }
 
 //PRE: the player name and password are unique
-func (p *defaultProcessor) addPlayer(name, password string) {
-	p.playerTroops[name] = &playerState{troops: p.startingTroopNumber,
+func (p *defaultProcessor) addPlayer(name, password, colour string) {
+	p.playerTroops[name] = &playerState{
+		troops:    p.startingTroopNumber,
 		countries: p.startingCountryNumber,
-		password:  password} //TODO colour decision
+		password:  password,
+		colour:    colour}
 	country := ""
 	//Assign countries
 	for n := p.startingCountryNumber; n > 0; {

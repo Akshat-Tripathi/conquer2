@@ -64,6 +64,7 @@ func main() {
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/game_intro", static.LocalFile("./frontend/build", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
 
@@ -128,7 +129,7 @@ func main() {
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
 		games[id].AddPlayer(username, password)
-		c.Redirect(http.StatusFound, "/game")
+		c.Redirect(http.StatusFound, "/game_intro")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -155,7 +156,7 @@ func main() {
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
-			c.Redirect(http.StatusFound, "/game")
+			c.Redirect(http.StatusFound, "/game_intro")
 		default:
 			redirect("Invalid username/password combo", c)
 		}
@@ -169,6 +170,10 @@ func main() {
 	r.GET("/game", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
+	r.GET("/game_intro", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	r.Run(":" + port)
 }
 
