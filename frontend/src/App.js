@@ -4,6 +4,8 @@ import "./App.css";
 import Home from "./pages/Home.jsx";
 import { UnderConstruction } from "./pages/UnderConstruction";
 import GameMap from "./pages/Map.jsx";
+import Intro2 from "./shashgonenuts/intro2.jsx";
+import Redirector from "./pages/Redirector.jsx";
 
 class App extends Component {
   render() {
@@ -15,8 +17,12 @@ class App extends Component {
               <Route exact path="/" component={Home} />
               <Route path="/home" component={Home} />
               <Route path="/underdev" component={UnderConstruction} />
-              <Route path="/game" component={GameMap} />
+              <Route path="/game" component={Redirector} />
+              <Route path="/gameoverride" component={GameMap} />
               <Route path="/map" component={GameMap} />
+
+              {/* ALPHA TESTING PURPOSES ONLY. PROHIBIT PUBLIC ACCESS*/}
+              <Route path="/alpha" component={Intro2} />
             </div>
           </Switch>
         </Router>
