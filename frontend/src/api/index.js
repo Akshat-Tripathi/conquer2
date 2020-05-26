@@ -1,3 +1,4 @@
+var loaddetails;
 let connect = () => {
   const id = document.cookie.split("; ")[0].replace("id=", "");
   const socketURL =
@@ -11,6 +12,7 @@ let connect = () => {
   };
 
   socket.onmessage = (msg) => {
+    loaddetails = msg;
     console.log(msg);
   };
 
@@ -19,7 +21,7 @@ let connect = () => {
     alert("Invalid login");
 
     //TODO: redirect to an error page
-    window.location.replace(window.location.href.replace("/game", ""));
+    window.location.replace(window.location.href.replace("/game", "/error"));
   };
 
   socket.onerror = (error) => {
@@ -37,4 +39,4 @@ let connect = () => {
   //   constructor(socket = new WebSocket(socketURL), ee = new EventEmitter())
 };
 
-export { connect };
+export { connect, loaddetails };

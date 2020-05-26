@@ -8,9 +8,11 @@ import {
 import ReactTooltip from "react-tooltip";
 // import { useSpring, animated } from "react-spring";
 import "./Map.css";
-import { connect } from "../api/index.js";
+import { connect, loaddetails } from "../api/index.js";
 import Intro2 from "../shashgonenuts/intro2";
 import { username } from "./Home.jsx";
+
+import mapdata from "../maps/world.txt";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -36,6 +38,11 @@ function SideBar() {
   const [subrg, setsubrg] = useState("");
   const [continent, setcontinent] = useState("");
   const [display, setdisplay] = useState(false);
+  // const [countryClicked, setcountryClicked] = useState(false);
+
+  // const handleCountryClicked = () => {
+  //   setcountryClicked(!countryClicked);
+  // };
 
   const CountryDetails = () => {
     return (
@@ -60,6 +67,11 @@ function SideBar() {
           <p>
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
+          </p>
+          <p>
+            {/* {loaddetails.map((detail) => {
+              console.log(detail);
+            })} */}
           </p>
           {display && <CountryDetails />}
         </div>
@@ -96,10 +108,61 @@ function notThisCountry(country) {
   return NAME !== "";
 }
 
-//TODO: Add read country data file here;
+var clickedCountry;
+//TODO: player team colour for country
 function countryColors(country) {
   const { NAME, ISO_A2 } = country.properties;
   return "#AAA";
+}
+
+function handleColourStroke(country, countryClicked) {
+  return "#BBB";
+}
+
+function getCountryCodes(countrycode) {
+  // var fs = require("fs");
+  // fetch(mapdata);
+  //enter country to search
+  const fileURL = "../maps/world.txt";
+  const textByLine = fetch(fileURL).then((line) => line.toString().split("\n"));
+
+  // var textByLine = fs
+  //   .readFileSync("../../../maps/world.txt")
+  //   .toString()
+  //   .split("\n");
+
+  var countriesBordering = [];
+
+  for (let j = 0; j < textByLine.length; j++) {
+    var borders = textByLine[j].split(" ");
+    if (borders[0] == countrycode) {
+      for (let i = 1; i < borders.length; i++) {
+        //Get border codes
+        countriesBordering.push(borders[i]);
+      }
+    }
+  }
+  return countriesBordering;
+}
+
+const handleColourFill = (country, countryClicked) => {
+  const { ISO_A2 } = country.properties;
+  if (
+    countryClicked &&
+    getCountryCodes(countryClicked).includes(ISO_A2) &&
+    countryClicked !== ""
+  ) {
+    return "#000";
+  }
+  return "#FFF";
+};
+
+function toAttackColorFill() {
+  return null;
+}
+
+function toAttackColorStroke() {
+  return null;
 }
 
 const MapSettings = ({
@@ -122,8 +185,8 @@ const MapSettings = ({
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={countryColors(geo)}
-                    stroke="#FFF"
+                    fill={handleColourFill(geo)}
+                    stroke={handleColourStroke(geo)}
                     onMouseEnter={() => {
                       const {
                         NAME,
@@ -133,6 +196,7 @@ const MapSettings = ({
                         CONTINENT,
                         ISO_A2,
                       } = geo.properties;
+
                       // setTooltipContent(
                       //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
                       // );
@@ -163,7 +227,14 @@ const MapSettings = ({
                         outline: "none",
                       },
                     }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      const { ISO_A2 } = geo.properties;
+                      if (clickedCountry === "") {
+                        clickedCountry = ISO_A2;
+                      } else {
+                        clickedCountry = "";
+                      }
+                    }}
                   />
                 ) : null
               )
