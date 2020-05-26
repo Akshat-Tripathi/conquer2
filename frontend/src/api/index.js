@@ -13,7 +13,8 @@ let connect = () => {
   socket.onopen = () => {
     console.log("Successfully Connected");
   };
-/*
+
+  /*
   socket.onmessage = (msg) => {
     loaddetails = msg;
     // console.log(msg);
@@ -29,7 +30,7 @@ let connect = () => {
   socket.onerror = (error) => {
     console.log("Socket Error: ", error);
   };
-  return socket
+  return socket;
   // socket.send
 
   // socket.addEventListener("/join", () => )
