@@ -34,7 +34,6 @@ class countryState {
 class GameMap extends Component {
   constructor() {
     super();
-    console.log(countries);
     socket = connect();
     socket.onmessage = (msg) => {
         var action = JSON.parse(msg.data);
@@ -45,7 +44,6 @@ class GameMap extends Component {
             case "updateCountry":
                 if (typeof countryStates[action.Country] == "undefined" || countryStates[action.Country].Player != action.Player) {
                     countryStates[action.Country] = new countryState(action.Troops, action.Player);
-                    console.log(action.Country, countryStates);
                 } else {
                     countryStates[action.Country].Troops += action.Troops;
                 }
@@ -94,9 +92,9 @@ function SideBar() {
     );
   };
 
-  const handleColourFill = async (country) => {
+  const handleColourFill = (country) => {
     if (!countriesLoaded) {
-        await loadMap();
+        loadMap();
         countriesLoaded = true;
     }
     const { ISO_A2 } = country.properties;
@@ -105,19 +103,17 @@ function SideBar() {
         clickedCountry !== "" &&
         countries[clickedCountry].includes(ISO_A2)
     ) {
-        console.log("hi");
-      return "#000";
+      return "#be90d4";
     }
     try {
-        return playerColours[countryStates[ISO_A2].Player];
+        var col = playerColours[countryStates[ISO_A2].Player];
+        if (typeof col == "undefined") {
+            col = "#B9A37E";
+        }
+        return col;
     } catch (TypeError) {
-        return "#FFF";
+        return "#B9A37E";
     }
-  };
-
-  const handleColourStroke = (country) => {
-    const { ISO_A2 } = country.properties;
-    return "#FFF";
   };
 
   return (
@@ -146,7 +142,7 @@ function SideBar() {
         setsubrg={setsubrg}
         setclickedCountry={handleclickedCountry}
         handleColourFill={handleColourFill}
-        handleColourStroke={handleColourStroke}
+        handleColourStroke={handleColourFill}
       />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
@@ -223,7 +219,6 @@ const MapSettings = ({
   setdisplay,
   setclickedCountry,
   handleColourFill,
-  handleColourStroke,
 }) => {
   return (
     <div className="map-wrapper">
@@ -237,7 +232,7 @@ const MapSettings = ({
                     key={geo.rsmKey}
                     geography={geo}
                     fill={handleColourFill(geo)}
-                    stroke={handleColourStroke(geo)}
+                    stroke={handleColourFill(geo)}
                     onMouseEnter={() => {
                       const {
                         NAME,
@@ -265,11 +260,11 @@ const MapSettings = ({
                     }}
                     style={{
                       default: {
-                        fill: "#D6D6DA",
                         outline: "none",
                       },
                       hover: {
-                        fill: "#F53",
+                        fill: "#D1BE9D",
+                        stroke: "#D1BE9D",
                         outline: "none",
                       },
                       pressed: {
