@@ -83,42 +83,15 @@ const gamemodes = [
   },
 ];
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-//TODO: asynchronous doesn't matter here, no need for concurrency
-
-const onSubmit = async (values) => {
-  await sleep(300);
-  window.alert(JSON.stringify(values, 0, 2));
-};
-
-//TODO: Improve or delete this junk code
-
-class gameForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: null,
-      gamemode: null,
-      noOfPlayers: null,
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChange(event) {
-    const target = event.target;
-    const ign = target.username;
-  }
-}
-
 var username;
-
 function StartGameBox(props) {
   //Collect form information
 
   //List the gamemode options
+
+  const handleUsername = () => {
+    username = document.getElementById("ign");
+  };
 
   return (
     <div className="wrapper">
@@ -129,10 +102,11 @@ function StartGameBox(props) {
           <div className="username">
             <input
               type="text"
+              id="ign"
               placeholder="Username"
               name="username"
               required
-              onChange={username}
+              onChange={handleUsername}
             ></input>
           </div>
           <div>
