@@ -30,3 +30,5 @@ for s in situation:
 		countries += "\n"
 	with open("../maps/" + s + ".txt", "w") as file:
 		file.write(countries[:-1])
+	with open("../frontend/src/maps/" + s + ".txt", "w") as file:
+		file.write(countries[:-1])
