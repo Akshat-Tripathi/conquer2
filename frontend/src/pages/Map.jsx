@@ -142,10 +142,9 @@ function countryColors(country) {
 function getCountryCodes(countrycode) {
   // var fs = require("fs");
   const fileURL = "../maps/world.txt";
-  var textByLine = fs
-    .readFileSync("../../../maps/world.txt")
-    .toString()
-    .split("\n");
+  const textByLine = fetch(fileURL)
+    .then((line) => line.text())
+    .then((line) => line.split("\n"));
 
   var countriesBordering = [];
 
