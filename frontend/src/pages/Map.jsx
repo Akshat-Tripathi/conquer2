@@ -19,14 +19,38 @@ const geoUrl =
 
 var countries = {};
 var socket = null;
+var troops = 0;
+var countryStates = {};
+var playerColours = {};
+
+class countryState {
+    constructor(Troops, Player) {
+        this.Troops = Troops;
+        this.Player = Player;
+    }
+}
 
 class GameMap extends Component {
   constructor() {
     super();
     socket = connect();
-
     socket.onmessage = (msg) => {
-        console.log(msg);
+        var action = JSON.parse(msg.data);
+        switch (action.Type) {
+            case "updateTroops":
+                troops = action.Troops;
+                break
+            case "updateCountry":
+                if (typeof countryStates[action.Country] == "undefined" || countryStates[action.Country].Player != action.Player) {
+                    countryStates[action.Country] = new countryState(action.Troops, action.Player);
+                } else {
+                    countryStates[action.Country].Troops += action.Troops;
+                }
+                break;
+            case "newPlayer":
+                console.log(action.Player + " has entered the chat bois as: " + action.Country);
+                playerColours[action.Player] = action.Country; 
+        }
       };
   }
 
@@ -70,14 +94,9 @@ function SideBar() {
   const handleColourFill = (country) => {
     const { ISO_A2 } = country.properties;
     if (
-<<<<<<< HEAD
-      clickedCountry !== "" &&
-      getCountryCodes(clickedCountry).includes(ISO_A2)
-=======
         clickedCountry !== "" &&
         getCountryCodes(clickedCountry).includes(ISO_A2)
       
->>>>>>> 03357aefb3348eb1ce65bc14a8e89d113e862833
     ) {
       return "#000";
     }
@@ -184,7 +203,7 @@ function getCountryCodes(countrycode) {
       return response.text();
     })
     .then(function (data) {
-      borderdata = data.split("\n").toString();
+      var borderdata = data.split("\n").toString();
       console.log(data.split("\n").toString());
       return borderdata;
     });
