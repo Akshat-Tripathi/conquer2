@@ -148,11 +148,6 @@ function getCountryCodes(countrycode) {
     .then((line) => line.text())
     .then((line) => line.split("\n"));
 
-  // var textByLine = fs
-  //   .readFileSync("../../../maps/world.txt")
-  //   .toString()
-  //   .split("\n");
-
   var countriesBordering = [];
 
   for (let j = 0; j < textByLine.length; j++) {
@@ -185,53 +180,6 @@ const MapSettings = ({
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
-<<<<<<< HEAD
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#AAA"
-                  stroke=""
-                  onMouseEnter={() => {
-                    const {
-                      NAME,
-                      POP_EST,
-                      GDP_MD_EST,
-                      SUBREGION,
-                      CONTINENT,
-                    } = geo.properties;
-                    // setTooltipContent(
-                    //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-                    // );
-                    setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-                    setname(NAME);
-                    setpop_est(getnum(POP_EST));
-                    setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-                    setsubrg(SUBREGION);
-                    setcontinent(CONTINENT);
-                    setdisplay(true);
-                  }}
-                  onMouseLeave={() => {
-                    setTooltipContent("");
-                    setdisplay(false);
-                  }}
-                  style={{
-                    default: {
-                      fill: "#D6D6DA",
-                      outline: "none",
-                    },
-                    hover: {
-                      fill: "#F53",
-                      outline: "none",
-                    },
-                    pressed: {
-                      fill: "#D6D6DA",
-                      outline: "none",
-                    },
-                  }}
-                />
-              ))
-=======
               geographies.map((geo) =>
                 notThisCountry(geo) ? (
                   <Geography
@@ -285,7 +233,6 @@ const MapSettings = ({
                   />
                 ) : null
               )
->>>>>>> 5e131db0849f346ff390c1eca3dc892a80b3c085
             }
           </Geographies>
         </ZoomableGroup>
