@@ -51,6 +51,7 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 	return msgs
 }
 
+//Calculates number of troops to send
 func (p *defaultProcessor) processTroops() []UpdateMessage {
 	msgs := make([]UpdateMessage, len(p.playerTroops))
 	i := 0

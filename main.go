@@ -121,6 +121,8 @@ func main() {
 		switch req.FormValue("type") {
 		case "realtime":
 			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+		case "campaign":
+			g = &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
 		}
 		g.AddPlayer(username, password)
 		g.Start(ctx)
