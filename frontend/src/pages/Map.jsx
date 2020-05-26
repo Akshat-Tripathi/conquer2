@@ -4,6 +4,9 @@ import {
   Geographies,
   Geography,
   ZoomableGroup,
+  Annotation,
+  Marker,
+  useZoomPan,
 } from "react-simple-maps";
 import ReactTooltip from "react-tooltip";
 // import { useSpring, animated } from "react-spring";
@@ -11,6 +14,7 @@ import "./Map.css";
 import { connect, loaddetails } from "../api/index.js";
 import Intro2 from "../shashgonenuts/intro2";
 import { username } from "./Home.jsx";
+import { geoCentroid } from "d3-geo";
 
 import mapdata from "../maps/world.txt";
 
@@ -19,14 +23,46 @@ const geoUrl =
 
 var countries = {};
 var socket = null;
+var troops = 0;
+var countryStates = {};
+var playerColours = {};
+
+class countryState {
+  constructor(Troops, Player) {
+    this.Troops = Troops;
+    this.Player = Player;
+  }
+}
 
 class GameMap extends Component {
   constructor() {
     super();
     socket = connect();
-
     socket.onmessage = (msg) => {
-      console.log(msg);
+      var action = JSON.parse(msg.data);
+      switch (action.Type) {
+        case "updateTroops":
+          troops = action.Troops;
+          break;
+        case "updateCountry":
+          if (
+            typeof countryStates[action.Country] == "undefined" ||
+            countryStates[action.Country].Player != action.Player
+          ) {
+            countryStates[action.Country] = new countryState(
+              action.Troops,
+              action.Player
+            );
+          } else {
+            countryStates[action.Country].Troops += action.Troops;
+          }
+          break;
+        case "newPlayer":
+          console.log(
+            action.Player + " has entered the chat bois as: " + action.Country
+          );
+          playerColours[action.Player] = action.Country;
+      }
     };
   }
 
@@ -69,12 +105,12 @@ function SideBar() {
 
   const handleColourFill = (country) => {
     const { ISO_A2 } = country.properties;
-    if (
-      clickedCountry !== "" &&
-      getCountryCodes(clickedCountry).includes(ISO_A2)
-    ) {
-      return "#000000";
-    }
+    // if (
+    //   clickedCountry !== "" &&
+    //   getCountryCodes(clickedCountry).includes(ISO_A2)
+    // ) {
+    //   return "#000000";
+    // }
     return "#AAA";
   };
 
@@ -86,6 +122,7 @@ function SideBar() {
   const selectedCountryOptions = () => {
     return (
       <div>
+        <h3>Selected Country: {clickedCountry}</h3>
         <h4>OPTIONS:</h4>
         <ul>
           <li>
@@ -106,14 +143,13 @@ function SideBar() {
           <div>
             <h1>START THE CONQUEST!</h1>
             <h2>Welcome Commander {username}!</h2>
+            <h3>BASE TROOPS: {troops}</h3>
           </div>
           <p>
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
           </p>
-          {clickedCountry !== "" && (
-              <p>Selected Country: {clickedCountry}</p>
-            ) && <selectedCountryOptions />}
+          {clickedCountry !== "" && <selectedCountryOptions />}
           {display && <CountryDetails />}
         </div>
       </div>
@@ -197,7 +233,7 @@ function getCountryCodes(countrycode) {
       return response.text();
     })
     .then(function (data) {
-      const borderdata = data.split("\n").toString();
+      const borderdata = data.split("\n");
       // console.log(data.split("\n").toString());
       //
       var countriesBordering = [];
@@ -239,66 +275,84 @@ const MapSettings = ({
       <ComposableMap data-tip="">
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const fillcolour = handleColourFill(geo);
-                const strokecolour = handleColourStroke(geo);
-                return notThisCountry(geo) ? (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={fillcolour}
-                    stroke={strokecolour}
-                    onMouseEnter={() => {
-                      const {
-                        NAME,
-                        POP_EST,
-                        GDP_MD_EST,
-                        SUBREGION,
-                        CONTINENT,
-                      } = geo.properties;
+            {({ geographies }) => (
+              <>
+                {geographies.map((geo) => {
+                  const fillcolour = handleColourFill(geo);
+                  const strokecolour = handleColourStroke(geo);
+                  return notThisCountry(geo) ? (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill={fillcolour}
+                      stroke={strokecolour}
+                      onMouseEnter={() => {
+                        const {
+                          NAME,
+                          POP_EST,
+                          GDP_MD_EST,
+                          SUBREGION,
+                          CONTINENT,
+                        } = geo.properties;
 
-                      // setTooltipContent(
-                      //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-                      // );
+                        // setTooltipContent(
+                        //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
+                        // );
 
-                      setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-                      setname(NAME);
-                      setpop_est(getnum(POP_EST));
-                      setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-                      setsubrg(SUBREGION);
-                      setcontinent(CONTINENT);
-                      setdisplay(true);
-                    }}
-                    onMouseLeave={() => {
-                      setTooltipContent("");
-                      setdisplay(false);
-                    }}
-                    style={{
-                      default: {
-                        fill: "#D6D6DA",
-                        outline: "none",
-                      },
-                      hover: {
-                        fill: "#F53",
-                        outline: "none",
-                      },
-                      pressed: {
-                        fill: "#D6D6DA",
-                        outline: "none",
-                      },
-                    }}
-                    onClick={() => {
-                      const { ISO_A2 } = geo.properties;
-                      setclickedCountry(ISO_A2);
-                    }}
-                    onDoubleClick={() => {
-                      setdoubleClicked();
-                    }}
-                  />
-                ) : null;
-              })
-            }
+                        setTooltipContent(`${NAME} - ENEMY TERRITORY`);
+                        setname(NAME);
+                        setpop_est(getnum(POP_EST));
+                        setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
+                        setsubrg(SUBREGION);
+                        setcontinent(CONTINENT);
+                        setdisplay(true);
+                      }}
+                      onMouseLeave={() => {
+                        setTooltipContent("");
+                        setdisplay(false);
+                      }}
+                      style={{
+                        default: {
+                          fill: "#D6D6DA",
+                          outline: "none",
+                        },
+                        hover: {
+                          fill: "#F53",
+                          outline: "none",
+                        },
+                        pressed: {
+                          fill: "#D6D6DA",
+                          outline: "none",
+                        },
+                      }}
+                      onClick={() => {
+                        const { ISO_A2 } = geo.properties;
+                        setclickedCountry(ISO_A2);
+                      }}
+                      onDoubleClick={() => {
+                        setdoubleClicked();
+                      }}
+                    />
+                  ) : null;
+                })}
+
+                {geographies.map((geo) => {
+                  const centroid = geoCentroid(geo);
+                  const { NAME } = geo.properties;
+                  return (
+                    <g key={geo.rsmKey}>
+                      {
+                        <Marker coordinates={centroid}>
+                          <text fontSize={4} alignmentBaseline="middle">
+                            {NAME}
+                          </text>
+                        </Marker>
+                      }
+                    </g>
+                  );
+                })}
+              </>
+            )}
           </Geographies>
         </ZoomableGroup>
       </ComposableMap>
