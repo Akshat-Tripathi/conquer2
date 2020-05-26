@@ -38,11 +38,7 @@ function SideBar() {
   const [subrg, setsubrg] = useState("");
   const [continent, setcontinent] = useState("");
   const [display, setdisplay] = useState(false);
-  // const [countryClicked, setcountryClicked] = useState(false);
-
-  // const handleCountryClicked = () => {
-  //   setcountryClicked(!countryClicked);
-  // };
+  const [clickedCountry, setclickedCountry] = useState("");
 
   const CountryDetails = () => {
     return (
@@ -54,6 +50,30 @@ function SideBar() {
         <h3>Continent: {continent}</h3>
       </div>
     );
+  };
+
+  const handleColourFill = (country) => {
+    const { ISO_A2 } = country.properties;
+    if (
+      getCountryCodes(clickedCountry).includes(ISO_A2) &&
+      clickedCountry !== ""
+    ) {
+      return "#000";
+    }
+    return "#FFF";
+  };
+
+  const handleclickedCountry = (ISO_A2) => {
+    if (clickedCountry === "") {
+      setclickedCountry(ISO_A2);
+    } else {
+      setclickedCountry("");
+    }
+  };
+
+  const handleColourStroke = (country) => {
+    const { ISO_A2 } = country.properties;
+    return "#FFF";
   };
 
   return (
@@ -84,6 +104,9 @@ function SideBar() {
         setdisplay={setdisplay}
         setcontinent={setcontinent}
         setsubrg={setsubrg}
+        setclickedCountry={handleclickedCountry}
+        handleColourFill={handleColourFill}
+        handleColourStroke={handleColourStroke}
       />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
@@ -115,16 +138,15 @@ function countryColors(country) {
   return "#AAA";
 }
 
-function handleColourStroke(country) {
-  return "#BBB";
-}
-
+//FIXME: fix read file correctly
 function getCountryCodes(countrycode) {
   // var fs = require("fs");
   // fetch(mapdata);
   //enter country to search
   const fileURL = "../maps/world.txt";
-  const textByLine = fetch(fileURL).then((line) => line.toString().split("\n"));
+  const textByLine = fetch(fileURL)
+    .then((line) => line.text())
+    .then((line) => line.split("\n"));
 
   // var textByLine = fs
   //   .readFileSync("../../../maps/world.txt")
@@ -145,25 +167,6 @@ function getCountryCodes(countrycode) {
   return countriesBordering;
 }
 
-const handleColourFill = (country) => {
-  const { ISO_A2 } = country.properties;
-  if (
-    getCountryCodes(clickedCountry).includes(ISO_A2) &&
-    clickedCountry !== ""
-  ) {
-    return "#000";
-  }
-  return "#FFF";
-};
-
-function toAttackColorFill() {
-  return null;
-}
-
-function toAttackColorStroke() {
-  return null;
-}
-
 const MapSettings = ({
   setTooltipContent,
   setname,
@@ -172,6 +175,9 @@ const MapSettings = ({
   setcontinent,
   setgdp,
   setdisplay,
+  setclickedCountry,
+  handleColourFill,
+  handleColourStroke,
 }) => {
   return (
     <div className="map-wrapper">
@@ -193,7 +199,6 @@ const MapSettings = ({
                         GDP_MD_EST,
                         SUBREGION,
                         CONTINENT,
-                        ISO_A2,
                       } = geo.properties;
 
                       // setTooltipContent(
@@ -228,11 +233,7 @@ const MapSettings = ({
                     }}
                     onClick={() => {
                       const { ISO_A2 } = geo.properties;
-                      if (clickedCountry === "") {
-                        clickedCountry = ISO_A2;
-                      } else {
-                        clickedCountry = "";
-                      }
+                      setclickedCountry(ISO_A2);
                     }}
                   />
                 ) : null
