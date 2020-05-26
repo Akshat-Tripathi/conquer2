@@ -55,6 +55,7 @@ func main() {
 		StartingTroopNumber:   1,
 		StartingCountryNumber: 3,
 		Situation:             situations["world"],
+		Colours:               colours,
 	}
 
 	//TEST CODE - REMOVE IN PRODUCTION
