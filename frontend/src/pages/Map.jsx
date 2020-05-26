@@ -73,14 +73,30 @@ function SideBar() {
       clickedCountry !== "" &&
       getCountryCodes(clickedCountry).includes(ISO_A2)
     ) {
-      return "#000";
+      return "#000000";
     }
-    return "#FFF";
+    return "#AAA";
   };
 
   const handleColourStroke = (country) => {
     const { ISO_A2 } = country.properties;
     return "#FFF";
+  };
+
+  const selectedCountryOptions = () => {
+    return (
+      <div>
+        <h4>OPTIONS:</h4>
+        <ul>
+          <li>
+            <button type="button"> ATTACK </button>
+            <button type="button">MOVE</button>
+            <button type="button">DONATE</button>
+            <button type="button">DROP</button>
+          </li>
+        </ul>
+      </div>
+    );
   };
 
   return (
@@ -95,7 +111,9 @@ function SideBar() {
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
           </p>
-          {clickedCountry !== "" && <p>Clicked Country: {clickedCountry}</p>}
+          {clickedCountry !== "" && (
+              <p>Selected Country: {clickedCountry}</p>
+            ) && <selectedCountryOptions />}
           {display && <CountryDetails />}
         </div>
       </div>
@@ -173,14 +191,14 @@ function getBorder(countrycode) {
 
 //FIXME: fix read file correctly
 function getCountryCodes(countrycode) {
-  const fileURL = "/maps/world.txt";
+  const fileURL = require("../maps/world.txt");
   const textByLine = fetch(fileURL)
     .then(function (response) {
       return response.text();
     })
     .then(function (data) {
       const borderdata = data.split("\n").toString();
-      console.log(data.split("\n").toString());
+      // console.log(data.split("\n").toString());
       //
       var countriesBordering = [];
       //Processing
@@ -190,15 +208,18 @@ function getCountryCodes(countrycode) {
         if (borders[0] == countrycode) {
           for (let i = 1; i < borders.length; i++) {
             //Get border codes
+            // console.log(borders[i]);
             countriesBordering.push(borders[i]);
           }
         }
       }
-      console.log(countriesBordering);
+      // console.log(countriesBordering);
       return countriesBordering;
     });
   return textByLine;
 }
+
+/* GAME MAP */
 
 const MapSettings = ({
   setTooltipContent,
@@ -219,13 +240,15 @@ const MapSettings = ({
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
-              geographies.map((geo) =>
-                notThisCountry(geo) ? (
+              geographies.map((geo) => {
+                const fillcolour = handleColourFill(geo);
+                const strokecolour = handleColourStroke(geo);
+                return notThisCountry(geo) ? (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={handleColourFill(geo)}
-                    stroke={handleColourStroke(geo)}
+                    fill={fillcolour}
+                    stroke={strokecolour}
                     onMouseEnter={() => {
                       const {
                         NAME,
@@ -273,8 +296,8 @@ const MapSettings = ({
                       setdoubleClicked();
                     }}
                   />
-                ) : null
-              )
+                ) : null;
+              })
             }
           </Geographies>
         </ZoomableGroup>
