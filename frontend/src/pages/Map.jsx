@@ -17,10 +17,17 @@ import mapdata from "../maps/world.txt";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
+var countries = {};
+var socket = null;
+
 class GameMap extends Component {
   constructor() {
     super();
-    connect();
+    socket = connect();
+
+    socket.onmessage = (msg) => {
+        console.log(msg);
+      };
   }
 
   render() {
@@ -63,8 +70,14 @@ function SideBar() {
   const handleColourFill = (country) => {
     const { ISO_A2 } = country.properties;
     if (
+<<<<<<< HEAD
       clickedCountry !== "" &&
       getCountryCodes(clickedCountry).includes(ISO_A2)
+=======
+        clickedCountry !== "" &&
+        getCountryCodes(clickedCountry).includes(ISO_A2)
+      
+>>>>>>> 03357aefb3348eb1ce65bc14a8e89d113e862833
     ) {
       return "#000";
     }
@@ -132,6 +145,34 @@ var clickedCountry;
 function countryColors(country) {
   const { NAME, ISO_A2 } = country.properties;
   return "#AAA";
+}
+
+function loadMap() {
+    const situation = document.cookie.split("; ")
+    .map((s) => s.split("="))
+    .filter((arr) => arr[0] == "situation")[0][1];
+    const fileURL = "/maps/" + situation + ".txt";
+
+    var countries = {};
+
+    var raw = "";
+    fetch(fileURL)
+        .then((line) => line.text())
+        .then((line) => line.split("\n"))
+        .then((data) => raw = data);
+    
+    console.log(raw);
+    var borders = [];
+    for (let i = 0; i < raw.length; i++) {
+        borders = [];
+        var line = raw[i].split(" ");
+        countries[line[0]] = line.slice(1,);
+    }
+    return countries
+}
+
+function getBorder(countrycode) {
+    return countries[countrycode];
 }
 
 //FIXME: fix read file correctly
