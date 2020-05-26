@@ -26,8 +26,8 @@ class GameMap extends Component {
     socket = connect();
 
     socket.onmessage = (msg) => {
-        console.log(msg);
-      };
+      console.log(msg);
+    };
   }
 
   render() {
@@ -48,11 +48,11 @@ function SideBar() {
   const [clickedCountry, setclickedCountry] = useState("");
 
   const handleclickedCountry = (ISO_A2) => {
-    if (clickedCountry === "") {
-      setclickedCountry(ISO_A2);
-    } else {
-      setclickedCountry("");
-    }
+    setclickedCountry(ISO_A2);
+  };
+
+  const handledoubleClicked = () => {
+    setclickedCountry("");
   };
 
   const CountryDetails = () => {
@@ -70,14 +70,8 @@ function SideBar() {
   const handleColourFill = (country) => {
     const { ISO_A2 } = country.properties;
     if (
-<<<<<<< HEAD
       clickedCountry !== "" &&
       getCountryCodes(clickedCountry).includes(ISO_A2)
-=======
-        clickedCountry !== "" &&
-        getCountryCodes(clickedCountry).includes(ISO_A2)
-      
->>>>>>> 03357aefb3348eb1ce65bc14a8e89d113e862833
     ) {
       return "#000";
     }
@@ -116,6 +110,7 @@ function SideBar() {
         setclickedCountry={handleclickedCountry}
         handleColourFill={handleColourFill}
         handleColourStroke={handleColourStroke}
+        setdoubleClicked={handledoubleClicked}
       />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
@@ -148,60 +143,61 @@ function countryColors(country) {
 }
 
 function loadMap() {
-    const situation = document.cookie.split("; ")
+  const situation = document.cookie
+    .split("; ")
     .map((s) => s.split("="))
     .filter((arr) => arr[0] == "situation")[0][1];
-    const fileURL = "/maps/" + situation + ".txt";
+  const fileURL = "/maps/" + situation + ".txt";
 
-    var countries = {};
+  var countries = {};
 
-    var raw = "";
-    fetch(fileURL)
-        .then((line) => line.text())
-        .then((line) => line.split("\n"))
-        .then((data) => raw = data);
-    
-    console.log(raw);
-    var borders = [];
-    for (let i = 0; i < raw.length; i++) {
-        borders = [];
-        var line = raw[i].split(" ");
-        countries[line[0]] = line.slice(1,);
-    }
-    return countries
+  var raw = "";
+  fetch(fileURL)
+    .then((line) => line.text())
+    .then((line) => line.split("\n"))
+    .then((data) => (raw = data));
+
+  console.log(raw);
+  var borders = [];
+  for (let i = 0; i < raw.length; i++) {
+    borders = [];
+    var line = raw[i].split(" ");
+    countries[line[0]] = line.slice(1);
+  }
+  return countries;
 }
 
 function getBorder(countrycode) {
-    return countries[countrycode];
+  return countries[countrycode];
 }
 
 //FIXME: fix read file correctly
 function getCountryCodes(countrycode) {
-  // var fs = require("fs");
   const fileURL = "/maps/world.txt";
   const textByLine = fetch(fileURL)
     .then(function (response) {
       return response.text();
     })
     .then(function (data) {
-      borderdata = data.split("\n").toString();
+      const borderdata = data.split("\n").toString();
       console.log(data.split("\n").toString());
-      return borderdata;
-    });
-
-  var countriesBordering = [];
-
-  for (let j = 0; j < textByLine.length; j++) {
-    var borders = textByLine[j].split(" ");
-    if (borders[0] == countrycode) {
-      for (let i = 1; i < borders.length; i++) {
-        //Get border codes
-        countriesBordering.push(borders[i]);
+      //
+      var countriesBordering = [];
+      //Processing
+      for (let j = 0; j < borderdata.length; j++) {
+        var borders = borderdata[j].split(" ");
+        console.log(borders);
+        if (borders[0] == countrycode) {
+          for (let i = 1; i < borders.length; i++) {
+            //Get border codes
+            countriesBordering.push(borders[i]);
+          }
+        }
       }
-    }
-  }
-  // console.log(countriesBordering);
-  return countriesBordering;
+      console.log(countriesBordering);
+      return countriesBordering;
+    });
+  return textByLine;
 }
 
 const MapSettings = ({
@@ -215,6 +211,7 @@ const MapSettings = ({
   setclickedCountry,
   handleColourFill,
   handleColourStroke,
+  setdoubleClicked,
 }) => {
   return (
     <div className="map-wrapper">
@@ -271,6 +268,9 @@ const MapSettings = ({
                     onClick={() => {
                       const { ISO_A2 } = geo.properties;
                       setclickedCountry(ISO_A2);
+                    }}
+                    onDoubleClick={() => {
+                      setdoubleClicked();
                     }}
                   />
                 ) : null
