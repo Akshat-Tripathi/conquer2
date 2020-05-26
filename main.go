@@ -55,13 +55,15 @@ func main() {
 		StartingTroopNumber:   1,
 		StartingCountryNumber: 3,
 		Situation:             situations["world"],
+		Colours:               colours,
+		TroopInterval:         1,
 	}
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
-	games["test"].Start(ctx)
 	games["test"].AddPlayer("Akshat", "asdf")
+	games["test"].Start(ctx)
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
@@ -120,6 +122,7 @@ func main() {
 		case "realtime":
 			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 		}
+		g.AddPlayer(username, password)
 		g.Start(ctx)
 		games[id] = g
 
@@ -130,7 +133,6 @@ func main() {
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
-		games[id].AddPlayer(username, password)
 		c.Redirect(http.StatusFound, "/game_intro")
 	})
 
@@ -176,7 +178,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.Run("192.168.1.85" + ":" + port)
+	r.Run("192.168.1.2:" + port)
 }
 
 func redirect(msg string, c *gin.Context) {

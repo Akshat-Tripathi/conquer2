@@ -14,7 +14,6 @@ with open("./merges.txt", "r") as file:
 		split = line.split(" ")
 		merged[split[0]] = [i.replace("\n", "") for i in split[1:]]
 
-
 with open("../maps/world.txt", "r") as file:
 	raw = file.readlines()
 	for line in raw:
@@ -52,4 +51,7 @@ for country in neighbours.keys():
 neigh = neigh[:-1]
 
 with open("../maps/world.txt", "w") as file:
+	file.write(neigh)
+
+with open("../frontend/src/maps/world.txt", "w") as file:
 	file.write(neigh)
