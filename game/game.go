@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"sync/atomic"
 	"time"
@@ -50,6 +51,7 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 	if g.numPlayers >= int32(g.maxPlayerNum) {
 		return false
 	}
+	fmt.Println(g.colours)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	atomic.AddInt32(&g.numPlayers, 1)
 	return true
