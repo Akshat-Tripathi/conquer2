@@ -45,6 +45,7 @@ class GameMap extends Component {
             case "updateCountry":
                 if (typeof countryStates[action.Country] == "undefined" || countryStates[action.Country].Player != action.Player) {
                     countryStates[action.Country] = new countryState(action.Troops, action.Player);
+                    console.log(action.Country, countryStates);
                 } else {
                     countryStates[action.Country].Troops += action.Troops;
                 }
@@ -107,7 +108,11 @@ function SideBar() {
         console.log("hi");
       return "#000";
     }
-    return "#FFF";
+    try {
+        return playerColours[countryStates[ISO_A2].Player];
+    } catch (TypeError) {
+        return "#FFF";
+    }
   };
 
   const handleColourStroke = (country) => {
