@@ -43,6 +43,7 @@ func main() {
 	}
 
 	situations := loadMaps()
+	colours := loadColours() //Temporary
 
 	games := make(map[string]game.Game)
 
@@ -111,6 +112,7 @@ func main() {
 			StartingCountryNumber: startingCountries,
 			TroopInterval:         time.Duration(troopInterval) * time.Minute,
 			Situation:             situations[situation],
+			Colours:               colours,
 		}
 
 		var g game.Game
