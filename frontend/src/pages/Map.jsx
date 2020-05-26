@@ -124,7 +124,7 @@ const MapSettings = ({
                   key={geo.rsmKey}
                   geography={geo}
                   fill="#AAA"
-                  stroke="#FFF"
+                  stroke=""
                   onMouseEnter={() => {
                     const {
                       NAME,

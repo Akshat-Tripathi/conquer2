@@ -1,12 +1,8 @@
 package game
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 )
-
-const troopInterval = time.Second * 60
 
 //RealTimeGame - a subclass of DefaultGame where actions happen as they are sent
 type RealTimeGame struct {
