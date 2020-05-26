@@ -89,6 +89,10 @@ function StartGameBox(props) {
 
   //List the gamemode options
 
+  const handleUsername = () => {
+    username = document.getElementById("ign");
+  };
+
   return (
     <div className="wrapper">
       <div className="form-wrapper">
@@ -98,10 +102,11 @@ function StartGameBox(props) {
           <div className="username">
             <input
               type="text"
+              id="ign"
               placeholder="Username"
               name="username"
               required
-              onChange={username}
+              onChange={handleUsername}
             ></input>
           </div>
           <div>

@@ -115,7 +115,7 @@ function countryColors(country) {
   return "#AAA";
 }
 
-function handleColourStroke(country, countryClicked) {
+function handleColourStroke(country) {
   return "#BBB";
 }
 
@@ -145,12 +145,11 @@ function getCountryCodes(countrycode) {
   return countriesBordering;
 }
 
-const handleColourFill = (country, countryClicked) => {
+const handleColourFill = (country) => {
   const { ISO_A2 } = country.properties;
   if (
-    countryClicked &&
-    getCountryCodes(countryClicked).includes(ISO_A2) &&
-    countryClicked !== ""
+    getCountryCodes(clickedCountry).includes(ISO_A2) &&
+    clickedCountry !== ""
   ) {
     return "#000";
   }
