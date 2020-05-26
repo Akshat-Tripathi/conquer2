@@ -8,31 +8,19 @@ import {
 import ReactTooltip from "react-tooltip";
 // import { useSpring, animated } from "react-spring";
 import "./Map.css";
-import { connect } from "../api/index.js";
+import { connect, loaddetails } from "../api/index.js";
 import Intro2 from "../shashgonenuts/intro2";
 import { username } from "./Home.jsx";
 
+import mapdata from "../maps/world.txt";
+
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
-
-//NOTE: For API, please see src/api/index.js;
 
 class GameMap extends Component {
   constructor() {
     super();
     connect();
-  }
-
-  state = {
-    redirect: false,
-  };
-
-  componentDidMount() {
-    this.id = setTimeout(() => this.setState({ redirect: true }), 5000);
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.id);
   }
 
   render() {
@@ -50,6 +38,7 @@ function SideBar() {
   const [subrg, setsubrg] = useState("");
   const [continent, setcontinent] = useState("");
   const [display, setdisplay] = useState(false);
+  const [clickedCountry, setclickedCountry] = useState("");
 
   const CountryDetails = () => {
     return (
@@ -61,6 +50,30 @@ function SideBar() {
         <h3>Continent: {continent}</h3>
       </div>
     );
+  };
+
+  const handleColourFill = (country) => {
+    const { ISO_A2 } = country.properties;
+    if (
+      getCountryCodes(clickedCountry).includes(ISO_A2) &&
+      clickedCountry !== ""
+    ) {
+      return "#000";
+    }
+    return "#FFF";
+  };
+
+  const handleclickedCountry = (ISO_A2) => {
+    if (clickedCountry === "") {
+      setclickedCountry(ISO_A2);
+    } else {
+      setclickedCountry("");
+    }
+  };
+
+  const handleColourStroke = (country) => {
+    const { ISO_A2 } = country.properties;
+    return "#FFF";
   };
 
   return (
@@ -75,6 +88,11 @@ function SideBar() {
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
           </p>
+          <p>
+            {/* {loaddetails.map((detail) => {
+              console.log(detail);
+            })} */}
+          </p>
           {display && <CountryDetails />}
         </div>
       </div>
@@ -86,6 +104,9 @@ function SideBar() {
         setdisplay={setdisplay}
         setcontinent={setcontinent}
         setsubrg={setsubrg}
+        setclickedCountry={handleclickedCountry}
+        handleColourFill={handleColourFill}
+        handleColourStroke={handleColourStroke}
       />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
@@ -104,6 +125,48 @@ const getnum = (num) => {
   return num;
 };
 
+//Countries to not display
+function notThisCountry(country) {
+  const { NAME } = country.properties;
+  return NAME !== "";
+}
+
+var clickedCountry;
+//TODO: player team colour for country
+function countryColors(country) {
+  const { NAME, ISO_A2 } = country.properties;
+  return "#AAA";
+}
+
+//FIXME: fix read file correctly
+function getCountryCodes(countrycode) {
+  // var fs = require("fs");
+  // fetch(mapdata);
+  //enter country to search
+  const fileURL = "../maps/world.txt";
+  const textByLine = fetch(fileURL)
+    .then((line) => line.text())
+    .then((line) => line.split("\n"));
+
+  // var textByLine = fs
+  //   .readFileSync("../../../maps/world.txt")
+  //   .toString()
+  //   .split("\n");
+
+  var countriesBordering = [];
+
+  for (let j = 0; j < textByLine.length; j++) {
+    var borders = textByLine[j].split(" ");
+    if (borders[0] == countrycode) {
+      for (let i = 1; i < borders.length; i++) {
+        //Get border codes
+        countriesBordering.push(borders[i]);
+      }
+    }
+  }
+  return countriesBordering;
+}
+
 const MapSettings = ({
   setTooltipContent,
   setname,
@@ -112,6 +175,9 @@ const MapSettings = ({
   setcontinent,
   setgdp,
   setdisplay,
+  setclickedCountry,
+  handleColourFill,
+  handleColourStroke,
 }) => {
   return (
     <div className="map-wrapper">
@@ -119,6 +185,7 @@ const MapSettings = ({
         <ZoomableGroup>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
+<<<<<<< HEAD
               geographies.map((geo) => (
                 <Geography
                   key={geo.rsmKey}
@@ -164,6 +231,61 @@ const MapSettings = ({
                   }}
                 />
               ))
+=======
+              geographies.map((geo) =>
+                notThisCountry(geo) ? (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={handleColourFill(geo)}
+                    stroke={handleColourStroke(geo)}
+                    onMouseEnter={() => {
+                      const {
+                        NAME,
+                        POP_EST,
+                        GDP_MD_EST,
+                        SUBREGION,
+                        CONTINENT,
+                      } = geo.properties;
+
+                      // setTooltipContent(
+                      //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
+                      // );
+
+                      setTooltipContent(`${NAME} - ENEMY TERRITORY`);
+                      setname(NAME);
+                      setpop_est(getnum(POP_EST));
+                      setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
+                      setsubrg(SUBREGION);
+                      setcontinent(CONTINENT);
+                      setdisplay(true);
+                    }}
+                    onMouseLeave={() => {
+                      setTooltipContent("");
+                      setdisplay(false);
+                    }}
+                    style={{
+                      default: {
+                        fill: "#D6D6DA",
+                        outline: "none",
+                      },
+                      hover: {
+                        fill: "#F53",
+                        outline: "none",
+                      },
+                      pressed: {
+                        fill: "#D6D6DA",
+                        outline: "none",
+                      },
+                    }}
+                    onClick={() => {
+                      const { ISO_A2 } = geo.properties;
+                      setclickedCountry(ISO_A2);
+                    }}
+                  />
+                ) : null
+              )
+>>>>>>> 5e131db0849f346ff390c1eca3dc892a80b3c085
             }
           </Geographies>
         </ZoomableGroup>
