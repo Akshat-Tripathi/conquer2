@@ -21,6 +21,7 @@ import mapdata from "../maps/world.txt";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
+var countriesLoaded = false;
 var countries = {};
 var socket = null;
 var troops = 0;
@@ -37,6 +38,7 @@ class countryState {
 class GameMap extends Component {
   constructor() {
     super();
+    console.log(countries);
     socket = connect();
     socket.onmessage = (msg) => {
       var action = JSON.parse(msg.data);
@@ -53,6 +55,7 @@ class GameMap extends Component {
               action.Troops,
               action.Player
             );
+            console.log(action.Country, countryStates);
           } else {
             countryStates[action.Country].Troops += action.Troops;
           }
@@ -103,15 +106,22 @@ function SideBar() {
     );
   };
 
-  const handleColourFill = (country) => {
+  const handleColourFill = async (country) => {
+    if (!countriesLoaded) {
+      await loadMap();
+      countriesLoaded = true;
+    }
     const { ISO_A2 } = country.properties;
-    // if (
-    //   clickedCountry !== "" &&
-    //   getCountryCodes(clickedCountry).includes(ISO_A2)
-    // ) {
-    //   return "#000000";
-    // }
-    return "#AAA";
+
+    if (clickedCountry !== "" && countries[clickedCountry].includes(ISO_A2)) {
+      console.log("hi");
+      return "#000";
+    }
+    try {
+      return playerColours[countryStates[ISO_A2].Player];
+    } catch (TypeError) {
+      return "#FFF";
+    }
   };
 
   const handleColourStroke = (country) => {
@@ -197,62 +207,40 @@ function countryColors(country) {
 }
 
 function loadMap() {
-  const situation = document.cookie
-    .split("; ")
-    .map((s) => s.split("="))
-    .filter((arr) => arr[0] == "situation")[0][1];
-  const fileURL = "/maps/" + situation + ".txt";
-
-  var countries = {};
-
-  var raw = "";
-  fetch(fileURL)
-    .then((line) => line.text())
-    .then((line) => line.split("\n"))
-    .then((data) => (raw = data));
-
-  console.log(raw);
-  var borders = [];
-  for (let i = 0; i < raw.length; i++) {
-    borders = [];
-    var line = raw[i].split(" ");
-    countries[line[0]] = line.slice(1);
-  }
-  return countries;
-}
-
-function getBorder(countrycode) {
-  return countries[countrycode];
+  //TODO take value from the cookie
+  fetch("/maps/world.txt")
+    .then((raw) => raw.text())
+    .then((raw) => raw.split("\n"))
+    .then((lines) => lines.map((s) => s.split(" ")))
+    .then((lines) =>
+      lines.forEach((line) => (countries[line[0]] = line.slice(1)))
+    );
 }
 
 //FIXME: fix read file correctly
 function getCountryCodes(countrycode) {
-  const fileURL = require("../maps/world.txt");
-  const textByLine = fetch(fileURL)
-    .then(function (response) {
-      return response.text();
-    })
-    .then(function (data) {
-      const borderdata = data.split("\n");
-      // console.log(data.split("\n").toString());
-      //
-      var countriesBordering = [];
-      //Processing
-      for (let j = 0; j < borderdata.length; j++) {
-        var borders = borderdata[j].split(" ");
-        console.log(borders);
-        if (borders[0] == countrycode) {
-          for (let i = 1; i < borders.length; i++) {
-            //Get border codes
-            // console.log(borders[i]);
-            countriesBordering.push(borders[i]);
-          }
-        }
+  // var fs = require("fs");
+  const fileURL = "/maps/world.txt";
+  var textByLine = "";
+  fetch(fileURL)
+    .then((raw) => raw.text())
+    .then((raw) => raw.split("\n"))
+    .then((raw) => raw.map((x) => x.split(" ")))
+    .then((raw) => (textByLine = raw));
+
+  var countriesBordering = [];
+
+  for (let j = 0; j < textByLine.length; j++) {
+    var borders = textByLine[j].split(" ");
+    if (borders[0] == countrycode) {
+      for (let i = 1; i < borders.length; i++) {
+        //Get border codes
+        countriesBordering.push(borders[i]);
       }
-      // console.log(countriesBordering);
-      return countriesBordering;
-    });
-  return textByLine;
+    }
+  }
+  console.log(countriesBordering);
+  return countriesBordering;
 }
 
 /* GAME MAP */
@@ -272,91 +260,107 @@ const MapSettings = ({
 }) => {
   return (
     <div className="map-wrapper">
-      <ComposableMap data-tip="">
-        <ZoomableGroup>
-          <Geographies geography={geoUrl}>
-            {({ geographies }) => (
-              <>
-                {geographies.map((geo) => {
-                  const fillcolour = handleColourFill(geo);
-                  const strokecolour = handleColourStroke(geo);
-                  return notThisCountry(geo) ? (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={fillcolour}
-                      stroke={strokecolour}
-                      onMouseEnter={() => {
-                        const {
-                          NAME,
-                          POP_EST,
-                          GDP_MD_EST,
-                          SUBREGION,
-                          CONTINENT,
-                        } = geo.properties;
+      <ComposableMap>
+        <CustomZoomableGroup center={[0, 0]}>
+          {(position) => (
+            <>
+              <Geographies geography={geoUrl}>
+                {({ geographies }) => (
+                  <>
+                    {geographies.map((geo) => {
+                      const fillcolour = handleColourFill(geo);
+                      const strokecolour = handleColourStroke(geo);
+                      return notThisCountry(geo) ? (
+                        <Geography
+                          key={geo.rsmKey}
+                          geography={geo}
+                          fill={fillcolour}
+                          stroke={strokecolour}
+                          onMouseEnter={() => {
+                            const {
+                              NAME,
+                              POP_EST,
+                              GDP_MD_EST,
+                              SUBREGION,
+                              CONTINENT,
+                            } = geo.properties;
 
-                        // setTooltipContent(
-                        //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-                        // );
+                            // setTooltipContent(
+                            //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
+                            // );
 
-                        setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-                        setname(NAME);
-                        setpop_est(getnum(POP_EST));
-                        setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-                        setsubrg(SUBREGION);
-                        setcontinent(CONTINENT);
-                        setdisplay(true);
-                      }}
-                      onMouseLeave={() => {
-                        setTooltipContent("");
-                        setdisplay(false);
-                      }}
-                      style={{
-                        default: {
-                          fill: "#D6D6DA",
-                          outline: "none",
-                        },
-                        hover: {
-                          fill: "#F53",
-                          outline: "none",
-                        },
-                        pressed: {
-                          fill: "#D6D6DA",
-                          outline: "none",
-                        },
-                      }}
-                      onClick={() => {
-                        const { ISO_A2 } = geo.properties;
-                        setclickedCountry(ISO_A2);
-                      }}
-                      onDoubleClick={() => {
-                        setdoubleClicked();
-                      }}
-                    />
-                  ) : null;
-                })}
+                            setTooltipContent(`${NAME} - ENEMY TERRITORY`);
+                            setname(NAME);
+                            setpop_est(getnum(POP_EST));
+                            setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
+                            setsubrg(SUBREGION);
+                            setcontinent(CONTINENT);
+                            setdisplay(true);
+                          }}
+                          onMouseLeave={() => {
+                            setTooltipContent("");
+                            setdisplay(false);
+                          }}
+                          style={{
+                            default: {
+                              fill: "#D6D6DA",
+                              outline: "none",
+                            },
+                            hover: {
+                              fill: "#F53",
+                              outline: "none",
+                            },
+                            pressed: {
+                              fill: "#D6D6DA",
+                              outline: "none",
+                            },
+                          }}
+                          onClick={() => {
+                            const { ISO_A2 } = geo.properties;
+                            setclickedCountry(ISO_A2);
+                          }}
+                          onDoubleClick={() => {
+                            setdoubleClicked();
+                          }}
+                        />
+                      ) : null;
+                    })}
 
-                {geographies.map((geo) => {
-                  const centroid = geoCentroid(geo);
-                  const { NAME } = geo.properties;
-                  return (
-                    <g key={geo.rsmKey}>
-                      {
-                        <Marker coordinates={centroid}>
-                          <text fontSize={4} alignmentBaseline="middle">
-                            {NAME}
-                          </text>
-                        </Marker>
-                      }
-                    </g>
-                  );
-                })}
-              </>
-            )}
-          </Geographies>
-        </ZoomableGroup>
+                    {geographies.map((geo) => {
+                      const centroid = geoCentroid(geo);
+                      const { NAME } = geo.properties;
+                      return (
+                        <g key={geo.rsmKey}>
+                          {
+                            <Marker coordinates={centroid}>
+                              <text fontSize={4} alignmentBaseline="middle">
+                                {NAME}
+                              </text>
+                            </Marker>
+                          }
+                        </g>
+                      );
+                    })}
+                  </>
+                )}
+              </Geographies>
+            </>
+          )}
+        </CustomZoomableGroup>
       </ComposableMap>
     </div>
+  );
+};
+
+const CustomZoomableGroup = ({ children, ...restProps }) => {
+  const { mapRef, transformString, position } = useZoomPan(restProps);
+  return (
+    // <div className="zoomable-group">
+    <g ref={mapRef}>
+      <rect fill="transparent" />
+      <g transform={transformString}>{children(position)}</g>
+    </g>
+    // </div>
   );
 };
 
