@@ -1,11 +1,13 @@
 var loaddetails;
 let connect = () => {
-  const id = document.cookie.split("; ")[0].replace("id=", "");
+  const id = document.cookie.split("; ")
+                .map((s) => s.split("="))
+                .filter((arr) => arr[0] == "id")[0][1];
   const socketURL =
     window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
 
   var socket = new WebSocket(socketURL);
-  console.log("Attempting Connection...");
+  console.log("Attempting connection to: " + socketURL);
 
   socket.onopen = () => {
     console.log("Successfully Connected");
@@ -21,7 +23,7 @@ let connect = () => {
     alert("Invalid login");
 
     //TODO: redirect to an error page
-    window.location.replace(window.location.href.replace("/game", "/error"));
+    //window.location.replace(window.location.href.replace("/game", "/error"));
   };
 
   socket.onerror = (error) => {

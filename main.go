@@ -31,7 +31,7 @@ func pain() {
 			})
 		})
 	}
-	router.Run(":5000")
+	router.Run(":8080")
 }
 
 func main() {
@@ -68,8 +68,13 @@ func main() {
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
 	r.Use(static.Serve("/game_intro", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
 
 	r.LoadHTMLGlob("frontend/**/*.html")
+
+	r.GET("/maps/", func(c *gin.Context) {
+		c.File("world.txt")
+	})
 
 	r.POST("/create", func(c *gin.Context) {
 		req := c.Request
@@ -135,7 +140,7 @@ func main() {
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
-		c.Redirect(http.StatusFound, "/game_intro")
+		c.Redirect(http.StatusFound, "/game")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -162,7 +167,7 @@ func main() {
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
-			c.Redirect(http.StatusFound, "/game_intro")
+			c.Redirect(http.StatusFound, "/game")
 		default:
 			redirect("Invalid username/password combo", c)
 		}
