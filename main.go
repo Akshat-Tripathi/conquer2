@@ -151,6 +151,11 @@ func main() {
 		password := req.FormValue("password")
 		situation := req.FormValue("situation")
 
+		//TODO remove this
+		if situation == "" {
+			situation = "world"
+		}
+
 		id := req.FormValue("id")
 		thisGame, validID := games[id]
 		if !validID {

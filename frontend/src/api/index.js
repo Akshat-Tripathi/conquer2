@@ -12,24 +12,23 @@ let connect = () => {
   socket.onopen = () => {
     console.log("Successfully Connected");
   };
-
+/*
   socket.onmessage = (msg) => {
     loaddetails = msg;
     console.log(msg);
   };
-
+*/
   socket.onclose = (event) => {
     console.log("Socket Closed Connection: ", event);
     alert("Invalid login");
 
-    //TODO: redirect to an error page
     //window.location.replace(window.location.href.replace("/game", "/error"));
   };
 
   socket.onerror = (error) => {
     console.log("Socket Error: ", error);
   };
-
+  return socket
   // socket.send
 
   // socket.addEventListener("/join", () => )
