@@ -40,6 +40,14 @@ function SideBar() {
   const [display, setdisplay] = useState(false);
   const [clickedCountry, setclickedCountry] = useState("");
 
+  const handleclickedCountry = (ISO_A2) => {
+    if (clickedCountry === "") {
+      setclickedCountry(ISO_A2);
+    } else {
+      setclickedCountry("");
+    }
+  };
+
   const CountryDetails = () => {
     return (
       <div>
@@ -55,20 +63,12 @@ function SideBar() {
   const handleColourFill = (country) => {
     const { ISO_A2 } = country.properties;
     if (
-      getCountryCodes(clickedCountry).includes(ISO_A2) &&
-      clickedCountry !== ""
+      clickedCountry !== "" &&
+      getCountryCodes(clickedCountry).includes(ISO_A2)
     ) {
       return "#000";
     }
     return "#FFF";
-  };
-
-  const handleclickedCountry = (ISO_A2) => {
-    if (clickedCountry === "") {
-      setclickedCountry(ISO_A2);
-    } else {
-      setclickedCountry("");
-    }
   };
 
   const handleColourStroke = (country) => {
@@ -88,11 +88,7 @@ function SideBar() {
             This is your war control room. Help us attain victory over our
             enemies. The Gods are on our side!
           </p>
-          <p>
-            {/* {loaddetails.map((detail) => {
-              console.log(detail);
-            })} */}
-          </p>
+          {clickedCountry !== "" && <p>Clicked Country: {clickedCountry}</p>}
           {display && <CountryDetails />}
         </div>
       </div>
@@ -141,10 +137,16 @@ function countryColors(country) {
 //FIXME: fix read file correctly
 function getCountryCodes(countrycode) {
   // var fs = require("fs");
-  const fileURL = "../maps/world.txt";
+  const fileURL = "/maps/world.txt";
   const textByLine = fetch(fileURL)
-    .then((line) => line.text())
-    .then((line) => line.split("\n"));
+    .then(function (response) {
+      return response.text();
+    })
+    .then(function (data) {
+      borderdata = data.split("\n").toString();
+      console.log(data.split("\n").toString());
+      return borderdata;
+    });
 
   var countriesBordering = [];
 
@@ -157,6 +159,7 @@ function getCountryCodes(countrycode) {
       }
     }
   }
+  // console.log(countriesBordering);
   return countriesBordering;
 }
 

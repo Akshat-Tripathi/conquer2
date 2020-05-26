@@ -1,8 +1,9 @@
 var loaddetails;
 let connect = () => {
-  const id = document.cookie.split("; ")
-                .map((s) => s.split("="))
-                .filter((arr) => arr[0] == "id")[0][1];
+  const id = document.cookie
+    .split("; ")
+    .map((s) => s.split("="))
+    .filter((arr) => arr[0] == "id")[0][1];
   const socketURL =
     window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
 
@@ -15,7 +16,7 @@ let connect = () => {
 
   socket.onmessage = (msg) => {
     loaddetails = msg;
-    console.log(msg);
+    // console.log(msg);
   };
 
   socket.onclose = (event) => {
