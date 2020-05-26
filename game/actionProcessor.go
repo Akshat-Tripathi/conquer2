@@ -52,7 +52,7 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 }
 
 func (p *defaultProcessor) processTroops() []UpdateMessage {
-	msgs := make([]UpdateMessage, p.maxPlayerNum)
+	msgs := make([]UpdateMessage, len(p.playerTroops))
 	i := 0
 	deltaTroops := 0
 	for name, vals := range p.playerTroops {

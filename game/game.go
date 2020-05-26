@@ -53,7 +53,10 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 	}
 	fmt.Println(g.colours)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
-	atomic.AddInt32(&g.numPlayers, 1)
+	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
+		log.Println("Processing troops")
+		go g.processTroops()
+	}
 	return true
 }
 
@@ -105,6 +108,7 @@ func (g *DefaultGame) processActions() {
 		g.send(msg1)
 		g.send(msg2)
 		if won {
+			g.numPlayers = 0
 			go func() {
 				time.Sleep(time.Second * 5)
 				close(g.actions)
@@ -123,10 +127,12 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 }
 
 func (g *DefaultGame) processTroops() {
-	for {
-		time.Sleep(g.troopInterval)
+	for g.numPlayers > 0 {
 		for _, v := range g.processor.processTroops() {
-			g.conn.sendToPlayer(v, v.Player)
+			go func(v UpdateMessage) {
+				g.conn.sendToPlayer(v, v.Player)
+			}(v)
 		}
+		time.Sleep(g.troopInterval * time.Minute)
 	}
 }
