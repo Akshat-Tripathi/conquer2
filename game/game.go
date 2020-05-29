@@ -49,10 +49,12 @@ func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 //AddPlayer - returns whether or not the player was successfully added
 func (g *DefaultGame) AddPlayer(name, password string) bool {
 	if g.numPlayers >= int32(g.maxPlayerNum) {
+		log.Println("false")
 		return false
 	}
 	fmt.Println(g.colours)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
+	log.Println(g.colours[g.numPlayers])
 	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
 		log.Println("Processing troops")
 		go g.processTroops()
@@ -87,14 +89,14 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 		return
 	}
 	g.conn.register(username)
-	go g.conn.monitor(username, conn, g.actions)
 	for _, msg := range g.processor.getState(username) {
 		if msg.Player == username {
 			g.conn.sendToAll(msg)
-		} else {
-			g.conn.sendToPlayer(msg, username)
+			} else {
+				g.conn.sendToPlayer(msg, username)
+			}
 		}
-	}
+	g.conn.monitor(username, conn, g.actions)
 }
 
 func redirect(conn *websocket.Conn) {
