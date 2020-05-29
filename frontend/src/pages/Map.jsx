@@ -43,6 +43,9 @@ class GameMap extends Component {
                 break
             case "updateCountry":
                 if (typeof countryStates[action.Country] == "undefined" || countryStates[action.Country].Player != action.Player) {
+                    if (action.Player != "") {
+                        console.log(action.Player)
+                    }
                     countryStates[action.Country] = new countryState(action.Troops, action.Player);
                 } else {
                     countryStates[action.Country].Troops += action.Troops;
@@ -103,16 +106,16 @@ function SideBar() {
         clickedCountry !== "" &&
         countries[clickedCountry].includes(ISO_A2)
     ) {
-      return "#be90d4";
+      return "#64513B"; //Highlighted colour
     }
     try {
         var col = playerColours[countryStates[ISO_A2].Player];
         if (typeof col == "undefined") {
-            col = "#B9A37E";
+            col = "#B9A37E"; //blank colour
         }
         return col;
     } catch (TypeError) {
-        return "#B9A37E";
+        return "#B9A37E"; //blank colour
     }
   };
 
