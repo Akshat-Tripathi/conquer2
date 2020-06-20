@@ -1,156 +1,268 @@
-import React from "react";
+import React, { useState } from 'react';
 import {
-  Typography,
-  Box,
-  makeStyles,
-  Button,
-  TextField,
-  Paper,
-  Slider,
-} from "@material-ui/core";
+	Typography,
+	Button,
+	TextField,
+	Paper,
+	Slider,
+	DialogContentText,
+	makeStyles,
+	Grid,
+	IconButton,
+	Select
+} from '@material-ui/core';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+import { fade } from '@material-ui/core/styles/colorManipulator';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import './StartGameBox.css';
 
 //TODO: Add username var here and set accordingly.
-var username = "";
+var mode = 0;
 
-function StartGameBox(props) {
-  const useStyles = makeStyles((theme) => ({
-    paper: {
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-      padding: theme.spacing(2),
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3),
-    },
-  }));
-  const handleUsername = () => {
-    username = document.getElementById("ign");
-  };
-  const valuetext = (troopsInterval) => {
-    return `${troopsInterval} Troop Interval`;
-  };
-  return (
-    // <div className="wrapper">
-    //   <div className="form-wrapper">
-    <div>
-      <Paper styles={{}}>
-        <Box style={{ paddingTop: "10%" }}>
-          <h3 className="gamebox-title">Join the game!</h3>
+const useStyles = makeStyles((theme) => ({
+	paper: {
+		marginLeft: '60%',
+		marginRight: '15%',
+		marginTop: '10%',
+		marginBottom: '20%',
+		background: fade('#000000', 0.8),
+		color: 'white',
+		padding: theme.spacing(3)
+	},
+	buttons: {
+		display: 'flex',
+		justifyContent: 'flex-end'
+	},
+	button: {
+		marginTop: theme.spacing(3),
+		marginLeft: theme.spacing(1)
+	}
+}));
 
-          <form action="/join" method="POST">
-            <TextField
-              type="text"
-              id="ign"
-              placeholder="Username"
-              name="username"
-              required
-              onChange={handleUsername}
-            />
+function StartGameBox() {
+	const classes = useStyles();
+	const [ mode, setmode ] = useState(0);
 
-            <div>
-              <TextField
-                type="password"
-                placeholder="Password"
-                name="password"
-                required
-              />
-            </div>
-            <div>
-              <TextField type="text" placeholder="Game Id" name="id" required />
-            </div>
-            <Button
-              type="submit"
-              name="submit"
-              value="join"
-              variant="contained"
-              color="primary"
-            >
-              Join Game
-            </Button>
-          </form>
-        </Box>
+	const handleModeOne = () => {
+		setmode(1);
+	};
 
-        <Box>
-          <form action="/create" method="POST">
-            <select className="gamemode" name="type" required>
-              <option value="realtime">Realtime game</option>
-            </select>
-            <div>
-              <TextField
-                type="text"
-                placeholder="Username"
-                name="username"
-                required
-                variant="outlined"
-              />
-            </div>
-            <div>
-              <TextField
-                type="password"
-                placeholder="Password"
-                name="password"
-                required
-                variant="outlined"
-              />
-            </div>
-            <div>
-              <TextField
-                className="noOfPlayers"
-                type="number"
-                placeholder="maxPlayers"
-                name="maxPlayers"
-                required
-                variant="outlined"
-              />
-            </div>
-            <div>
-              <TextField
-                type="number"
-                placeholder="startingTroops"
-                name="startingTroops"
-                required
-                variant="outlined"
-              />
-            </div>
-            <div>
-              <TextField
-                type="number"
-                placeholder="startingCountries"
-                name="startingCountries"
-                required
-                variant="outlined"
-              />
-            </div>
-            <div>
-              <Typography id="troopInterval" gutterBottom>
-                Small steps
-              </Typography>
-              <Slider
-                defaultValue={0.00000005}
-                getAriaValueText={valuetext}
-                aria-labelledby="troopInterval"
-                step={1}
-                marks
-                min={1}
-                max={10}
-                valueLabelDisplay="auto"
-              />
-            </div>
-            <Button
-              type="submit"
-              name="submit"
-              value="create"
-              variant="contained"
-              color="secondary"
-            >
-              Commence WAR
-            </Button>
-          </form>
-        </Box>
-      </Paper>
-    </div>
-  );
+	const handleModeZero = () => {
+		setmode(0);
+	};
+
+	const handleModeTwo = () => {
+		setmode(2);
+	};
+
+	const getOptionContent = (mode) => {
+		switch (mode) {
+			case 0:
+				return <StartContent setModeToOne={handleModeOne} setModeToTwo={handleModeTwo} />;
+			case 1:
+				return <JoinGame setModeToZero={handleModeZero} />;
+			case 2:
+				return <CreateGame setModeToZero={handleModeZero} />;
+			default:
+				throw new Error('?? what happened ...');
+		}
+	};
+
+	return (
+		<div>
+			<CssBaseline />
+			<Paper className={classes.paper} elevation={3}>
+				<Grid container spacing={2}>
+					<Grid item xs={12}>
+						<Typography component="h3" variant="h5" align="center">
+							It's time to begin Commander.
+						</Typography>
+					</Grid>
+					{getOptionContent(mode)}
+				</Grid>
+			</Paper>
+		</div>
+	);
 }
 
+const StartContent = ({ setModeToOne, setModeToTwo }) => {
+	return (
+		<React.Fragment>
+			<Grid item xs={12} sm={6}>
+				<div
+					style={{
+						marginLeft: '10%',
+						marginRight: '10%',
+						marginTop: '10%',
+						marginBottom: '10%',
+						textAlign: 'center',
+						fontSize: '50'
+					}}
+				>
+					<IconButton aria-label="newgame" color="primary" size="medium" onClick={setModeToTwo}>
+						<AddCircleIcon
+							style={{
+								fontSize: '50'
+							}}
+						/>
+					</IconButton>
+					<Typography variant="subtitle2">Create New Game</Typography>
+				</div>
+			</Grid>
+			<Grid item xs={12} sm={6}>
+				<div
+					style={{
+						marginLeft: '10%',
+						marginRight: '10%',
+						marginTop: '10%',
+						marginBottom: '10%',
+						textAlign: 'center'
+					}}
+				>
+					<IconButton aria-label="joingame" color="secondary" size="medium" onClick={setModeToOne}>
+						<DoubleArrowIcon
+							style={{
+								fontSize: '50'
+							}}
+						/>
+					</IconButton>
+					<Typography variant="subtitle2">Join Game</Typography>
+				</div>
+			</Grid>
+		</React.Fragment>
+	);
+};
+
+const JoinGame = ({ setModeToZero }) => {
+	return (
+		<Grid items xs={12}>
+			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
+			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
+				<form action="/join" method="POST">
+					<Grid container spacing={3}>
+						<Grid item xs={12}>
+							<TextField type="text" id="ign" placeholder="Username" name="username" required />
+						</Grid>
+						<Grid item xs={12}>
+							<TextField type="password" placeholder="Password" name="password" required />
+						</Grid>
+						<Grid item xs={12}>
+							<TextField type="text" placeholder="Game Id" name="id" required />
+						</Grid>
+						<Grid item xs={12}>
+							<Button type="submit" name="submit" value="join" variant="outlined" color="secondary">
+								Join Game
+							</Button>
+						</Grid>
+					</Grid>
+				</form>
+			</Paper>
+			<IconButton aria-label="return" color="secondary" onClick={setModeToZero}>
+				<ArrowBackIcon
+					style={{
+						fontSize: '50'
+					}}
+				/>
+				<Typography variant="subtitle1">Back</Typography>
+			</IconButton>
+		</Grid>
+	);
+};
+
+const CreateGame = ({ setModeToZero }) => {
+	return (
+		<Grid items xs={12}>
+			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
+				<form action="/create" method="POST">
+					<Grid container spacing={3}>
+						<Grid item xs={12}>
+							<Select
+								className="gamemode"
+								id="gamemode"
+								name="type"
+								label="Gamemode"
+								required
+								variant="outlined"
+							>
+								<MenuItem value="realtime">World War III</MenuItem>
+							</Select>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField type="text" placeholder="Username" name="username" required variant="outlined" />
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								type="password"
+								placeholder="Password"
+								name="password"
+								required
+								variant="outlined"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								className="noOfPlayers"
+								type="number"
+								placeholder="Maximum number of players"
+								name="maxPlayers"
+								required
+								variant="outlined"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								type="number"
+								placeholder="Starting Number of Troops"
+								name="startingTroops"
+								required
+								variant="outlined"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								type="number"
+								placeholder="startingCountries"
+								name="startingCountries"
+								required
+								variant="outlined"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<Typography id="troopInterval" gutterBottom>
+								Please Specify Troop Interval
+							</Typography>
+							<Slider
+								defaultValue={0.00000005}
+								aria-labelledby="troopInterval"
+								step={1}
+								marks
+								min={1}
+								max={10}
+								valueLabelDisplay="auto"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<Button type="submit" name="submit" value="create" variant="outlined" color="secondary">
+								Commence WAR
+							</Button>
+						</Grid>
+					</Grid>
+				</form>
+			</Paper>
+			<IconButton aria-label="return" color="secondary" onClick={setModeToZero}>
+				<ArrowBackIcon
+					style={{
+						fontSize: '50'
+					}}
+				/>
+				<Typography variant="subtitle1">Back</Typography>
+			</IconButton>
+		</Grid>
+	);
+};
+
 export default StartGameBox;
-export { username };
