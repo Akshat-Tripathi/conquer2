@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -39,6 +40,7 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 		Troops: p.playerTroops[username].troops,
 		Type:   "updateTroops",
 		Player: username}
+	fmt.Println(p.playerTroops[username].troops)
 	i++
 	for player, state := range p.playerTroops {
 		msgs[i] = UpdateMessage{

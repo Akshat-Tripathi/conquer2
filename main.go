@@ -56,7 +56,7 @@ func main() {
 		StartingCountryNumber: 3,
 		Situation:             situations["world"],
 		Colours:               colours,
-		TroopInterval:         1,
+		TroopInterval:         time.Second * 10,
 	}
 
 	//TEST CODE - REMOVE IN PRODUCTION

@@ -128,11 +128,13 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for g.numPlayers > 0 {
+		fmt.Println(g.troopInterval)
+		time.Sleep(g.troopInterval)
 		for _, v := range g.processor.processTroops() {
 			go func(v UpdateMessage) {
+				fmt.Println(v.Troops)
 				g.conn.sendToPlayer(v, v.Player)
 			}(v)
 		}
-		time.Sleep(g.troopInterval * time.Minute)
 	}
 }
