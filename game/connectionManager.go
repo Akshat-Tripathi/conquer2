@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -18,6 +19,14 @@ func (c *connectionManager) register(name string) {
 	c.players[name] = make(chan UpdateMessage)
 }
 
+//UpdateMessage - sent to client
+type UpdateMessage struct {
+	Troops  int    //delta troops
+	Type    string //Type of update: updateCountry or updateTroops or newPlayer
+	Player  string //Player that owns the country / dest player
+	Country string //Could be the colour iff the type is newPlayer
+}
+
 func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
 	var act Action
 	err := conn.ReadJSON(&act)
@@ -32,8 +41,8 @@ func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
 //Monitor - monitors a player's websocket
 func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
 	go func() {
+		var act Action
 		for {
-			var act Action
 			err := conn.ReadJSON(&act)
 			if err != nil {
 				log.Println("read ", err)
@@ -48,6 +57,9 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan
 		if len(c.players) > 0 {
 			select {
 			case msg := <-c.players[name]:
+				if msg.Type == "updateTroops" {
+					fmt.Println(msg)
+				}
 				err := conn.WriteJSON(msg)
 				if err != nil {
 					//log.Println("write ", err)
@@ -71,12 +83,4 @@ func (c *connectionManager) sendToAll(msg UpdateMessage) {
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 	c.players[player] <- msg
-}
-
-//UpdateMessage - sent to client
-type UpdateMessage struct {
-	Troops  int    //delta troops
-	Type    string //Type of update: updateCountry or updateTroops or newPlayer
-	Player  string //Player that owns the country / dest player
-	Country string //Could be the colour iff the type is newPlayer
 }
