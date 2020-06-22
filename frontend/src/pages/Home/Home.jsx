@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import StartGameBox from './StartGameBox';
 import Video from './Video.jsx';
 import Grid from '@material-ui/core/Grid';
-
+import { fade } from '@material-ui/core/styles/colorManipulator';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import './Home.css';
@@ -40,7 +40,7 @@ function Footer() {
 					left: 0,
 					bottom: 0,
 					width: '100%',
-					backgroundColor: 'black',
+					background: fade('#000000', 0.8),
 					color: 'white',
 					textAlign: 'center'
 				}}

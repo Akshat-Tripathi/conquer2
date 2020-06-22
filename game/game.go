@@ -53,6 +53,7 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 		return false
 	}
 	fmt.Println(g.colours)
+	fmt.Println(g.numPlayers)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	log.Println(g.colours[g.numPlayers])
 	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
@@ -92,10 +93,10 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	for _, msg := range g.processor.getState(username) {
 		if msg.Player == username {
 			g.conn.sendToAll(msg)
-			} else {
-				g.conn.sendToPlayer(msg, username)
-			}
+		} else {
+			g.conn.sendToPlayer(msg, username)
 		}
+	}
 	g.conn.monitor(username, conn, g.actions)
 }
 
