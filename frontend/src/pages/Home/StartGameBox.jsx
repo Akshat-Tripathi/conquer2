@@ -9,11 +9,15 @@ import {
 	makeStyles,
 	Grid,
 	IconButton,
-	Select
+	Select,
+	FormControlLabel,
+	Checkbox
 } from '@material-ui/core';
+
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import { fade } from '@material-ui/core/styles/colorManipulator';
@@ -21,7 +25,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import './StartGameBox.css';
 
 //TODO: Add username var here and set accordingly.
-var mode = 0;
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -46,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 function StartGameBox() {
 	const classes = useStyles();
 	const [ mode, setmode ] = useState(0);
+	const [ username, setusername ] = useState('Loser');
 
 	const handleModeOne = () => {
 		setmode(1);
@@ -57,6 +61,10 @@ function StartGameBox() {
 
 	const handleModeTwo = () => {
 		setmode(2);
+	};
+
+	const handleUsername = (name) => {
+		setusername(name);
 	};
 
 	const getOptionContent = (mode) => {
@@ -137,7 +145,7 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 	);
 };
 
-const JoinGame = ({ setModeToZero }) => {
+const JoinGame = ({ setModeToZero, setusername }) => {
 	return (
 		<Grid items xs={12}>
 			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
@@ -173,20 +181,22 @@ const JoinGame = ({ setModeToZero }) => {
 	);
 };
 
-const CreateGame = ({ setModeToZero }) => {
+const CreateGame = ({ setModeToZero, setusername }) => {
 	return (
 		<Grid items xs={12}>
 			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
+				<DialogContentText>Creating a new game...</DialogContentText>
 				<form action="/create" method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
 							<Select
 								className="gamemode"
 								id="gamemode"
-								name="type"
+								name="gamemode"
 								label="Gamemode"
 								required
 								variant="outlined"
+								placeholder="World War III"
 							>
 								<MenuItem value="realtime">World War III</MenuItem>
 							</Select>
@@ -236,13 +246,19 @@ const CreateGame = ({ setModeToZero }) => {
 								Please Specify Troop Interval
 							</Typography>
 							<Slider
-								defaultValue={0.00000005}
+								defaultValue={5}
 								aria-labelledby="troopInterval"
 								step={1}
 								marks
-								min={1}
-								max={10}
+								min={4}
+								max={20}
 								valueLabelDisplay="auto"
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<FormControlLabel
+								control={<Checkbox color="secondary" name="tncs" value="yes" />}
+								label="I agree with the Imperium Games Terms and Conditions"
 							/>
 						</Grid>
 						<Grid item xs={12}>
