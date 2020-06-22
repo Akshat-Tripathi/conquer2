@@ -1,11 +1,13 @@
 import React, { Component, useState } from 'react';
 import { connect, loaddetails } from '../../api/index.js';
-import { Typography, Paper, makeStyles, IconButton, Snackbar, Grid } from '@material-ui/core';
+import { Typography, Paper, makeStyles, IconButton, Snackbar, Grid, Button } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import HelpIcon from '@material-ui/icons/Help';
 import MuiAlert from '@material-ui/lab/Alert';
 import VectorMap from './VectorMap';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+//FIXME: Username not being imported - has no val??
+// import { username } from '../Home/StartGameBox';
 import './Map.css';
 
 var countriesLoaded = false;
@@ -24,32 +26,32 @@ class countryState {
 }
 
 class GameMap extends Component {
-	// constructor() {
-	// 	super();
-	// 	socket = connect();
-	// 	socket.onmessage = (msg) => {
-	// 		var action = JSON.parse(msg.data);
-	// 		switch (action.Type) {
-	// 			case 'updateTroops':
-	// 				troops = action.Troops;
-	// 				break;
-	// 			case 'updateCountry':
-	// 				if (
-	// 					typeof countryStates[action.Country] == 'undefined' ||
-	// 					countryStates[action.Country].Player != action.Player
-	// 				) {
-	// 					countryStates[action.Country] = new countryState(action.Troops, action.Player);
-	// 				} else {
-	// 					countryStates[action.Country].Troops += action.Troops;
-	// 				}
-	// 				break;
-	// 			case 'newPlayer':
-	// 				console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
-	// 				playerColours[action.Player] = action.Country;
-	// 				players.push(action.Player);
-	// 		}
-	// 	};
-	// }
+	constructor() {
+		super();
+		socket = connect();
+		socket.onmessage = (msg) => {
+			var action = JSON.parse(msg.data);
+			switch (action.Type) {
+				case 'updateTroops':
+					troops = action.Troops;
+					break;
+				case 'updateCountry':
+					if (
+						typeof countryStates[action.Country] == 'undefined' ||
+						countryStates[action.Country].Player != action.Player
+					) {
+						countryStates[action.Country] = new countryState(action.Troops, action.Player);
+					} else {
+						countryStates[action.Country].Troops += action.Troops;
+					}
+					break;
+				case 'newPlayer':
+					console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
+					playerColours[action.Player] = action.Country;
+					players.push(action.Player);
+			}
+		};
+	}
 
 	render() {
 		return <SideBar />;
@@ -93,7 +95,7 @@ function Alert(props) {
 function SideBar() {
 	//CSS
 	const classes = useStyles();
-
+	const username = 'Shashwat';
 	//TODO: Fetch #troops, attack, move options, fix data vals
 
 	// Spy Detail Information
@@ -109,9 +111,6 @@ function SideBar() {
 
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
-
-	//Get username
-	const username = countryState.Player;
 
 	const handleClick = (geo) => {
 		const { NAME } = geo.properties;
@@ -193,27 +192,6 @@ function SideBar() {
 		return 0.3;
 	};
 
-	const options = () => {
-		return (
-			<div>
-				<Grid container xs={12}>
-					<Grid item xs={12}>
-						<button>ATTACK</button>
-					</Grid>
-					<Grid item xs={12}>
-						<button>MOVE</button>
-					</Grid>
-					<Grid item xs={12}>
-						<button>DONATE</button>
-					</Grid>
-					<Grid item xs={12}>
-						<button>DEPLOY</button>
-					</Grid>
-				</Grid>
-			</div>
-		);
-	};
-
 	return (
 		<div>
 			{players.length !== 0 && <PlayerBox classes={classes} />}
@@ -240,6 +218,11 @@ function SideBar() {
 							</Snackbar>
 						</IconButton>
 					</Grid>
+					{toCountry !== '' && (
+						<Grid item xs={12}>
+							<Options classes={classes} fromCountry={fromCountry} toCountry={toCountry} />
+						</Grid>
+					)}
 					<Grid item xs={12}>
 						{name !== '' && (
 							<SpyDetails name={name} subrg={subrg} continent={continent} pop_est={pop_est} gdp={gdp} />
@@ -262,6 +245,42 @@ function SideBar() {
 		</div>
 	);
 }
+
+const Options = (classes, toCountry, fromCountry) => {
+	return (
+		<div>
+			<Grid container xs={12}>
+				<Grid item xs={12}>
+					<Typography variant="h5">
+						{' '}
+						From <div style={{ color: 'lightgreen' }}>{fromCountry}</div> To{' '}
+						<div style={{ color: 'red' }}>{toCountry}</div>
+					</Typography>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button}>
+						ATTACK
+					</Button>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<Button variant="contained" size="small" color="primary" className={classes.button}>
+						MOVE
+					</Button>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<Button variant="contained" size="small" color="primary" className={classes.button}>
+						DONATE
+					</Button>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button}>
+						DEPLOY
+					</Button>
+				</Grid>
+			</Grid>
+		</div>
+	);
+};
 
 const PlayerBox = ({ classes }) => {
 	return (
@@ -329,115 +348,6 @@ function getCountryCodes(countrycode) {
 	return countriesBordering;
 }
 
-/* GAME MAP */
-
-// const MapSettings = ({
-// 	setTooltipContent,
-// 	setname,
-// 	setpop_est,
-// 	setsubrg,
-// 	setcontinent,
-// 	setgdp,
-// 	setdisplay,
-// 	setclickedCountry,
-// 	handleColourFill,
-// 	handleColourStroke,
-// 	setdoubleClicked
-// }) => {
-// 	return (
-// 		<div className="map-wrapper">
-// 			<ComposableMap>
-// 				<CustomZoomableGroup center={[ 0, 0 ]}>
-// 					{(position) => (
-// 						<div>
-// 							<Geographies geography={geoUrl}>
-// 								{({ geographies }) => (
-// 									<div>
-// 										{geographies.map((geo) => {
-// 											const fillcolour = handleColourFill(geo);
-// 											const strokecolour = handleColourStroke(geo);
-// 											return notThisCountry(geo) ? (
-// 												<Geography
-// 													key={geo.rsmKey}
-// 													geography={geo}
-// 													fill={fillcolour}
-// 													stroke={strokecolour}
-// 													onMouseEnter={() => {
-// 														const {
-// 															NAME,
-// 															POP_EST,
-// 															GDP_MD_EST,
-// 															SUBREGION,
-// 															CONTINENT
-// 														} = geo.properties;
-
-// 														// setTooltipContent(
-// 														//   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
-// 														// );
-
-// 														setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-// 														setname(NAME);
-// 														setpop_est(getnum(POP_EST));
-// 														setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-// 														setsubrg(SUBREGION);
-// 														setcontinent(CONTINENT);
-// 														setdisplay(true);
-// 													}}
-// 													onMouseLeave={() => {
-// 														setTooltipContent('');
-// 														setdisplay(false);
-// 													}}
-// 													style={{
-// 														default: {
-// 															fill: '#D6D6DA',
-// 															outline: 'none'
-// 														},
-// 														hover: {
-// 															fill: '#F53',
-// 															outline: 'none'
-// 														},
-// 														pressed: {
-// 															fill: '#D6D6DA',
-// 															outline: 'none'
-// 														}
-// 													}}
-// 													onClick={() => {
-// 														const { ISO_A2 } = geo.properties;
-// 														setclickedCountry(ISO_A2);
-// 													}}
-// 													onDoubleClick={() => {
-// 														setdoubleClicked();
-// 													}}
-// 												/>
-// 											) : null;
-// 										})}
-
-// 										{geographies.map((geo) => {
-// 											const centroid = geoCentroid(geo);
-// 											const { ISO_A2 } = geo.properties;
-// 											return (
-// 												<g key={geo.rsmKey}>
-// 													{
-// 														<Marker coordinates={centroid}>
-// 															<text fontSize={7 / position.k} alignmentBaseline="middle">
-// 																{countries[ISO_A2]}
-// 															</text>
-// 														</Marker>
-// 													}
-// 												</g>
-// 											);
-// 										})}
-// 									</div>
-// 								)}
-// 							</Geographies>
-// 						</div>
-// 					)}
-// 				</CustomZoomableGroup>
-// 			</ComposableMap>
-// 		</div>
-// 	);
-// };
-
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
 		<div>
@@ -479,4 +389,4 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	);
 };
 
-export default SideBar;
+export default GameMap;
