@@ -25,6 +25,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import './StartGameBox.css';
 
 //TODO: Add username var here and set accordingly.
+export var username = '';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -64,7 +65,7 @@ function StartGameBox() {
 	};
 
 	const handleUsername = (name) => {
-		setusername(name);
+		username = name;
 	};
 
 	const getOptionContent = (mode) => {
@@ -72,7 +73,7 @@ function StartGameBox() {
 			case 0:
 				return <StartContent setModeToOne={handleModeOne} setModeToTwo={handleModeTwo} />;
 			case 1:
-				return <JoinGame setModeToZero={handleModeZero} />;
+				return <JoinGame setModeToZero={handleModeZero} setusername={handleUsername} />;
 			case 2:
 				return <CreateGame setModeToZero={handleModeZero} />;
 			default:
@@ -153,7 +154,14 @@ const JoinGame = ({ setModeToZero, setusername }) => {
 				<form action="/join" method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
-							<TextField type="text" id="ign" placeholder="Username" name="username" required />
+							<TextField
+								type="text"
+								id="ign"
+								placeholder="Username"
+								name="username"
+								required
+								onChange={setusername}
+							/>
 						</Grid>
 						<Grid item xs={12}>
 							<TextField type="password" placeholder="Password" name="password" required />
