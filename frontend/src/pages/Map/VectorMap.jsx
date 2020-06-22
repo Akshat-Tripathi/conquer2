@@ -23,9 +23,7 @@ function notThisCountry(country) {
 	return true;
 }
 
-const mapWidth = 1000;
-const mapHeight = 600;
-const MapChart = ({ setTooltipContent }) => {
+const MapChart = ({ setTooltipContent, setname, setpop_est, setsubrg, setcontinent, setgdp }) => {
 	return (
 		<div>
 			{/* <ComposableMap data-tip="" projectionConfig={{ scale: 200 }} width={mapWidth} height={mapHeight}> */}
@@ -43,11 +41,21 @@ const MapChart = ({ setTooltipContent }) => {
 										stroke="#FFF"
 										strokeWidth={0.3}
 										onMouseEnter={() => {
-											const { NAME } = geo.properties;
+											const { NAME, POP_EST, SUBREGION, CONTINENT, GDP_MD_EST } = geo.properties;
 											setTooltipContent(`${NAME}`);
+											setname(NAME);
+											setpop_est(rounded(POP_EST));
+											setcontinent(CONTINENT);
+											setgdp(rounded(GDP_MD_EST * 1000));
+											setsubrg(SUBREGION);
 										}}
 										onMouseLeave={() => {
 											setTooltipContent('');
+											setname('');
+											setpop_est('');
+											setcontinent('');
+											setgdp();
+											setsubrg('');
 										}}
 										style={{
 											default: {
@@ -73,15 +81,25 @@ const MapChart = ({ setTooltipContent }) => {
 	);
 };
 
-function VectorMap() {
+const VectorMap = ({ setname, setpop_est, setsubrg, setcontinent, setgdp }) => {
 	const [ content, setContent ] = React.useState('');
-
+	const mapWidth = 1000;
+	const mapHeight = 600;
 	return (
 		<div>
-			<MapChart setTooltipContent={setContent} mapWidth={mapWidth} mapHeight={mapHeight} />
+			<MapChart
+				setTooltipContent={setContent}
+				mapWidth={mapWidth}
+				mapHeight={mapHeight}
+				setname={setname}
+				setpop_est={setpop_est}
+				setsubrg={setsubrg}
+				setcontinent={setcontinent}
+				setgdp={setgdp}
+			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>
 	);
-}
+};
 
 export default memo(VectorMap);

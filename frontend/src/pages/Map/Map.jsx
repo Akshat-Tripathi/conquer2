@@ -1,15 +1,12 @@
 import React, { Component, useState } from 'react';
-import './Map.css';
 import { connect, loaddetails } from '../../api/index.js';
 import { Typography, Paper, makeStyles, IconButton, Snackbar, Grid } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import HelpIcon from '@material-ui/icons/Help';
 import MuiAlert from '@material-ui/lab/Alert';
 import VectorMap from './VectorMap';
-
-const username = 'Shashwat';
-
-const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import './Map.css';
 
 var countriesLoaded = false;
 var countries = {};
@@ -60,7 +57,7 @@ class GameMap extends Component {
 }
 
 const useStyles = makeStyles((theme) => ({
-	sidebarPaper: {
+	sidebar: {
 		marginLeft: '70%',
 		marginTop: '10%',
 		background: fade('#000000', 0.8),
@@ -70,6 +67,13 @@ const useStyles = makeStyles((theme) => ({
 		width: '30%',
 		height: '80%',
 		borderRadius: '5%',
+		boxShadow: '0px 10px 50px #555'
+	},
+	players: {
+		background: fade('#000000', 0.8),
+		color: 'white',
+		padding: theme.spacing(2),
+		position: 'fixed',
 		boxShadow: '0px 10px 50px #555'
 	},
 	buttons: {
@@ -91,23 +95,18 @@ function SideBar() {
 
 	//Fetch #troops, attack, move options, fix data vals
 	//TODO: Import username from entry form
-	const [ name, setname ] = useState('Shashwat');
+	const [ name, setname ] = useState('');
 	const [ pop_est, setpop_est ] = useState('');
 	const [ gdp, setgdp ] = useState('');
 	const [ subrg, setsubrg ] = useState('');
 	const [ continent, setcontinent ] = useState('');
 	const [ display, setdisplay ] = useState(false);
 	const [ clickedCountry, setclickedCountry ] = useState('');
+	var username = 'Shashwat';
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
-
-	const handleclickedCountry = (ISO_A2) => {
-		setclickedCountry(ISO_A2);
-	};
-
-	const handledoubleClicked = () => {
-		setclickedCountry('');
-	};
+	//Get the geo data for each country
+	const [ geo, setgeo ] = useState(null);
 
 	const handleOpenHelp = () => {
 		setOpenHelp(true);
@@ -118,20 +117,6 @@ function SideBar() {
 			return;
 		}
 		setOpenHelp(false);
-	};
-
-	const CountryDetails = () => {
-		return (
-			<div>
-				<h2>Spy Report On {name}:</h2>
-				<h3>{countryStates[clickedCountry].Troops !== undefined && countryStates[clickedCountry].Troops}</h3>
-				<h3>Population: {pop_est}</h3>
-				<h3>GDP (PPP): {gdp}</h3>
-				{continent !== 'South America' && <h3>Subregion: {subrg}</h3>}
-				<h3>Continent: {continent}</h3>
-				<h3>Allegiance: Ohio</h3>
-			</div>
-		);
 	};
 
 	const handleColourFill = (country) => {
@@ -159,6 +144,47 @@ function SideBar() {
 		}
 	};
 
+	const SpyDetails = (geo) => {
+		return (
+			<div>
+				<Grid container spacing={12}>
+					<Grid item xs={12} style={{ alignText: 'center' }}>
+						<h2>
+							Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
+						</h2>
+					</Grid>
+					<Grid item xs={12} sm={6}>
+						<h3>Population: </h3>
+						<Typography variant="subtitle1">{pop_est} </Typography>
+						{/* <h3>{countryStates[clickedCountry].Troops 
+							!== undefined && countryStates[clickedCountry].Troops}</h3> */}
+					</Grid>
+					<Grid item xs={12} sm={6}>
+						<h3>GDP (PPP): </h3>
+
+						<Typography variant="subtitle1">{gdp} </Typography>
+					</Grid>
+					<Grid item xs={12} sm={6}>
+						<h3>Continent</h3>
+						<Typography variant="subtitle1">{continent} </Typography>
+					</Grid>
+					<Grid item xs={12} sm={6}>
+						{continent !== 'South America' && (
+							<div>
+								<h3>Subregion: </h3>
+								<Typography variant="subtitle1">{subrg} </Typography>
+							</div>
+						)}
+					</Grid>
+					<Grid item xs={12}>
+						<h3>Allegiance: </h3>
+						<Typography variant="subtitle1">Ohio </Typography>
+					</Grid>
+				</Grid>
+			</div>
+		);
+	};
+
 	const options = () => {
 		return (
 			<div>
@@ -173,9 +199,22 @@ function SideBar() {
 	const PlayerBox = () => {
 		return (
 			<div>
-				<Paper>
-					<Typography variant="subtitle1">PLAYERS:</Typography>
-					<ul>{players.map((p) => <li key={p}>p</li>)}</ul>
+				<Paper className={classes.players}>
+					<Typography variant="subtitle1">ONLINE PLAYERS:</Typography>
+					<Grid container spacing={12}>
+						{Object.keys(playerColours).map(function(player, color) {
+							return (
+								<div key={player} style={{ padding: '5%' }}>
+									<Grid container spacing={12}>
+										<Grid item xs={12}>
+											<Typography variant="p">{player}</Typography>
+											<FiberManualRecordIcon style={{ color: color }} />
+										</Grid>
+									</Grid>
+								</div>
+							);
+						})}
+					</Grid>
 				</Paper>
 			</div>
 		);
@@ -183,10 +222,13 @@ function SideBar() {
 
 	return (
 		<div>
-			<Paper class={classes.sidebarPaper}>
-				<Grid container spacing={2}>
+			{players.length !== 0 && <PlayerBox />}
+			<Paper className={classes.sidebar}>
+				<Grid container spacing={2} style={{ alignText: 'center' }}>
 					<Grid item xs={12} sm={10}>
-						<Typography variant="h4">Welcome, Commander {name}!</Typography>
+						<Typography variant="h4" align="center" style={{ color: 'lightblue' }}>
+							Welcome, Commander {username}!
+						</Typography>
 					</Grid>
 					<Grid item xs={12} sm={2}>
 						<IconButton aria-label="help" color="primary" size="small">
@@ -196,33 +238,27 @@ function SideBar() {
 								}}
 								onClick={handleOpenHelp}
 							/>
-							<Snackbar open={openHelp} autoHideDuration={10000} onClose={handleCloseHelp}>
+							<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
 								<Alert onClose={handleCloseHelp} severity="info">
-									This is your control room. Hover above countries to communicate with your spies.
+									This is your control room. Hover above countries to receive encrypted data. Click on
+									countries to see your military options.
 								</Alert>
 							</Snackbar>
 						</IconButton>
 					</Grid>
+					<Grid item xs={12}>
+						{name !== '' && <SpyDetails />}
+					</Grid>
 				</Grid>
 			</Paper>
 
-			{/* <PlayerBox />
-			<div className="map-sidebar-wrapper">
-				<div className="map-sidebar-info-wrapper">
-					<h1>START THE CONQUEST!</h1>
-					<Typography variant="h4">Welcome Commander {username}!</Typography>
-					<br />
-					<br />
-					<Typography variant="subtitle1">BASE TROOPS: {troops}</Typography>
-					<p>
-						This is your war control room. Help us attain victory over our enemies. The Gods are on our
-						side!
-					</p>
-					{clickedCountry !== '' && <selectedCountryOptions />}
-					{display && <CountryDetails />}
-				</div>
-			</div> */}
-			<VectorMap />
+			<VectorMap
+				setname={setname}
+				setpop_est={setpop_est}
+				setsubrg={setsubrg}
+				setcontinent={setcontinent}
+				setgdp={setgdp}
+			/>
 		</div>
 	);
 }
