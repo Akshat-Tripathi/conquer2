@@ -91,23 +91,43 @@ function Alert(props) {
 }
 
 function SideBar() {
+	//CSS
 	const classes = useStyles();
 
-	//Fetch #troops, attack, move options, fix data vals
-	//TODO: Import username from entry form
+	//TODO: Fetch #troops, attack, move options, fix data vals
+
+	// Spy Detail Information
 	const [ name, setname ] = useState('');
 	const [ pop_est, setpop_est ] = useState('');
 	const [ gdp, setgdp ] = useState('');
 	const [ subrg, setsubrg ] = useState('');
 	const [ continent, setcontinent ] = useState('');
-	const [ display, setdisplay ] = useState(false);
-	const [ clickedCountry, setclickedCountry ] = useState('');
-	var username = 'Shashwat';
+
+	//Currently Clicked Countries
+	const [ fromCountry, setfromCountry ] = useState('');
+	const [ toCountry, settoCountry ] = useState('');
+
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
-	//Get the geo data for each country
-	const [ geo, setgeo ] = useState(null);
 
+	//Get username
+	const username = countryState.Player;
+
+	const handleClick = (geo) => {
+		const { NAME } = geo.properties;
+
+		//TODO: Check if country1 is player's country
+		if (fromCountry === '') {
+			setfromCountry(NAME);
+		} else if (NAME === fromCountry) {
+			setfromCountry('');
+			settoCountry('');
+		} else {
+			settoCountry(NAME);
+		}
+	};
+
+	//Handle functions for snackbar
 	const handleOpenHelp = () => {
 		setOpenHelp(true);
 	};
@@ -119,20 +139,27 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
-	const handleColourFill = (country) => {
+	const handleColorFill = (country) => {
 		if (!countriesLoaded) {
 			loadMap();
 			countriesLoaded = true;
 		}
-		const { ISO_A2 } = country.properties;
+		const { NAME, ISO_A2 } = country.properties;
 
-		if (
-			clickedCountry !== '' &&
-			countries[clickedCountry] !== undefined &&
-			countries[clickedCountry].some((iso) => iso === ISO_A2)
-		) {
-			return '#be90d4';
+		if (NAME === fromCountry) {
+			return '#002984';
+		} else if (NAME === toCountry) {
+			return '#ffcd38';
 		}
+
+		if (fromCountry === ISO_A2)
+			if (
+				clickedCountry !== '' &&
+				countries[clickedCountry] !== undefined &&
+				countries[clickedCountry].some((iso) => iso === ISO_A2)
+			) {
+				return '#be90d4';
+			}
 		try {
 			var col = playerColours[countryStates[ISO_A2].Player];
 			if (typeof col == 'undefined') {
@@ -144,89 +171,56 @@ function SideBar() {
 		}
 	};
 
-	const SpyDetails = (geo) => {
+	//TODO: Change stroke according to action
+	const handleColorStroke = (geo) => {
+		const { NAME } = geo.properties;
+
+		if (NAME === fromCountry) {
+			return '#002984';
+		} else if (NAME === toCountry) {
+			return '#ff9800';
+		}
+
+		return '#FFFFFF';
+	};
+
+	const handleStrokeWidth = (geo) => {
+		const { NAME } = geo.properties;
+
+		if (NAME === fromCountry || NAME === toCountry) {
+			return 1;
+		}
+		return 0.3;
+	};
+
+	const options = () => {
 		return (
 			<div>
-				<Grid container spacing={12}>
-					<Grid item xs={12} style={{ alignText: 'center' }}>
-						<h2>
-							Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
-						</h2>
-					</Grid>
-					<Grid item xs={12} sm={6}>
-						<h3>Population: </h3>
-						<Typography variant="subtitle1">{pop_est} </Typography>
-						{/* <h3>{countryStates[clickedCountry].Troops 
-							!== undefined && countryStates[clickedCountry].Troops}</h3> */}
-					</Grid>
-					<Grid item xs={12} sm={6}>
-						<h3>GDP (PPP): </h3>
-
-						<Typography variant="subtitle1">{gdp} </Typography>
-					</Grid>
-					<Grid item xs={12} sm={6}>
-						<h3>Continent</h3>
-						<Typography variant="subtitle1">{continent} </Typography>
-					</Grid>
-					<Grid item xs={12} sm={6}>
-						{continent !== 'South America' && (
-							<div>
-								<h3>Subregion: </h3>
-								<Typography variant="subtitle1">{subrg} </Typography>
-							</div>
-						)}
+				<Grid container xs={12}>
+					<Grid item xs={12}>
+						<button>ATTACK</button>
 					</Grid>
 					<Grid item xs={12}>
-						<h3>Allegiance: </h3>
-						<Typography variant="subtitle1">Ohio </Typography>
+						<button>MOVE</button>
+					</Grid>
+					<Grid item xs={12}>
+						<button>DONATE</button>
+					</Grid>
+					<Grid item xs={12}>
+						<button>DEPLOY</button>
 					</Grid>
 				</Grid>
 			</div>
 		);
 	};
 
-	const options = () => {
-		return (
-			<div>
-				<button>ATTACK</button>
-				<button>MOVE</button>
-				<button>DONATE</button>
-				<button>DEPLOY</button>
-			</div>
-		);
-	};
-
-	const PlayerBox = () => {
-		return (
-			<div>
-				<Paper className={classes.players}>
-					<Typography variant="subtitle1">ONLINE PLAYERS:</Typography>
-					<Grid container spacing={12}>
-						{Object.keys(playerColours).map(function(player, color) {
-							return (
-								<div key={player} style={{ padding: '5%' }}>
-									<Grid container spacing={12}>
-										<Grid item xs={12}>
-											<Typography variant="p">{player}</Typography>
-											<FiberManualRecordIcon style={{ color: color }} />
-										</Grid>
-									</Grid>
-								</div>
-							);
-						})}
-					</Grid>
-				</Paper>
-			</div>
-		);
-	};
-
 	return (
 		<div>
-			{players.length !== 0 && <PlayerBox />}
+			{players.length !== 0 && <PlayerBox classes={classes} />}
 			<Paper className={classes.sidebar}>
 				<Grid container spacing={2} style={{ alignText: 'center' }}>
 					<Grid item xs={12} sm={10}>
-						<Typography variant="h4" align="center" style={{ color: 'lightblue' }}>
+						<Typography variant="h4" align="center">
 							Welcome, Commander {username}!
 						</Typography>
 					</Grid>
@@ -247,7 +241,9 @@ function SideBar() {
 						</IconButton>
 					</Grid>
 					<Grid item xs={12}>
-						{name !== '' && <SpyDetails />}
+						{name !== '' && (
+							<SpyDetails name={name} subrg={subrg} continent={continent} pop_est={pop_est} gdp={gdp} />
+						)}
 					</Grid>
 				</Grid>
 			</Paper>
@@ -258,10 +254,38 @@ function SideBar() {
 				setsubrg={setsubrg}
 				setcontinent={setcontinent}
 				setgdp={setgdp}
+				handleColorFill={handleColorFill}
+				handleColorStroke={handleColorStroke}
+				handleStrokeWidth={handleStrokeWidth}
+				handleClick={handleClick}
 			/>
 		</div>
 	);
 }
+
+const PlayerBox = ({ classes }) => {
+	return (
+		<div>
+			<Paper className={classes.players}>
+				<Typography variant="subtitle1">ONLINE PLAYERS:</Typography>
+				<Grid container spacing={12}>
+					{Object.keys(playerColours).map(function(player, color) {
+						return (
+							<div key={player} style={{ padding: '5%' }}>
+								<Grid container spacing={12}>
+									<Grid item xs={12}>
+										<Typography variant="p">{player}</Typography>
+										<FiberManualRecordIcon style={{ color: color }} />
+									</Grid>
+								</Grid>
+							</div>
+						);
+					})}
+				</Grid>
+			</Paper>
+		</div>
+	);
+};
 
 var clickedCountry;
 //TODO: player team colour for country
@@ -413,5 +437,46 @@ function getCountryCodes(countrycode) {
 // 		</div>
 // 	);
 // };
+
+const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
+	return (
+		<div>
+			<Grid container spacing={12}>
+				<Grid item xs={12} style={{ alignText: 'center' }}>
+					<h2>
+						Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
+					</h2>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>Population: </h3>
+					<Typography variant="subtitle1">{pop_est} </Typography>
+					{/* <h3>{countryStates[clickedCountry].Troops 
+							!== undefined && countryStates[clickedCountry].Troops}</h3> */}
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>GDP (PPP): </h3>
+
+					<Typography variant="subtitle1">{gdp} </Typography>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>Continent</h3>
+					<Typography variant="subtitle1">{continent} </Typography>
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					{continent !== 'South America' && (
+						<div>
+							<h3>Subregion: </h3>
+							<Typography variant="subtitle1">{subrg} </Typography>
+						</div>
+					)}
+				</Grid>
+				<Grid item xs={12}>
+					<h3>Allegiance: </h3>
+					<Typography variant="subtitle1">Ohio </Typography>
+				</Grid>
+			</Grid>
+		</div>
+	);
+};
 
 export default SideBar;

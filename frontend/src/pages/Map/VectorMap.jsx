@@ -23,7 +23,18 @@ function notThisCountry(country) {
 	return true;
 }
 
-const MapChart = ({ setTooltipContent, setname, setpop_est, setsubrg, setcontinent, setgdp }) => {
+const MapChart = ({
+	setTooltipContent,
+	setname,
+	setpop_est,
+	setsubrg,
+	setcontinent,
+	setgdp,
+	handleColorFill,
+	handleColorStroke,
+	handleStrokeWidth,
+	handleClick
+}) => {
 	return (
 		<div>
 			{/* <ComposableMap data-tip="" projectionConfig={{ scale: 200 }} width={mapWidth} height={mapHeight}> */}
@@ -33,13 +44,16 @@ const MapChart = ({ setTooltipContent, setname, setpop_est, setsubrg, setcontine
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
-								const centroid = geoCentroid(geo);
+								const fillcolor = handleColorFill(geo);
+								const strokecolor = handleColorStroke(geo);
+								const strokewidth = handleStrokeWidth(geo);
 								return notThisCountry(geo) ? (
 									<Geography
 										key={geo.rsmKey}
 										geography={geo}
-										stroke="#FFF"
-										strokeWidth={0.3}
+										stroke={strokecolor}
+										fill={fillcolor}
+										strokeWidth={strokewidth}
 										onMouseEnter={() => {
 											const { NAME, POP_EST, SUBREGION, CONTINENT, GDP_MD_EST } = geo.properties;
 											setTooltipContent(`${NAME}`);
@@ -56,6 +70,9 @@ const MapChart = ({ setTooltipContent, setname, setpop_est, setsubrg, setcontine
 											setcontinent('');
 											setgdp();
 											setsubrg('');
+										}}
+										onClick={() => {
+											handleClick(geo);
 										}}
 										style={{
 											default: {
@@ -81,7 +98,17 @@ const MapChart = ({ setTooltipContent, setname, setpop_est, setsubrg, setcontine
 	);
 };
 
-const VectorMap = ({ setname, setpop_est, setsubrg, setcontinent, setgdp }) => {
+const VectorMap = ({
+	setname,
+	setpop_est,
+	setsubrg,
+	setcontinent,
+	setgdp,
+	handleColorStroke,
+	handleColorFill,
+	handleStrokeWidth,
+	handleClick
+}) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
 	const mapHeight = 600;
@@ -96,6 +123,10 @@ const VectorMap = ({ setname, setpop_est, setsubrg, setcontinent, setgdp }) => {
 				setsubrg={setsubrg}
 				setcontinent={setcontinent}
 				setgdp={setgdp}
+				handleColorFill={handleColorFill}
+				handleColorStroke={handleColorStroke}
+				handleStrokeWidth={handleStrokeWidth}
+				handleClick={handleClick}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>
