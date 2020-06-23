@@ -117,16 +117,16 @@ function SideBar() {
 	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
 	const handleClick = (geo) => {
-		const { NAME } = geo.properties;
+		const { NAME, ISO_A2 } = geo.properties;
 
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
-		if (fromCountry === '' && play) {
+		if (fromCountry === '') {
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
 			setfromCountry('');
 			settoCountry('');
-		} else {
+		} else if (countries[ISO_A2].some((iso) => iso === ISO_A2)) {
 			settoCountry(NAME);
 		}
 	};
