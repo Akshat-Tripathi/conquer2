@@ -269,6 +269,51 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 	);
 };
 
+class action {
+    constructor(Troops, ActionType, Src, Dest, Player) {
+        this.Troops = Troops;    
+        this.ActionType = ActionType;
+        this.Src = Src;       
+        this.Dest = Dest;      
+        this.Player = Player;    
+    }
+}
+
+var act = new action();
+
+function attack() {
+    act.Troops = 0;
+    act.ActionType = "attack"
+    act.Src = fromCountry;
+    act.Dest = toCountry;
+    act.Player = user;
+}
+
+
+function donate() {
+    act.Troops = troops;
+    act.ActionType = "donate"
+    act.Src = fromCountry;
+    act.Dest = toCountry;
+    act.Player = user;
+}
+
+function move() {
+    act.Troops = troops;
+    act.ActionType = "move"
+    act.Src = fromCountry;
+    act.Dest = toCountry;
+    act.Player = user;
+}
+
+function deploy() {
+    act.Troops = troops;
+    act.ActionType = "drop"
+    act.Src = fromCountry;
+    act.Dest = toCountry;
+    act.Player = user;
+}
+
 const Options = ({ classes, toCountry, fromCountry }) => {
 	//If toCountry is not your land
 	if (toCountry !== '' && fromCountry !== '') {
@@ -282,12 +327,12 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 					</Typography>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={attack}>
 						ATTACK
 					</Button>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="primary" className={classes.button}>
+					<Button variant="contained" size="small" color="primary" className={classes.button} onClick={donate}>
 						DONATE
 					</Button>
 				</Grid>
@@ -299,7 +344,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		//If toCountry is your land
 		return (
 			<Grid item xs={12} sm={6}>
-				<Button variant="contained" size="small" color="primary" className={classes.button}>
+				<Button variant="contained" size="small" color="primary" className={classes.button} onClick={move}>
 					MOVE
 				</Button>
 			</Grid>
@@ -310,7 +355,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		return (
 			<div>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={deploy}>
 						DEPLOY
 					</Button>
 				</Grid>
