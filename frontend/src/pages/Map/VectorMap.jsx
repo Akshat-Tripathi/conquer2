@@ -39,7 +39,7 @@ const MapChart = ({
 		<div>
 			{/* <ComposableMap data-tip="" projectionConfig={{ scale: 200 }} width={mapWidth} height={mapHeight}> */}
 			{/* <ZoomableGroup translateExtent={[ [ 0, -mapHeight ], [ mapWidth, mapHeight ] ]}> */}
-			<ComposableMap data-tip="" projectionConfig={{ scale: 200 }}>
+			<ComposableMap data-tip="" projectionConfig={{ scale: 140 }}>
 				<ZoomableGroup>
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>

@@ -10,8 +10,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-var countriesLoaded = false;
-var countries = {};
+// var countriesLoaded = false;
+// var countries = {};
 var socket = null;
 var troops = 0;
 var countryStates = {};
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: '10%',
 		background: fade('#000000', 0.8),
 		color: 'white',
-		padding: theme.spacing(3),
+		padding: theme.spacing(2),
 		position: 'fixed',
 		width: '30%',
 		height: '80%',
@@ -112,10 +112,13 @@ function SideBar() {
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
 
+	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
+
 	const handleClick = (geo) => {
 		const { NAME } = geo.properties;
 
 		//TODO: Check if country1 is player's country
+		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
@@ -138,27 +141,31 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
-	const handleColorFill = (country) => {
+	const handleColorFill = (geo) => {
 		if (!countriesLoaded) {
 			loadMap();
-			countriesLoaded = true;
-		}
-		const { NAME, ISO_A2 } = country.properties;
-
-		if (NAME === fromCountry) {
-			return '#002984';
-		} else if (NAME === toCountry) {
-			return '#ffcd38';
+			setcountriesLoaded(true);
 		}
 
-		if (fromCountry === ISO_A2)
-			if (
-				clickedCountry !== '' &&
-				countries[clickedCountry] !== undefined &&
-				countries[clickedCountry].some((iso) => iso === ISO_A2)
-			) {
-				return '#be90d4';
-			}
+		const { NAME, ISO_A2 } = geo.properties;
+
+		// if (NAME === fromCountry) {
+		// 	return '#002984';
+		// } else if (NAME === toCountry) {
+		// 	return '#ffcd38';
+		// }
+
+		console.log(ISO_A2);
+		console.log(countryStates[ISO_A2]);
+
+		if (
+			fromCountry !== '' &&
+			countryStates[ISO_A2] !== undefined &&
+			countryStates[ISO_A2].some((iso) => iso === ISO_A2)
+		) {
+			return '#be90d4';
+		}
+
 		try {
 			var col = playerColours[countryStates[ISO_A2].Player];
 			if (typeof col == 'undefined') {
@@ -173,21 +180,18 @@ function SideBar() {
 	//TODO: Change stroke according to action
 	const handleColorStroke = (geo) => {
 		const { NAME } = geo.properties;
-
 		if (NAME === fromCountry) {
 			return '#002984';
 		} else if (NAME === toCountry) {
 			return '#ff9800';
 		}
-
 		return '#FFFFFF';
 	};
 
 	const handleStrokeWidth = (geo) => {
 		const { NAME } = geo.properties;
-
 		if (NAME === fromCountry || NAME === toCountry) {
-			return 1;
+			return 2;
 		}
 		return 0.3;
 	};
@@ -196,33 +200,20 @@ function SideBar() {
 		<div>
 			{players.length !== 0 && <PlayerBox classes={classes} />}
 			<Paper className={classes.sidebar}>
-				<Grid container spacing={2} style={{ alignText: 'center' }}>
-					<Grid item xs={12} sm={10}>
-						<Typography variant="h4" align="center">
-							Welcome, Commander {username}!
-						</Typography>
-					</Grid>
-					<Grid item xs={12} sm={2}>
-						<IconButton aria-label="help" color="primary" size="small">
-							<HelpIcon
-								style={{
-									fontSize: '25'
-								}}
-								onClick={handleOpenHelp}
-							/>
-							<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
-								<Alert onClose={handleCloseHelp} severity="info">
-									This is your control room. Hover above countries to receive encrypted data. Click on
-									countries to see your military options.
-								</Alert>
-							</Snackbar>
-						</IconButton>
-					</Grid>
+				<Grid container style={{ alignText: 'center' }}>
+					<Title
+						username={username}
+						handleCloseHelp={handleCloseHelp}
+						handleOpenHelp={handleOpenHelp}
+						openHelp={openHelp}
+					/>
+
 					{toCountry !== '' && (
 						<Grid item xs={12}>
-							<Options classes={classes} fromCountry={fromCountry} toCountry={toCountry} />
+							<Options classes={classes} toCountry={toCountry} fromCountry={fromCountry} />
 						</Grid>
 					)}
+
 					<Grid item xs={12}>
 						{name !== '' && (
 							<SpyDetails name={name} subrg={subrg} continent={continent} pop_est={pop_est} gdp={gdp} />
@@ -246,10 +237,43 @@ function SideBar() {
 	);
 }
 
-const Options = (classes, toCountry, fromCountry) => {
+const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 	return (
 		<div>
-			<Grid container xs={12}>
+			<IconButton aria-label="help" color="primary" size="small">
+				<HelpIcon
+					style={{
+						fontSize: '20'
+					}}
+					onClick={handleOpenHelp}
+				/>
+				<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
+					<Alert onClose={handleCloseHelp} severity="info">
+						This is your control room. Hover above countries to receive encrypted data. Click on countries
+						to see your military options.
+					</Alert>
+				</Snackbar>
+			</IconButton>
+			<Grid item xs={12}>
+				<Typography variant="h4" align="center">
+					Welcome, Commander {username}!
+				</Typography>
+			</Grid>
+			<br />
+			<Grid item xs={12}>
+				<Typography variant="h6" align="center">
+					Base Troops: {troops}
+				</Typography>
+			</Grid>
+		</div>
+	);
+};
+
+const Options = ({ classes, toCountry, fromCountry }) => {
+	//If toCountry is not your land
+	if (toCountry !== '' && fromCountry !== '') {
+		return (
+			<div>
 				<Grid item xs={12}>
 					<Typography variant="h5">
 						{' '}
@@ -264,22 +288,35 @@ const Options = (classes, toCountry, fromCountry) => {
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<Button variant="contained" size="small" color="primary" className={classes.button}>
-						MOVE
-					</Button>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="primary" className={classes.button}>
 						DONATE
 					</Button>
 				</Grid>
+			</div>
+		);
+	}
+
+	if (toCountry !== '' && fromCountry !== '') {
+		//If toCountry is your land
+		return (
+			<Grid item xs={12} sm={6}>
+				<Button variant="contained" size="small" color="primary" className={classes.button}>
+					MOVE
+				</Button>
+			</Grid>
+		);
+	}
+
+	if (fromCountry !== '' && toCountry === '') {
+		return (
+			<div>
 				<Grid item xs={12} sm={6}>
 					<Button variant="contained" size="small" color="secondary" className={classes.button}>
 						DEPLOY
 					</Button>
 				</Grid>
-			</Grid>
-		</div>
-	);
+			</div>
+		);
+	}
 };
 
 const PlayerBox = ({ classes }) => {
@@ -306,7 +343,6 @@ const PlayerBox = ({ classes }) => {
 	);
 };
 
-var clickedCountry;
 //TODO: player team colour for country
 function countryColors(country) {
 	const { NAME, ISO_A2 } = country.properties;
@@ -317,7 +353,7 @@ function loadMap() {
 	//TODO: take value from the cookie
 	fetch('/maps/world.txt')
 		.then((raw) => raw.text())
-		.then((raw) => raw.split('\n'))
+		.then((raw) => raw.split('\r\n'))
 		.then((lines) => lines.map((s) => s.split(' ')))
 		.then((lines) => lines.forEach((line) => (countries[line[0]] = line.slice(1))));
 }
@@ -360,8 +396,9 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 				<Grid item xs={12} sm={6}>
 					<h3>Population: </h3>
 					<Typography variant="subtitle1">{pop_est} </Typography>
-					{/* <h3>{countryStates[clickedCountry].Troops 
-							!== undefined && countryStates[clickedCountry].Troops}</h3> */}
+					{/* <h3>
+						{countryStates[clickedCountry].Troops !== undefined && countryStates[clickedCountry].Troops}
+					</h3> */}
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<h3>GDP (PPP): </h3>
