@@ -51,7 +51,7 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 	if g.numPlayers >= int32(g.maxPlayerNum) {
 		return false
 	}
-	fmt.Println(g.colours)
+	fmt.Println(g.colours, g.numPlayers)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
 		log.Println("Processing troops")
