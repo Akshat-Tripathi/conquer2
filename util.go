@@ -16,7 +16,7 @@ func loadColours() []string {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
-	cols := make([]string, 9)
+	cols := make([]string, 20)
 	i := 0
 	for scanner.Scan() {
 		cols[i] = scanner.Text()
