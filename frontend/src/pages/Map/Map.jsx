@@ -10,8 +10,9 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-// var countriesLoaded = false;
-// var countries = {};
+var countriesLoaded = false;
+var clickedCountry = '';
+var countries = {};
 var socket = null;
 var troops = 0;
 var countryStates = {};
@@ -107,19 +108,19 @@ function SideBar() {
 
 	//Currently Clicked Countries
 	const [ fromCountry, setfromCountry ] = useState('');
-	const [ toCountry, settoCountry ] = useState('');
+    const [ toCountry, settoCountry ] = useState('');
 
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
 
-	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
-
 	const handleClick = (geo) => {
-		const { NAME } = geo.properties;
-
+        const { NAME, ISO_A2 } = geo.properties;
+        clickedCountry = '';
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
+            clickedCountry = ISO_A2;
+            console.log(clickedCountry);
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
 			setfromCountry('');
@@ -144,7 +145,7 @@ function SideBar() {
 	const handleColorFill = (geo) => {
 		if (!countriesLoaded) {
 			loadMap();
-			setcountriesLoaded(true);
+			countriesLoaded = true;
 		}
 
 		const { NAME, ISO_A2 } = geo.properties;
@@ -155,14 +156,13 @@ function SideBar() {
 		// 	return '#ffcd38';
 		// }
 
-		console.log(ISO_A2);
-		console.log(countryStates[ISO_A2]);
-
+        
 		if (
-			fromCountry !== '' &&
-			countryStates[ISO_A2] !== undefined &&
-			countryStates[ISO_A2].some((iso) => iso === ISO_A2)
-		) {
+            clickedCountry !== '' &&
+			countries[clickedCountry] !== undefined &&
+			countries[clickedCountry].some((iso) => iso === ISO_A2)
+            ) {
+            console.log(countries[clickedCountry]);
 			return '#be90d4';
 		}
 
@@ -173,7 +173,7 @@ function SideBar() {
 			}
 			return col;
 		} catch (TypeError) {
-			return '#B9A37E';
+			col = '#B9A37E';
 		}
 	};
 
@@ -231,7 +231,7 @@ function SideBar() {
 				handleColorFill={handleColorFill}
 				handleColorStroke={handleColorStroke}
 				handleStrokeWidth={handleStrokeWidth}
-				handleClick={handleClick}
+                handleClick={handleClick}
 			/>
 		</div>
 	);

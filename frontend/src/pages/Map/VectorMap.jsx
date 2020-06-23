@@ -76,7 +76,6 @@ const MapChart = ({
 										}}
 										style={{
 											default: {
-												fill: '#D6D6DA',
 												outline: 'none'
 											},
 											hover: {
