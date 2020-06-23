@@ -17,7 +17,8 @@ var troops = 0;
 var countryStates = {};
 var playerColours = {};
 var players = [];
-var name;
+var playerCountries = [];
+var user = '';
 
 class countryState {
 	constructor(Troops, Player) {
@@ -34,14 +35,20 @@ class GameMap extends Component {
 			var action = JSON.parse(msg.data);
 			switch (action.Type) {
 				case 'updateTroops':
+					user = action.Player;
 					troops = action.Troops;
-					name = action.Player;
 					break;
 				case 'updateCountry':
 					if (
 						typeof countryStates[action.Country] == 'undefined' ||
 						countryStates[action.Country].Player != action.Player
 					) {
+						if (action.Player == user) {
+							playerCountries.push(action.Country);
+						}
+						if (countryStates[action.Country] == user) {
+							playerCountries.filter((country) => country != action.Country);
+						}
 						countryStates[action.Country] = new countryState(action.Troops, action.Player);
 					} else {
 						countryStates[action.Country].Troops += action.Troops;
@@ -126,7 +133,10 @@ function SideBar() {
 		} else if (NAME === fromCountry) {
 			setfromCountry('');
 			settoCountry('');
-		} else if (countries[ISO_A2].some((iso) => iso === ISO_A2)) {
+		} else {
+			// if (countries[ISO_A2].some((iso) => iso === ISO_A2)) {
+
+			// }
 			settoCountry(NAME);
 		}
 	};
@@ -383,7 +393,6 @@ function getCountryCodes(countrycode) {
 			}
 		}
 	}
-	console.log(countriesBordering);
 	return countriesBordering;
 }
 

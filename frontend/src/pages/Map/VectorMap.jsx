@@ -81,10 +81,6 @@ const MapChart = ({
 											hover: {
 												fill: '#F53',
 												outline: 'none'
-											},
-											pressed: {
-												fill: '#',
-												outline: 'none'
 											}
 										}}
 									/>
