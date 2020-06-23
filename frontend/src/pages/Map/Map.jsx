@@ -186,13 +186,21 @@ function SideBar() {
 
 	//TODO: Change stroke according to action
 	const handleColorStroke = (geo) => {
-		const { NAME } = geo.properties;
+		const { NAME, ISO_A2 } = geo.properties;
 		if (NAME === fromCountry) {
 			return '#002984';
 		} else if (NAME === toCountry) {
 			return '#ff9800';
 		}
-		return '#FFFFFF';
+		try {
+			var col = playerColours[countryStates[ISO_A2].Player];
+			if (typeof col == 'undefined') {
+				col = '#B9A37E';
+			}
+			return col;
+		} catch (TypeError) {
+			col = '#B9A37E';
+		}
 	};
 
 	const handleStrokeWidth = (geo) => {
@@ -288,7 +296,7 @@ class action {
 
 var act = new action();
 
-function attack() {
+function attack(fromCountry, toCountry) {
     act.Troops = 0;
     act.ActionType = "attack"
     act.Src = fromCountry;
@@ -297,7 +305,7 @@ function attack() {
 }
 
 
-function donate() {
+function donate(troops, fromCountry, toCountry) {
     act.Troops = troops;
     act.ActionType = "donate"
     act.Src = fromCountry;
@@ -305,7 +313,7 @@ function donate() {
     act.Player = user;
 }
 
-function move() {
+function move(troops, fromCountry, toCountry) {
     act.Troops = troops;
     act.ActionType = "move"
     act.Src = fromCountry;
@@ -313,9 +321,9 @@ function move() {
     act.Player = user;
 }
 
-function deploy() {
+function deploy(troops, fromCountry, toCountry) {
     act.Troops = troops;
-    act.ActionType = "drop"
+    act.ActionType = "drop";
     act.Src = fromCountry;
     act.Dest = toCountry;
     act.Player = user;
