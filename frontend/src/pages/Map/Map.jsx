@@ -121,7 +121,7 @@ function SideBar() {
 
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
-		if (fromCountry === '') {
+		if (fromCountry === '' && play) {
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
 			setfromCountry('');
