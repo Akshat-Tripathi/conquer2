@@ -14,12 +14,6 @@ let connect = () => {
     console.log("Successfully Connected");
   };
 
-  /*
-  socket.onmessage = (msg) => {
-    loaddetails = msg;
-    // console.log(msg);
-  };
-*/
   socket.onclose = (event) => {
     console.log("Socket Closed Connection: ", event);
     alert("Invalid login");

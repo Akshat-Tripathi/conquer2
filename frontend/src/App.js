@@ -1,14 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import "./App.css";
-import Home from "./pages/Home.jsx";
-import { UnderConstruction } from "./pages/UnderConstruction";
-import GameMap from "./pages/Map.jsx";
+import Home from "./pages/Home/Home.jsx";
+import { UnderConstruction } from "./pages/Extra/UnderConstruction";
+import GameMap from "./pages/Map/Map.jsx";
 import Intro2 from "./shashgonenuts/intro2.jsx";
-import ErrorPage from "./pages/Error.jsx";
-import Redirector from "./pages/Redirector.jsx";
+import ErrorPage from "./pages/Extra/Error.jsx";
+import Redirector from "./pages/Extra/Redirector.jsx";
 
-class App extends Component {
+class App extends React.Component {
   render() {
     return (
       <React.Fragment>

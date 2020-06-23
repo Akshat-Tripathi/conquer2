@@ -82,5 +82,7 @@ func (c *connectionManager) sendToAll(msg UpdateMessage) {
 }
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
-	c.players[player] <- msg
+	go func() {
+		c.players[player] <- msg
+	}()
 }
