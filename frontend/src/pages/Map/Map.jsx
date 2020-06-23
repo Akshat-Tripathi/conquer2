@@ -11,7 +11,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import './Map.css';
 
 var countriesLoaded = false;
-var clickedCountry = '';
+var fromCountryISO = '';
+var toCountryISO = '';
 var countries = {};
 var socket = null;
 var troops = 0;
@@ -65,7 +66,7 @@ class GameMap extends Component {
 
 	render() {
 		return <SideBar />;
-	}
+    }
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -124,13 +125,14 @@ function SideBar() {
 
 	const handleClick = (geo) => {
         const { NAME, ISO_A2 } = geo.properties;
-        clickedCountry = '';
+        fromCountryISO = '';
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
-            clickedCountry = ISO_A2;
+            fromCountryISO = ISO_A2;
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
+            toCountryISO = ISO_A2;
 			setfromCountry('');
 			settoCountry('');
 		} else {
@@ -166,9 +168,9 @@ function SideBar() {
 
         
 		if (
-            clickedCountry !== '' &&
-			countries[clickedCountry] !== undefined &&
-			countries[clickedCountry].some((iso) => iso === ISO_A2)
+            fromCountryISO !== '' &&
+			countries[fromCountryISO] !== undefined &&
+			countries[fromCountryISO].some((iso) => iso === ISO_A2)
             ) {
 			return '#be90d4';
 		}
@@ -296,36 +298,37 @@ class action {
 
 var act = new action();
 
-function attack(fromCountry, toCountry) {
+function attack() {
     act.Troops = 0;
     act.ActionType = "attack"
-    act.Src = fromCountry;
-    act.Dest = toCountry;
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
     act.Player = user;
+    socket.send(JSON.stringify(act));
 }
 
 
-function donate(troops, fromCountry, toCountry) {
-    act.Troops = troops;
+function donate() {
+    act.Troops = 5; //TODO: change to troops var
     act.ActionType = "donate"
-    act.Src = fromCountry;
-    act.Dest = toCountry;
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
     act.Player = user;
 }
 
-function move(troops, fromCountry, toCountry) {
-    act.Troops = troops;
+function move() {
+    act.Troops = 5; //TODO: change to troops var
     act.ActionType = "move"
-    act.Src = fromCountry;
-    act.Dest = toCountry;
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
     act.Player = user;
 }
 
-function deploy(troops, fromCountry, toCountry) {
-    act.Troops = troops;
+function deploy() {
+    act.Troops = 5; //TODO: change to troops var
     act.ActionType = "drop";
-    act.Src = fromCountry;
-    act.Dest = toCountry;
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
     act.Player = user;
 }
 
