@@ -10,14 +10,14 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-var countriesLoaded = false;
-var clickedCountry = '';
+// var countriesLoaded = false;
 var countries = {};
 var socket = null;
 var troops = 0;
 var countryStates = {};
 var playerColours = {};
 var players = [];
+var name;
 
 class countryState {
 	constructor(Troops, Player) {
@@ -35,6 +35,7 @@ class GameMap extends Component {
 			switch (action.Type) {
 				case 'updateTroops':
 					troops = action.Troops;
+					name = action.Player;
 					break;
 				case 'updateCountry':
 					if (
@@ -108,19 +109,19 @@ function SideBar() {
 
 	//Currently Clicked Countries
 	const [ fromCountry, setfromCountry ] = useState('');
-    const [ toCountry, settoCountry ] = useState('');
+	const [ toCountry, settoCountry ] = useState('');
 
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
 
+	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
+
 	const handleClick = (geo) => {
-        const { NAME, ISO_A2 } = geo.properties;
-        clickedCountry = '';
+		const { NAME } = geo.properties;
+
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
-            clickedCountry = ISO_A2;
-            console.log(clickedCountry);
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
 			setfromCountry('');
@@ -142,13 +143,11 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
-	const handleColorFill = (geo) => {
+	const handleColorFill = (NAME, ISO_A2) => {
 		if (!countriesLoaded) {
 			loadMap();
-			countriesLoaded = true;
+			setcountriesLoaded(true);
 		}
-
-		const { NAME, ISO_A2 } = geo.properties;
 
 		// if (NAME === fromCountry) {
 		// 	return '#002984';
@@ -156,13 +155,10 @@ function SideBar() {
 		// 	return '#ffcd38';
 		// }
 
-        
-		if (
-            clickedCountry !== '' &&
-			countries[clickedCountry] !== undefined &&
-			countries[clickedCountry].some((iso) => iso === ISO_A2)
-            ) {
-            console.log(countries[clickedCountry]);
+		console.log(ISO_A2);
+		console.log(countries[ISO_A2]);
+
+		if (fromCountry !== '' && countries[ISO_A2] !== undefined && countries[ISO_A2].some((iso) => iso === ISO_A2)) {
 			return '#be90d4';
 		}
 
@@ -173,7 +169,7 @@ function SideBar() {
 			}
 			return col;
 		} catch (TypeError) {
-			col = '#B9A37E';
+			return '#B9A37E';
 		}
 	};
 
@@ -215,9 +211,16 @@ function SideBar() {
 					)}
 
 					<Grid item xs={12}>
-						{name !== '' && (
-							<SpyDetails name={name} subrg={subrg} continent={continent} pop_est={pop_est} gdp={gdp} />
-						)}
+						{fromCountry === '' &&
+							(name !== '' && (
+								<SpyDetails
+									name={name}
+									subrg={subrg}
+									continent={continent}
+									pop_est={pop_est}
+									gdp={gdp}
+								/>
+							))}
 					</Grid>
 				</Grid>
 			</Paper>
@@ -231,7 +234,7 @@ function SideBar() {
 				handleColorFill={handleColorFill}
 				handleColorStroke={handleColorStroke}
 				handleStrokeWidth={handleStrokeWidth}
-                handleClick={handleClick}
+				handleClick={handleClick}
 			/>
 		</div>
 	);
@@ -343,19 +346,19 @@ const PlayerBox = ({ classes }) => {
 	);
 };
 
-//TODO: player team colour for country
-function countryColors(country) {
-	const { NAME, ISO_A2 } = country.properties;
-	return '#AAA';
-}
-
 function loadMap() {
 	//TODO: take value from the cookie
 	fetch('/maps/world.txt')
 		.then((raw) => raw.text())
 		.then((raw) => raw.split('\r\n'))
 		.then((lines) => lines.map((s) => s.split(' ')))
-		.then((lines) => lines.forEach((line) => (countries[line[0]] = line.slice(1))));
+		.then((lines) =>
+			lines.forEach((line) => {
+				countries[line[0]] = line.slice(1);
+				console.log(line[0]);
+				console.log(countries[line[0]]);
+			})
+		);
 }
 
 //FIXME: fix read file correctly
