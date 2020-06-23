@@ -40,38 +40,10 @@ class GameMap extends Component {
     super();
     socket = connect();
     socket.onmessage = (msg) => {
-<<<<<<< HEAD
-      var action = JSON.parse(msg.data);
-      switch (action.Type) {
-        case "updateTroops":
-          troops = action.Troops;
-          break;
-        case "updateCountry":
-          if (
-            typeof countryStates[action.Country] == "undefined" ||
-            countryStates[action.Country].Player != action.Player
-          ) {
-            countryStates[action.Country] = new countryState(
-              action.Troops,
-              action.Player
-            );
-            console.log(action.Country, countryStates);
-          } else {
-            countryStates[action.Country].Troops += action.Troops;
-          }
-          break;
-        case "newPlayer":
-          console.log(
-            action.Player + " has entered the chat bois as: " + action.Country
-          );
-          playerColours[action.Player] = action.Country;
-      }
-    };
-=======
         var action = JSON.parse(msg.data);
         switch (action.Type) {
             case "updateTroops":
-                troops = action.Troops;
+                troops += action.Troops;
                 break
             case "updateCountry":
                 if (typeof countryStates[action.Country] == "undefined" || countryStates[action.Country].Player != action.Player) {
@@ -85,7 +57,6 @@ class GameMap extends Component {
                 playerColours[action.Player] = action.Country; 
         }
       };
->>>>>>> 14bc5f3b108c939cd7612dd1a76a45f5653296cd
   }
 
   render() {
@@ -127,46 +98,6 @@ function SideBar() {
 
   const handleColourFill = (country) => {
     if (!countriesLoaded) {
-<<<<<<< HEAD
-      await loadMap();
-      countriesLoaded = true;
-    }
-    const { ISO_A2 } = country.properties;
-
-    if (clickedCountry !== "" && countries[clickedCountry].includes(ISO_A2)) {
-      console.log("hi");
-      return "#000";
-    }
-    try {
-      return playerColours[countryStates[ISO_A2].Player];
-    } catch (TypeError) {
-      return "#FFF";
-    }
-  };
-
-  const handleColourStroke = (country) => {
-    const { ISO_A2 } = country.properties;
-    return "#FFF";
-  };
-
-  const selectedCountryOptions = () => {
-    return (
-      <div>
-        <h3>Selected Country: {clickedCountry}</h3>
-        <h4>OPTIONS:</h4>
-        <ul>
-          <li>
-            <button type="button"> ATTACK </button>
-            <button type="button">MOVE</button>
-            <button type="button">DONATE</button>
-            <button type="button">DROP</button>
-          </li>
-        </ul>
-      </div>
-    );
-  };
-
-=======
         loadMap();
         countriesLoaded = true;
     }
@@ -189,7 +120,6 @@ function SideBar() {
     }
   };
 
->>>>>>> 14bc5f3b108c939cd7612dd1a76a45f5653296cd
   return (
     <div>
       <div className="map-sidebar-wrapper">
@@ -217,12 +147,7 @@ function SideBar() {
         setsubrg={setsubrg}
         setclickedCountry={handleclickedCountry}
         handleColourFill={handleColourFill}
-<<<<<<< HEAD
-        handleColourStroke={handleColourStroke}
-        setdoubleClicked={handledoubleClicked}
-=======
         handleColourStroke={handleColourFill}
->>>>>>> 14bc5f3b108c939cd7612dd1a76a45f5653296cd
       />
       <ReactTooltip>{state}</ReactTooltip>
     </div>
@@ -258,7 +183,7 @@ function loadMap() {
   //TODO take value from the cookie
   fetch("/maps/world.txt")
     .then((raw) => raw.text())
-    .then((raw) => raw.split("\n"))
+    .then((raw) => raw.split("\r\n"))
     .then((lines) => lines.map((s) => s.split(" ")))
     .then((lines) =>
       lines.forEach((line) => (countries[line[0]] = line.slice(1)))
@@ -272,22 +197,20 @@ function getCountryCodes(countrycode) {
   var textByLine = "";
   fetch(fileURL)
     .then((raw) => raw.text())
-    .then((raw) => raw.split("\n"))
+    .then((raw) => raw.split("\r\n"))
     .then((raw) => raw.map((x) => x.split(" ")))
     .then((raw) => (textByLine = raw));
 
   var countriesBordering = [];
-
   for (let j = 0; j < textByLine.length; j++) {
     var borders = textByLine[j].split(" ");
     if (borders[0] == countrycode) {
-      for (let i = 1; i < borders.length; i++) {
+      for (let i = 1; i < borders.length - 1; i++) {
         //Get border codes
         countriesBordering.push(borders[i]);
       }
     }
   }
-  console.log(countriesBordering);
   return countriesBordering;
 }
 
@@ -303,37 +226,6 @@ const MapSettings = ({
   setdisplay,
   setclickedCountry,
   handleColourFill,
-<<<<<<< HEAD
-  handleColourStroke,
-  setdoubleClicked,
-}) => {
-  return (
-    <div className="map-wrapper">
-      <ComposableMap>
-        <CustomZoomableGroup center={[0, 0]}>
-          {(position) => (
-            <>
-              <Geographies geography={geoUrl}>
-                {({ geographies }) => (
-                  <>
-                    {geographies.map((geo) => {
-                      const fillcolour = handleColourFill(geo);
-                      const strokecolour = handleColourStroke(geo);
-                      return notThisCountry(geo) ? (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill={fillcolour}
-                          stroke={strokecolour}
-                          onMouseEnter={() => {
-                            const {
-                              NAME,
-                              POP_EST,
-                              GDP_MD_EST,
-                              SUBREGION,
-                              CONTINENT,
-                            } = geo.properties;
-=======
 }) => {
   return (
     <div className="map-wrapper">
@@ -356,72 +248,11 @@ const MapSettings = ({
                         SUBREGION,
                         CONTINENT,
                       } = geo.properties;
->>>>>>> 14bc5f3b108c939cd7612dd1a76a45f5653296cd
 
                             // setTooltipContent(
                             //   `${NAME} - $${getnum(GDP_MD_EST * Math.pow(10, 6))}`
                             // );
 
-<<<<<<< HEAD
-                            setTooltipContent(`${NAME} - ENEMY TERRITORY`);
-                            setname(NAME);
-                            setpop_est(getnum(POP_EST));
-                            setgdp(getnum(GDP_MD_EST * Math.pow(10, 6)));
-                            setsubrg(SUBREGION);
-                            setcontinent(CONTINENT);
-                            setdisplay(true);
-                          }}
-                          onMouseLeave={() => {
-                            setTooltipContent("");
-                            setdisplay(false);
-                          }}
-                          style={{
-                            default: {
-                              fill: "#D6D6DA",
-                              outline: "none",
-                            },
-                            hover: {
-                              fill: "#F53",
-                              outline: "none",
-                            },
-                            pressed: {
-                              fill: "#D6D6DA",
-                              outline: "none",
-                            },
-                          }}
-                          onClick={() => {
-                            const { ISO_A2 } = geo.properties;
-                            setclickedCountry(ISO_A2);
-                          }}
-                          onDoubleClick={() => {
-                            setdoubleClicked();
-                          }}
-                        />
-                      ) : null;
-                    })}
-
-                    {geographies.map((geo) => {
-                      const centroid = geoCentroid(geo);
-                      const { NAME } = geo.properties;
-                      return (
-                        <g key={geo.rsmKey}>
-                          {
-                            <Marker coordinates={centroid}>
-                              <text fontSize={4} alignmentBaseline="middle">
-                                {NAME}
-                              </text>
-                            </Marker>
-                          }
-                        </g>
-                      );
-                    })}
-                  </>
-                )}
-              </Geographies>
-            </>
-          )}
-        </CustomZoomableGroup>
-=======
                       setTooltipContent(`${NAME} - ENEMY TERRITORY`);
                       setname(NAME);
                       setpop_est(getnum(POP_EST));
@@ -458,7 +289,6 @@ const MapSettings = ({
             }
           </Geographies>
         </ZoomableGroup>
->>>>>>> 14bc5f3b108c939cd7612dd1a76a45f5653296cd
       </ComposableMap>
     </div>
   );
