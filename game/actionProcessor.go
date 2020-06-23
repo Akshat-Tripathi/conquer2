@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 )
 
@@ -26,6 +27,7 @@ type defaultProcessor struct {
 //PRE: Username is valid ie it is in playerTroops
 func (p *defaultProcessor) getState(username string) []UpdateMessage {
 	msgs := make([]UpdateMessage, len(p.countries)+1+len(p.playerTroops))
+	log.Println(len(p.playerTroops))
 	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done probably with a mutex
 	i := 0
 	for country, state := range p.countryStates {
@@ -42,6 +44,7 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 		Player: username}
 	fmt.Println(p.playerTroops[username].troops)
 	i++
+	log.Println(p.playerTroops)
 	for player, state := range p.playerTroops {
 		msgs[i] = UpdateMessage{
 			Type:    "newPlayer",

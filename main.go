@@ -45,15 +45,17 @@ func main() {
 	situations := loadMaps()
 	colours := loadColours() //Temporary
 
+	log.Println(colours)
+
 	games := make(map[string]game.Game)
 
 	r := gin.Default()
 
 	ctx := game.Context{
 		ID:                    "test",
-		MaxPlayerNumber:       5,
+		MaxPlayerNumber:       10,
 		StartingTroopNumber:   1,
-		StartingCountryNumber: 3,
+		StartingCountryNumber: 20,
 		Situation:             situations["world"],
 		Colours:               colours,
 		TroopInterval:         time.Second * 10,
@@ -62,8 +64,11 @@ func main() {
 	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
-	games["test"].AddPlayer("Akshat", "asdf")
 	games["test"].Start(ctx)
+	for i := 0; i < 8; i++ {
+		games["test"].AddPlayer(strconv.Itoa(i), "blah")
+	}
+	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
@@ -190,7 +195,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.Run("192.168.1.2:" + port)
+	r.Run("192.168.1.85:" + port)
 }
 
 func redirect(msg string, c *gin.Context) {
