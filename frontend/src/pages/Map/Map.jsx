@@ -10,6 +10,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
+var countriesLoaded = false;
 var fromCountryISO = '';
 var toCountryISO = '';
 var countries = {};
@@ -106,7 +107,6 @@ function Alert(props) {
 function SideBar() {
 	//CSS
 	const classes = useStyles();
-	const username = 'Shashwat';
 	//TODO: Fetch #troops, attack, move options, fix data vals
 
 	// Spy Detail Information
@@ -123,24 +123,24 @@ function SideBar() {
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
 
-	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
-
 	const handleClick = (geo) => {
 		const { NAME, ISO_A2 } = geo.properties;
-		fromCountryISO = '';
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
-			fromCountryISO = ISO_A2;
-			setfromCountry(NAME);
+            if (playerCountries.some((iso) => iso === ISO_A2)) {
+                fromCountryISO = ISO_A2;
+                setfromCountry(NAME);
+            }
 		} else if (NAME === fromCountry) {
-			toCountryISO = ISO_A2;
+            toCountryISO = '';
+            fromCountryISO = '';
 			setfromCountry('');
 			settoCountry('');
 		} else {
-			console.log(playerCountries);
-			if (playerCountries.some((iso) => iso === ISO_A2)) {
-				settoCountry(NAME);
+            console.log(playerCountries);
+			if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
+                settoCountry(NAME);
 				toCountryISO = ISO_A2;
 			}
 			console.log(toCountry);
@@ -162,7 +162,7 @@ function SideBar() {
 	const handleColorFill = (geo) => {
 		if (!countriesLoaded) {
 			loadMap();
-			setcountriesLoaded(true);
+			countriesLoaded = true;
 		}
 
 		const { ISO_A2 } = geo.properties;
@@ -225,7 +225,7 @@ function SideBar() {
 			<Paper className={classes.sidebar}>
 				<Grid container style={{ alignText: 'center' }}>
 					<Title
-						username={username}
+						username={user}
 						handleCloseHelp={handleCloseHelp}
 						handleOpenHelp={handleOpenHelp}
 						openHelp={openHelp}
@@ -288,7 +288,7 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 			</IconButton>
 			<Grid item xs={12}>
 				<Typography variant="h4" align="center">
-					Welcome, Commander {username}!
+					Welcome, Commander {user}!
 				</Typography>
 			</Grid>
 			<br />
@@ -327,7 +327,9 @@ function donate() {
 	act.ActionType = 'donate';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-	act.Player = user;
+    act.Player = user;
+    console.log(JSON.stringify(act));
+    socket.send(JSON.stringify(act));
 }
 
 function move() {
@@ -335,15 +337,17 @@ function move() {
 	act.ActionType = 'move';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-	act.Player = user;
+    act.Player = user;
+    socket.send(JSON.stringify(act));
 }
 
-function deploy() {
+function assist() {
 	act.Troops = 5; //TODO: change to troops var
 	act.ActionType = 'drop';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-	act.Player = user;
+    act.Player = user;
+    socket.send(JSON.stringify(act));
 }
 
 const Options = ({ classes, toCountry, fromCountry }) => {
@@ -359,12 +363,12 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 					</Typography>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onclick={attack}>
 						ATTACK
 					</Button>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="primary" className={classes.button}>
+					<Button variant="contained" size="small" color="primary" className={classes.button} onclick={assist}>
 						ASSIST
 					</Button>
 				</Grid>
@@ -376,7 +380,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		//If toCountry is your land
 		return (
 			<Grid item xs={12} sm={6}>
-				<Button variant="contained" size="small" color="primary" className={classes.button}>
+				<Button variant="contained" size="small" color="primary" className={classes.button} onclick={move}>
 					MOVE
 				</Button>
 			</Grid>
@@ -387,8 +391,8 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		return (
 			<div>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button}>
-						DEPLOY
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onclick={donate}>
+						DONATE
 					</Button>
 				</Grid>
 			</div>
