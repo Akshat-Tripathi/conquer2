@@ -41,6 +41,7 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan
 				return
 			}
 			act.Player = name
+			log.Println(act)
 			msgs <- act
 		}
 	}()
