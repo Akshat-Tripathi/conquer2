@@ -318,7 +318,8 @@ function attack() {
 	act.ActionType = 'attack';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-	act.Player = user;
+    act.Player = user;
+    console.log("hi");
 	socket.send(JSON.stringify(act));
 }
 
@@ -328,7 +329,6 @@ function donate() {
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
     act.Player = user;
-    console.log(JSON.stringify(act));
     socket.send(JSON.stringify(act));
 }
 
@@ -351,8 +351,9 @@ function assist() {
 }
 
 const Options = ({ classes, toCountry, fromCountry }) => {
-	//If toCountry is not your land
+    //If toCountry is not your land
 	if (toCountry !== '' && fromCountry !== '') {
+        console.log("can press");
 		return (
 			<div>
 				<Grid item xs={12}>
@@ -363,12 +364,12 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 					</Typography>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button} onclick={attack}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={attack}>
 						ATTACK
 					</Button>
 				</Grid>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="primary" className={classes.button} onclick={assist}>
+					<Button variant="contained" size="small" color="primary" className={classes.button} onClick={assist}>
 						ASSIST
 					</Button>
 				</Grid>
@@ -380,7 +381,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		//If toCountry is your land
 		return (
 			<Grid item xs={12} sm={6}>
-				<Button variant="contained" size="small" color="primary" className={classes.button} onclick={move}>
+				<Button variant="contained" size="small" color="primary" className={classes.button} onClick={move}>
 					MOVE
 				</Button>
 			</Grid>
@@ -391,7 +392,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		return (
 			<div>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button} onclick={donate}>
+					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={donate}>
 						DONATE
 					</Button>
 				</Grid>
