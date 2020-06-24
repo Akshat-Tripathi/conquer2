@@ -1,4 +1,4 @@
-import {abs, atan2, cos, epsilon, sign, sin, sqrt} from "../math.js";
+import {abs, atan2, cos, epsilon, pi, sign, sin, sqrt} from "../math.js";
 import {conicProjection} from "./conic.js";
 import {equirectangularRaw} from "./equirectangular.js";
 
@@ -15,8 +15,11 @@ export function conicEquidistantRaw(y0, y1) {
   }
 
   project.invert = function(x, y) {
-    var gy = g - y;
-    return [atan2(x, abs(gy)) / n * sign(gy), g - sign(n) * sqrt(x * x + gy * gy)];
+    var gy = g - y,
+        l = atan2(x, abs(gy)) * sign(gy);
+    if (gy * n < 0)
+      l -= pi * sign(x) * sign(gy);
+    return [l / n, g - sign(n) * sqrt(x * x + gy * gy)];
   };
 
   return project;

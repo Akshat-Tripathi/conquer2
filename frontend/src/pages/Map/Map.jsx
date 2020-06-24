@@ -10,13 +10,9 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-<<<<<<< HEAD
-// var countriesLoaded = false;
-=======
 var countriesLoaded = false;
 var fromCountryISO = '';
 var toCountryISO = '';
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 var countries = {};
 var socket = null;
 var troops = 0;
@@ -50,6 +46,7 @@ class GameMap extends Component {
 						countryStates[action.Country].Player != action.Player
 					) {
 						if (action.Player == user) {
+                            console.log(user);
 							playerCountries.push(action.Country);
 						}
 						if (countryStates[action.Country] == user) {
@@ -130,20 +127,12 @@ function SideBar() {
 	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
 	const handleClick = (geo) => {
-<<<<<<< HEAD
-		const { NAME, ISO_A2 } = geo.properties;
-
-		//TODO: Check if country1 is player's country
-		//TODO: Check if country2 is a neighbouring country, else change country1
-		if (fromCountry === '') {
-=======
         const { NAME, ISO_A2 } = geo.properties;
         fromCountryISO = '';
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
             fromCountryISO = ISO_A2;
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
             toCountryISO = ISO_A2;
@@ -181,19 +170,12 @@ function SideBar() {
 		// 	return '#ffcd38';
 		// }
 
-<<<<<<< HEAD
-		console.log(ISO_A2);
-		console.log(countries[ISO_A2]);
-
-		if (fromCountry !== '' && countries[ISO_A2] !== undefined && countries[ISO_A2].some((iso) => iso === ISO_A2)) {
-=======
         
 		if (
             fromCountryISO !== '' &&
 			countries[fromCountryISO] !== undefined &&
 			countries[fromCountryISO].some((iso) => iso === ISO_A2)
             ) {
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 			return '#be90d4';
 		}
 
@@ -315,8 +297,6 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 	);
 };
 
-<<<<<<< HEAD
-=======
 class action {
     constructor(Troops, ActionType, Src, Dest, Player) {
         this.Troops = Troops;    
@@ -363,7 +343,6 @@ function deploy() {
     act.Player = user;
 }
 
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 const Options = ({ classes, toCountry, fromCountry }) => {
 	//If toCountry is not your land
 	if (toCountry !== '' && fromCountry !== '') {
@@ -447,8 +426,8 @@ function loadMap() {
 		.then((lines) =>
 			lines.forEach((line) => {
 				countries[line[0]] = line.slice(1);
-				console.log(line[0]);
-				console.log(countries[line[0]]);
+				/*console.log(line[0]);
+				console.log(countries[line[0]]);*/
 			})
 		);
 }
