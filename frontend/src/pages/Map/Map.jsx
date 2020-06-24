@@ -10,13 +10,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-<<<<<<< HEAD
-// var countriesLoaded = false;
-=======
-var countriesLoaded = false;
 var fromCountryISO = '';
 var toCountryISO = '';
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 var countries = {};
 var socket = null;
 var troops = 0;
@@ -70,7 +65,7 @@ class GameMap extends Component {
 
 	render() {
 		return <SideBar />;
-    }
+	}
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -130,30 +125,24 @@ function SideBar() {
 	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
 	const handleClick = (geo) => {
-<<<<<<< HEAD
 		const { NAME, ISO_A2 } = geo.properties;
-
+		fromCountryISO = '';
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
-=======
-        const { NAME, ISO_A2 } = geo.properties;
-        fromCountryISO = '';
-		//TODO: Check if country1 is player's country
-		//TODO: Check if country2 is a neighbouring country, else change country1
-		if (fromCountry === '') {
-            fromCountryISO = ISO_A2;
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
+			fromCountryISO = ISO_A2;
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
-            toCountryISO = ISO_A2;
+			toCountryISO = ISO_A2;
 			setfromCountry('');
 			settoCountry('');
 		} else {
-			// if (countries[ISO_A2].some((iso) => iso === ISO_A2)) {
-
-			// }
-			settoCountry(NAME);
+			console.log(playerCountries);
+			if (playerCountries.some((iso) => iso === ISO_A2)) {
+				settoCountry(NAME);
+				toCountryISO = ISO_A2;
+			}
+			console.log(toCountry);
 		}
 	};
 
@@ -169,11 +158,13 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
-	const handleColorFill = (NAME, ISO_A2) => {
+	const handleColorFill = (geo) => {
 		if (!countriesLoaded) {
 			loadMap();
 			setcountriesLoaded(true);
 		}
+
+		const { ISO_A2 } = geo.properties;
 
 		// if (NAME === fromCountry) {
 		// 	return '#002984';
@@ -181,19 +172,11 @@ function SideBar() {
 		// 	return '#ffcd38';
 		// }
 
-<<<<<<< HEAD
-		console.log(ISO_A2);
-		console.log(countries[ISO_A2]);
-
-		if (fromCountry !== '' && countries[ISO_A2] !== undefined && countries[ISO_A2].some((iso) => iso === ISO_A2)) {
-=======
-        
 		if (
-            fromCountryISO !== '' &&
+			fromCountryISO !== '' &&
 			countries[fromCountryISO] !== undefined &&
 			countries[fromCountryISO].some((iso) => iso === ISO_A2)
-            ) {
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
+		) {
 			return '#be90d4';
 		}
 
@@ -247,12 +230,14 @@ function SideBar() {
 						openHelp={openHelp}
 					/>
 
+					{/* Only show Attacka and Donate options when two countries clicked */}
 					{toCountry !== '' && (
 						<Grid item xs={12}>
 							<Options classes={classes} toCountry={toCountry} fromCountry={fromCountry} />
 						</Grid>
 					)}
 
+					{/* Only Show SpyDetails when not clicked anything */}
 					<Grid item xs={12}>
 						{fromCountry === '' &&
 							(name !== '' && (
@@ -315,55 +300,51 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 	);
 };
 
-<<<<<<< HEAD
-=======
 class action {
-    constructor(Troops, ActionType, Src, Dest, Player) {
-        this.Troops = Troops;    
-        this.ActionType = ActionType;
-        this.Src = Src;       
-        this.Dest = Dest;      
-        this.Player = Player;    
-    }
+	constructor(Troops, ActionType, Src, Dest, Player) {
+		this.Troops = Troops;
+		this.ActionType = ActionType;
+		this.Src = Src;
+		this.Dest = Dest;
+		this.Player = Player;
+	}
 }
 
 var act = new action();
 
 function attack() {
-    act.Troops = 0;
-    act.ActionType = "attack"
-    act.Src = fromCountryISO;
-    act.Dest = toCountryISO;
-    act.Player = user;
-    socket.send(JSON.stringify(act));
+	act.Troops = 0;
+	act.ActionType = 'attack';
+	act.Src = fromCountryISO;
+	act.Dest = toCountryISO;
+	act.Player = user;
+	socket.send(JSON.stringify(act));
 }
 
-
 function donate() {
-    act.Troops = 5; //TODO: change to troops var
-    act.ActionType = "donate"
-    act.Src = fromCountryISO;
-    act.Dest = toCountryISO;
-    act.Player = user;
+	act.Troops = 5; //TODO: change to troops var
+	act.ActionType = 'donate';
+	act.Src = fromCountryISO;
+	act.Dest = toCountryISO;
+	act.Player = user;
 }
 
 function move() {
-    act.Troops = 5; //TODO: change to troops var
-    act.ActionType = "move"
-    act.Src = fromCountryISO;
-    act.Dest = toCountryISO;
-    act.Player = user;
+	act.Troops = 5; //TODO: change to troops var
+	act.ActionType = 'move';
+	act.Src = fromCountryISO;
+	act.Dest = toCountryISO;
+	act.Player = user;
 }
 
 function deploy() {
-    act.Troops = 5; //TODO: change to troops var
-    act.ActionType = "drop";
-    act.Src = fromCountryISO;
-    act.Dest = toCountryISO;
-    act.Player = user;
+	act.Troops = 5; //TODO: change to troops var
+	act.ActionType = 'drop';
+	act.Src = fromCountryISO;
+	act.Dest = toCountryISO;
+	act.Player = user;
 }
 
->>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 const Options = ({ classes, toCountry, fromCountry }) => {
 	//If toCountry is not your land
 	if (toCountry !== '' && fromCountry !== '') {
@@ -383,7 +364,7 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<Button variant="contained" size="small" color="primary" className={classes.button}>
-						DONATE
+						ASSIST
 					</Button>
 				</Grid>
 			</div>
@@ -439,7 +420,6 @@ const PlayerBox = ({ classes }) => {
 };
 
 function loadMap() {
-	//TODO: take value from the cookie
 	fetch('/maps/world.txt')
 		.then((raw) => raw.text())
 		.then((raw) => raw.split('\r\n'))
@@ -451,31 +431,6 @@ function loadMap() {
 				console.log(countries[line[0]]);
 			})
 		);
-}
-
-//FIXME: fix read file correctly
-function getCountryCodes(countrycode) {
-	// var fs = require("fs");
-	const fileURL = '/maps/world.txt';
-	var textByLine = '';
-	fetch(fileURL)
-		.then((raw) => raw.text())
-		.then((raw) => raw.split('\n'))
-		.then((raw) => raw.map((x) => x.split(' ')))
-		.then((raw) => (textByLine = raw));
-
-	var countriesBordering = [];
-
-	for (let j = 0; j < textByLine.length; j++) {
-		var borders = textByLine[j].split(' ');
-		if (borders[0] == countrycode) {
-			for (let i = 1; i < borders.length; i++) {
-				//Get border codes
-				countriesBordering.push(borders[i]);
-			}
-		}
-	}
-	return countriesBordering;
 }
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
@@ -490,9 +445,6 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 				<Grid item xs={12} sm={6}>
 					<h3>Population: </h3>
 					<Typography variant="subtitle1">{pop_est} </Typography>
-					{/* <h3>
-						{countryStates[clickedCountry].Troops !== undefined && countryStates[clickedCountry].Troops}
-					</h3> */}
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<h3>GDP (PPP): </h3>
