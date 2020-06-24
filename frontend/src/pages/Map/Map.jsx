@@ -10,7 +10,13 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
+<<<<<<< HEAD
 // var countriesLoaded = false;
+=======
+var countriesLoaded = false;
+var fromCountryISO = '';
+var toCountryISO = '';
+>>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 var countries = {};
 var socket = null;
 var troops = 0;
@@ -64,7 +70,7 @@ class GameMap extends Component {
 
 	render() {
 		return <SideBar />;
-	}
+    }
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -124,13 +130,23 @@ function SideBar() {
 	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
 	const handleClick = (geo) => {
+<<<<<<< HEAD
 		const { NAME, ISO_A2 } = geo.properties;
 
 		//TODO: Check if country1 is player's country
 		//TODO: Check if country2 is a neighbouring country, else change country1
 		if (fromCountry === '') {
+=======
+        const { NAME, ISO_A2 } = geo.properties;
+        fromCountryISO = '';
+		//TODO: Check if country1 is player's country
+		//TODO: Check if country2 is a neighbouring country, else change country1
+		if (fromCountry === '') {
+            fromCountryISO = ISO_A2;
+>>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 			setfromCountry(NAME);
 		} else if (NAME === fromCountry) {
+            toCountryISO = ISO_A2;
 			setfromCountry('');
 			settoCountry('');
 		} else {
@@ -165,10 +181,19 @@ function SideBar() {
 		// 	return '#ffcd38';
 		// }
 
+<<<<<<< HEAD
 		console.log(ISO_A2);
 		console.log(countries[ISO_A2]);
 
 		if (fromCountry !== '' && countries[ISO_A2] !== undefined && countries[ISO_A2].some((iso) => iso === ISO_A2)) {
+=======
+        
+		if (
+            fromCountryISO !== '' &&
+			countries[fromCountryISO] !== undefined &&
+			countries[fromCountryISO].some((iso) => iso === ISO_A2)
+            ) {
+>>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 			return '#be90d4';
 		}
 
@@ -185,13 +210,21 @@ function SideBar() {
 
 	//TODO: Change stroke according to action
 	const handleColorStroke = (geo) => {
-		const { NAME } = geo.properties;
+		const { NAME, ISO_A2 } = geo.properties;
 		if (NAME === fromCountry) {
 			return '#002984';
 		} else if (NAME === toCountry) {
 			return '#ff9800';
 		}
-		return '#FFFFFF';
+		try {
+			var col = playerColours[countryStates[ISO_A2].Player];
+			if (typeof col == 'undefined') {
+				col = '#B9A37E';
+			}
+			return col;
+		} catch (TypeError) {
+			col = '#B9A37E';
+		}
 	};
 
 	const handleStrokeWidth = (geo) => {
@@ -282,6 +315,55 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 	);
 };
 
+<<<<<<< HEAD
+=======
+class action {
+    constructor(Troops, ActionType, Src, Dest, Player) {
+        this.Troops = Troops;    
+        this.ActionType = ActionType;
+        this.Src = Src;       
+        this.Dest = Dest;      
+        this.Player = Player;    
+    }
+}
+
+var act = new action();
+
+function attack() {
+    act.Troops = 0;
+    act.ActionType = "attack"
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
+    act.Player = user;
+    socket.send(JSON.stringify(act));
+}
+
+
+function donate() {
+    act.Troops = 5; //TODO: change to troops var
+    act.ActionType = "donate"
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
+    act.Player = user;
+}
+
+function move() {
+    act.Troops = 5; //TODO: change to troops var
+    act.ActionType = "move"
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
+    act.Player = user;
+}
+
+function deploy() {
+    act.Troops = 5; //TODO: change to troops var
+    act.ActionType = "drop";
+    act.Src = fromCountryISO;
+    act.Dest = toCountryISO;
+    act.Player = user;
+}
+
+>>>>>>> c264f0fb6e93f98c943b318c5ae4e1ab0c7204d1
 const Options = ({ classes, toCountry, fromCountry }) => {
 	//If toCountry is not your land
 	if (toCountry !== '' && fromCountry !== '') {
