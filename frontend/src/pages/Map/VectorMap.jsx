@@ -47,6 +47,7 @@ const MapChart = ({
 								const fillcolor = handleColorFill(geo);
 								const strokecolor = handleColorStroke(geo);
 								const strokewidth = handleStrokeWidth(geo);
+								const centroid = geoCentroid(geo);
 								return notThisCountry(geo) ? (
 									<Geography
 										key={geo.rsmKey}
@@ -84,6 +85,20 @@ const MapChart = ({
 											}
 										}}
 									/>
+								) : null;
+							})}
+					</Geographies>
+					<Geographies geography={geoUrl}>
+						{({ geographies }) =>
+							geographies.map((geo) => {
+								const { NAME } = geo.properties;
+								return notThisCountry(geo) ? (
+									<Marker coordinates={geoCentroid(geo)}>
+										<text y="2" fontSize={3} textAnchor="middle" fill="#FF">
+											3
+											{/* TODO: Enter no Troops here */}
+										</text>
+									</Marker>
 								) : null;
 							})}
 					</Geographies>

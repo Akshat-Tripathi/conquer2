@@ -54,46 +54,46 @@ class countryState {
 	}
 }
 
-class GameMap extends Component {
-	constructor() {
-		super();
-		socket = connect();
-		socket.onmessage = (msg) => {
-			var action = JSON.parse(msg.data);
-			switch (action.Type) {
-				case 'updateTroops':
-					user = action.Player;
-					troops += action.Troops;
-					break;
-				case 'updateCountry':
-					if (
-						typeof countryStates[action.Country] == 'undefined' ||
-						countryStates[action.Country].Player != action.Player
-					) {
-						if (action.Player == user) {
-							console.log(user);
-							playerCountries.push(action.Country);
-						}
-						if (countryStates[action.Country] == user) {
-							playerCountries.filter((country) => country != action.Country);
-						}
-						countryStates[action.Country] = new countryState(action.Troops, action.Player);
-					} else {
-						countryStates[action.Country].Troops += action.Troops;
-					}
-					break;
-				case 'newPlayer':
-					console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
-					playerColours[action.Player] = action.Country;
-					players.push(action.Player);
-			}
-		};
-	}
+// class GameMap extends Component {
+// 	constructor() {
+// 		super();
+// 		socket = connect();
+// 		socket.onmessage = (msg) => {
+// 			var action = JSON.parse(msg.data);
+// 			switch (action.Type) {
+// 				case 'updateTroops':
+// 					user = action.Player;
+// 					troops += action.Troops;
+// 					break;
+// 				case 'updateCountry':
+// 					if (
+// 						typeof countryStates[action.Country] == 'undefined' ||
+// 						countryStates[action.Country].Player != action.Player
+// 					) {
+// 						if (action.Player == user) {
+// 							console.log(user);
+// 							playerCountries.push(action.Country);
+// 						}
+// 						if (countryStates[action.Country] == user) {
+// 							playerCountries.filter((country) => country != action.Country);
+// 						}
+// 						countryStates[action.Country] = new countryState(action.Troops, action.Player);
+// 					} else {
+// 						countryStates[action.Country].Troops += action.Troops;
+// 					}
+// 					break;
+// 				case 'newPlayer':
+// 					console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
+// 					playerColours[action.Player] = action.Country;
+// 					players.push(action.Player);
+// 			}
+// 		};
+// 	}
 
-	render() {
-		return <SideBar />;
-	}
-}
+// 	render() {
+// 		return <SideBar />;
+// 	}
+// }
 
 const useStyles = makeStyles((theme) => ({
 	sidebar: {
@@ -437,7 +437,7 @@ const PlayerBox = ({ classes }) => {
 				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12}>
 					{Object.keys(playerColours).map(function(player) {
-                        var colour = playerColours[player];
+						var colour = playerColours[player];
 						return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid container spacing={12}>
@@ -508,5 +508,5 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	);
 };
 
-export default GameMap;
+export default SideBar;
 export { players, fromCountryISO, toCountryISO, user, socket };

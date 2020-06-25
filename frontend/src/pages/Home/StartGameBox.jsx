@@ -25,7 +25,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import './StartGameBox.css';
 
 //TODO: Add username var here and set accordingly.
-export var username = '';
+var username = '';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -250,9 +250,7 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography gutterBottom>
-								Please Specify Troop Interval
-							</Typography>
+							<Typography gutterBottom>Please Specify Troop Interval</Typography>
 							<Slider
 								defaultValue={5}
 								aria-labelledby="troopInterval"
@@ -260,8 +258,8 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 								marks
 								min={4}
 								max={20}
-                                valueLabelDisplay="auto"
-                                name = "troopInterval"
+								valueLabelDisplay="auto"
+								name="troopInterval"
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -291,3 +289,4 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 };
 
 export default StartGameBox;
+export { username };
