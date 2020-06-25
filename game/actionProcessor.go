@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 )
@@ -30,6 +29,12 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 	log.Println(len(p.playerTroops))
 	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done probably with a mutex
 	i := 0
+	msgs[i] = UpdateMessage{
+		Troops: p.playerTroops[username].troops,
+		Type:   "updateTroops",
+		Player: username}
+	i++
+
 	for country, state := range p.countryStates {
 		msgs[i] = UpdateMessage{
 			Troops:  state.troops,
@@ -38,12 +43,6 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 			Country: country}
 		i++
 	}
-	msgs[i] = UpdateMessage{
-		Troops: p.playerTroops[username].troops,
-		Type:   "updateTroops",
-		Player: username}
-	fmt.Println(p.playerTroops[username].troops)
-	i++
 	log.Println(p.playerTroops)
 	for player, state := range p.playerTroops {
 		msgs[i] = UpdateMessage{
