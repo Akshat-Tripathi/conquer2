@@ -1,28 +1,11 @@
 import React, { Component, useState } from 'react';
 import { connect, loaddetails } from '../../api/index.js';
-import {
-	Typography,
-	Paper,
-	makeStyles,
-	IconButton,
-	Snackbar,
-	Grid,
-	Button,
-	Select,
-	MenuItem,
-	FormHelperText,
-	FormControl
-} from '@material-ui/core';
+import { Paper, makeStyles, Grid } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import HelpIcon from '@material-ui/icons/Help';
-import MuiAlert from '@material-ui/lab/Alert';
 import VectorMap from './VectorMap';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-//FIXME: Username not being imported - has no val??
-// import { username } from '../Home/StartGameBox';
 import './Map.css';
 import { Options, OptionsDeploy, DonateForm } from './ActionButtons';
+import { SpyDetails, PlayerBox, Title } from './Texts';
 
 // ISO_A2 of source country
 var fromCountryISO = '';
@@ -44,8 +27,6 @@ var players = [];
 var playerCountries = [];
 // Current player name
 var user = '';
-// Number of troops for actions (e.g. donate)
-// var numTroops = 0;
 
 class countryState {
 	constructor(Troops, Player) {
@@ -54,46 +35,48 @@ class countryState {
 	}
 }
 
-// class GameMap extends Component {
-// 	constructor() {
-// 		super();
-// 		socket = connect();
-// 		socket.onmessage = (msg) => {
-// 			var action = JSON.parse(msg.data);
-// 			switch (action.Type) {
-// 				case 'updateTroops':
-// 					user = action.Player;
-// 					troops += action.Troops;
-// 					break;
-// 				case 'updateCountry':
-// 					if (
-// 						typeof countryStates[action.Country] == 'undefined' ||
-// 						countryStates[action.Country].Player != action.Player
-// 					) {
-// 						if (action.Player == user) {
-// 							console.log(user);
-// 							playerCountries.push(action.Country);
-// 						}
-// 						if (countryStates[action.Country] == user) {
-// 							playerCountries.filter((country) => country != action.Country);
-// 						}
-// 						countryStates[action.Country] = new countryState(action.Troops, action.Player);
-// 					} else {
-// 						countryStates[action.Country].Troops += action.Troops;
-// 					}
-// 					break;
-// 				case 'newPlayer':
-// 					console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
-// 					playerColours[action.Player] = action.Country;
-// 					players.push(action.Player);
-// 			}
-// 		};
-// 	}
+class GameMap extends Component {
+	constructor() {
+		super();
+		socket = connect();
+		socket.onmessage = (msg) => {
+			var action = JSON.parse(msg.data);
+			switch (action.Type) {
+				case 'updateTroops':
+					user = action.Player;
+					troops += action.Troops;
+					break;
+				case 'updateCountry':
+					if (
+						typeof countryStates[action.Country] === 'undefined' ||
+						countryStates[action.Country].Player !== action.Player
+					) {
+						if (action.Player === user) {
+							console.log(user);
+							playerCountries.push(action.Country);
+						}
+						if (countryStates[action.Country] === user) {
+							playerCountries.filter((country) => country !== action.Country);
+						}
+						countryStates[action.Country] = new countryState(action.Troops, action.Player);
+					} else {
+						countryStates[action.Country].Troops += action.Troops;
+					}
+					break;
+				case 'newPlayer':
+					console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
+					playerColours[action.Player] = action.Country;
+					players.push(action.Player);
+			}
+		};
+	}
 
-// 	render() {
-// 		return <SideBar />;
-// 	}
-// }
+	render() {
+		console.log('countries', countries);
+		console.log('countryStates', countryStates);
+		return <SideBar />;
+	}
+}
 
 const useStyles = makeStyles((theme) => ({
 	sidebar: {
@@ -133,10 +116,6 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
-function Alert(props) {
-	return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 function SideBar() {
 	//CSS
 	const classes = useStyles();
@@ -169,6 +148,8 @@ function SideBar() {
 	const [ showDonate, setshowDonate ] = useState(false);
 	const [ showAssist, setshowAssist ] = useState(false);
 	const [ showMove, setshowMove ] = useState(false);
+	const [ showDeploy, setshowDeploy ] = useState(false);
+
 	//For sending socket message actions (e.g. donate)
 	const [ targetPlayer, settargetPlayer ] = useState('');
 	const [ numTroops, setnumTroops ] = useState(0);
@@ -234,6 +215,13 @@ function SideBar() {
 	const handleMove = () => {
 		setshowMove(!showMove);
 		if (!showMove) {
+			setnumTroops(0);
+		}
+	};
+
+	const handleDeploy = () => {
+		setshowDeploy(!showDeploy);
+		if (!showDeploy) {
 			setnumTroops(0);
 		}
 	};
@@ -316,7 +304,7 @@ function SideBar() {
 
 	return (
 		<div>
-			{players.length !== 0 && <PlayerBox classes={classes} />}
+			{players.length !== 0 && <PlayerBox classes={classes} playerColours={playerColours} />}
 			<Paper className={classes.sidebar}>
 				<Grid container style={{ alignText: 'center' }}>
 					<Title
@@ -324,6 +312,8 @@ function SideBar() {
 						handleCloseHelp={handleCloseHelp}
 						handleOpenHelp={handleOpenHelp}
 						openHelp={openHelp}
+						user={user}
+						troops={troops}
 					/>
 					{/* Show Donation options when clicked on Donate Button */}
 					{fromCountry === '' && (
@@ -362,6 +352,8 @@ function SideBar() {
 							numTroops={numTroops}
 							handleNumTroops={handleNumTroops}
 							fromCountry={fromCountry}
+							handleDeploy={handleDeploy}
+							showDeploy={showDeploy}
 						/>
 					)}
 
@@ -396,65 +388,6 @@ function SideBar() {
 	);
 }
 
-const Title = ({ handleCloseHelp, handleOpenHelp, openHelp }) => {
-	return (
-		<div>
-			<IconButton aria-label="help" color="primary" size="small">
-				<HelpIcon
-					style={{
-						fontSize: '20'
-					}}
-					onClick={handleOpenHelp}
-				/>
-				<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
-					<Alert onClose={handleCloseHelp} severity="info">
-						This is your control room. Hover above countries to receive encrypted data. Click on countries
-						to see your military options.
-					</Alert>
-				</Snackbar>
-			</IconButton>
-			<Grid item xs={12}>
-				<Typography variant="h4" align="center">
-					Welcome, Commander {user}!
-				</Typography>
-			</Grid>
-			<br />
-			<Grid item xs={12}>
-				<Typography variant="h6" align="center">
-					Base Troops: {troops}
-				</Typography>
-			</Grid>
-			<br />
-		</div>
-	);
-};
-
-//FIXME: Colour appearing not correct?
-const PlayerBox = ({ classes }) => {
-	return (
-		<div>
-			<Paper className={classes.players}>
-				<Typography variant="subtitle1">PLAYERS:</Typography>
-				<Grid container spacing={12}>
-					{Object.keys(playerColours).map(function(player) {
-						var colour = playerColours[player];
-						return (
-							<div key={player} style={{ padding: '5%' }}>
-								<Grid container spacing={12}>
-									<Grid item xs={12}>
-										<Typography variant="p">{player}</Typography>
-										<FiberManualRecordIcon style={{ color: colour }} />
-									</Grid>
-								</Grid>
-							</div>
-						);
-					})}
-				</Grid>
-			</Paper>
-		</div>
-	);
-};
-
 function loadMap() {
 	fetch('/maps/world.txt')
 		.then((raw) => raw.text())
@@ -469,44 +402,5 @@ function loadMap() {
 		);
 }
 
-const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
-	return (
-		<div>
-			<Grid container spacing={12}>
-				<Grid item xs={12} style={{ alignText: 'center' }}>
-					<h2>
-						Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
-					</h2>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<h3>Population: </h3>
-					<Typography variant="subtitle1">{pop_est} </Typography>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<h3>GDP (PPP): </h3>
-
-					<Typography variant="subtitle1">{gdp} </Typography>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<h3>Continent</h3>
-					<Typography variant="subtitle1">{continent} </Typography>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					{continent !== 'South America' && (
-						<div>
-							<h3>Subregion: </h3>
-							<Typography variant="subtitle1">{subrg} </Typography>
-						</div>
-					)}
-				</Grid>
-				<Grid item xs={12}>
-					<h3>Allegiance: </h3>
-					<Typography variant="subtitle1">Ohio </Typography>
-				</Grid>
-			</Grid>
-		</div>
-	);
-};
-
-export default SideBar;
-export { players, fromCountryISO, toCountryISO, user, socket };
+export default GameMap;
+export { players, fromCountryISO, toCountryISO, user, socket, countryStates };

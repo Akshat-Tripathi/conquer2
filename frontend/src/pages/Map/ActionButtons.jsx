@@ -271,7 +271,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove })
 	);
 };
 
-const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry }) => {
+const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy }) => {
 	return (
 		<Grid item xs={12} sm={6}>
 			<Typography variant="h5">
@@ -286,36 +286,72 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry }) => 
 					</strong>
 				</span>
 			</Typography>
-			<Grid item xs>
-				<FormControl classes={classes.input}>
-					<Select
-						name="donateNumTroops"
-						required
-						variant="outlined"
-						placeholder={5}
-						label="Number of Troops to Donate"
-						value={numTroops}
-						onChange={handleNumTroops}
-						className={classes.select}
-						style={{ color: 'yellow', borderColor: 'white' }}
+
+			{!showDeploy ? (
+				<Grid item xs={12}>
+					<Button
+						variant="contained"
+						size="small"
+						color="secondary"
+						className={classes.button}
+						onClick={handleDeploy}
 					>
-						<MenuItem value={5}>5</MenuItem>
-						<MenuItem value={10}>10</MenuItem>
-						<MenuItem value={20}>20</MenuItem>
-						<MenuItem value={50}>50</MenuItem>
-					</Select>
-					<FormHelperText style={{ color: 'white' }}>Select Number of Base Troops to Deploy</FormHelperText>
-				</FormControl>
-			</Grid>
-			<Button
-				variant="contained"
-				size="small"
-				color="primary"
-				className={classes.button}
-				onClick={deploy(numTroops)}
-			>
-				DEPLOY
-			</Button>
+						DEPLOY
+					</Button>
+				</Grid>
+			) : (
+				<div>
+					<Grid container spacing={2} style={{ alignContent: 'center' }}>
+						<Grid item xs>
+							<FormControl classes={classes.input}>
+								<Select
+									name="donateNumTroops"
+									required
+									variant="outlined"
+									placeholder={5}
+									label="Number of Troops to Donate"
+									value={numTroops}
+									onChange={handleNumTroops}
+									className={classes.select}
+									style={{ color: 'yellow', borderColor: 'white' }}
+								>
+									{/* //TODO: Update value= num of base troops */}
+									<MenuItem value={0}>All Base Troops</MenuItem>
+									<MenuItem value={5}>5</MenuItem>
+									<MenuItem value={10}>10</MenuItem>
+									<MenuItem value={20}>20</MenuItem>
+									<MenuItem value={50}>50</MenuItem>
+								</Select>
+								<FormHelperText style={{ color: 'white' }}>
+									Select Number of Base Troops to Deploy
+								</FormHelperText>
+							</FormControl>
+						</Grid>
+						<Grid item xs={6}>
+							<Button
+								variant="contained"
+								size="small"
+								color="primary"
+								className={classes.button}
+								onClick={deploy(numTroops)}
+							>
+								DEPLOY
+							</Button>
+						</Grid>
+					</Grid>
+
+					<Grid item xs={12}>
+						<IconButton aria-label="return" color="secondary" onClick={handleDeploy}>
+							<ArrowBackIcon
+								style={{
+									fontSize: '30'
+								}}
+							/>
+							<Typography variant="subtitle2">Back</Typography>
+						</IconButton>
+					</Grid>
+				</div>
+			)}
 		</Grid>
 	);
 };

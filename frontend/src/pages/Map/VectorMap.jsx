@@ -2,11 +2,12 @@ import React, { memo } from 'react';
 import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
 import ReactTooltip from 'react-tooltip';
+import { countryStates } from './Map';
 
 const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 
 const rounded = (num) => {
-	var num = Math.round(num);
+	num = Math.round(num);
 	if (num > Math.pow(10, 12)) {
 		num = num / Math.pow(10, 12) + ' Trillion';
 	} else if (num > Math.pow(10, 9)) {
@@ -17,8 +18,8 @@ const rounded = (num) => {
 	return num;
 };
 
-function notThisCountry(country) {
-	const { NAME } = country.properties;
+function notThisCountry(geo) {
+	// const { NAME } = geo.properties;
 	// return NAME !== '';
 	return true;
 }
@@ -47,7 +48,6 @@ const MapChart = ({
 								const fillcolor = handleColorFill(geo);
 								const strokecolor = handleColorStroke(geo);
 								const strokewidth = handleStrokeWidth(geo);
-								const centroid = geoCentroid(geo);
 								return notThisCountry(geo) ? (
 									<Geography
 										key={geo.rsmKey}
@@ -91,12 +91,15 @@ const MapChart = ({
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
-								const { NAME } = geo.properties;
+								const { ISO_A2 } = geo.properties;
 								return notThisCountry(geo) ? (
 									<Marker coordinates={geoCentroid(geo)}>
 										<text y="2" fontSize={3} textAnchor="middle" fill="#FF">
-											3
-											{/* TODO: Enter no Troops here */}
+											{countryStates !== undefined && ISO_A2.toString() in countryStates ? (
+												countryStates[ISO_A2.toString()]['Troops']
+											) : (
+												0
+											)}
 										</text>
 									</Marker>
 								) : null;
