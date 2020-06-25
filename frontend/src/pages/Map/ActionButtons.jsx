@@ -194,7 +194,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={assist(numTroops)}
+						onClick={move(numTroops)}
 					>
 						CONFIRM ASSISTANCE
 					</Button>
@@ -312,7 +312,7 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry }) => 
 				size="small"
 				color="primary"
 				className={classes.button}
-				onClick={move(numTroops)}
+				onClick={deploy(numTroops)}
 			>
 				DEPLOY
 			</Button>
