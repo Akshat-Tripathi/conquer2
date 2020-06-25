@@ -199,8 +199,8 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 						<Grid item xs={12}>
 							<Select
 								className="gamemode"
-								id="gamemode"
-								name="gamemode"
+								id="type"
+								name="type"
 								label="Gamemode"
 								required
 								variant="outlined"
@@ -250,7 +250,7 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography id="troopInterval" gutterBottom>
+							<Typography gutterBottom>
 								Please Specify Troop Interval
 							</Typography>
 							<Slider
@@ -260,7 +260,8 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 								marks
 								min={4}
 								max={20}
-								valueLabelDisplay="auto"
+                                valueLabelDisplay="auto"
+                                name = "troopInterval"
 							/>
 						</Grid>
 						<Grid item xs={12}>

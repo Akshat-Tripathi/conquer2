@@ -133,8 +133,8 @@ func main() {
 		case "campaign":
 			g = &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
 		}
-		g.AddPlayer(username, password)
 		g.Start(ctx)
+		g.AddPlayer(username, password)
 		games[id] = g
 
 		//Sets a cookie for the current game id
