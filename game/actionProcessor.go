@@ -139,8 +139,8 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 		if p.validateMove(action) {
 			p.countryStates[action.Src].troops -= action.Troops
 			p.countryStates[action.Dest].troops += action.Troops
-			return false, UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player},
-				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Country: action.Src}
+			return false, UpdateMessage{Type: "updateCountry", Troops: -action.Troops, Player: action.Player, Country: action.Src},
+				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Country: action.Dest}
 		}
 	case "drop":
 		if p.validateDrop(action) {
@@ -213,10 +213,6 @@ func (p defaultProcessor) validateMove(move Action) bool {
 	if !ok {
 		return false
 	}
-	dest, ok := p.countryStates[move.Dest]
-	if !ok {
-		return false
-	}
 	//Must select neighbouring countries
 	if !p.areNeighbours(move.Src, move.Dest) {
 		return false
@@ -229,10 +225,11 @@ func (p defaultProcessor) validateMove(move Action) bool {
 		return false
 	}
 	//Must own dest
-	if dest.player == move.Player {
+	/*if dest.player == move.Player {
 		return false
-	}
-	return true
+	}*/
+	_, ok = p.countryStates[move.Dest]
+	return ok
 }
 
 func (p defaultProcessor) validateDrop(drop Action) bool {

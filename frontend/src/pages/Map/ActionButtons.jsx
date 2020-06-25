@@ -360,11 +360,10 @@ function move(numTroops) {
 	socket.send(JSON.stringify(act));
 }
 
-function assist(numTroops) {
+function deploy(numTroops) {
 	act.Troops = numTroops;
 	act.ActionType = 'drop';
 	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
 	act.Player = user;
 	socket.send(JSON.stringify(act));
 }
