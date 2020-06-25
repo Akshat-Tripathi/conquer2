@@ -66,6 +66,7 @@ class GameMap extends Component {
 					troops += action.Troops;
 					break;
 				case 'updateCountry':
+                    console.log(action);
 					if (
 						typeof countryStates[action.Country] == 'undefined' ||
 						countryStates[action.Country].Player != action.Player
@@ -193,7 +194,6 @@ function SideBar() {
 		} else {
 			//TODO: Is own country: Enable Move
 			//TODO: Another country: Enable attack/assist
-			console.log(playerCountries);
 			// TODO: Check if neighbouring country
 			// if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
 			// }
@@ -429,7 +429,6 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp }) => {
 	);
 };
 
-//FIXME: Colour appearing not correct?
 const PlayerBox = ({ classes }) => {
 	return (
 		<div>
