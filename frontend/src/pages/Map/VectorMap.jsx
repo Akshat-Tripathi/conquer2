@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation } from 'react-simple-maps';
+import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation, Graticule } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
 import ReactTooltip from 'react-tooltip';
 import { countryStates } from './Map';
@@ -40,8 +40,9 @@ const MapChart = ({
 		<div>
 			{/* <ComposableMap data-tip="" projectionConfig={{ scale: 200 }} width={mapWidth} height={mapHeight}> */}
 			{/* <ZoomableGroup translateExtent={[ [ 0, -mapHeight ], [ mapWidth, mapHeight ] ]}> */}
-			<ComposableMap data-tip="" projectionConfig={{ scale: 140 }}>
+			<ComposableMap data-tip="" /*projection="geoOrthographic"*/ projectionConfig={{ scale: 140 }}>
 				<ZoomableGroup>
+                    <Graticule stroke="#2e3131" />
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {

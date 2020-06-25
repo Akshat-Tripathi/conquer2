@@ -27,7 +27,6 @@ const Options = ({
 	handleAssist
 }) => {
 	if (toCountry !== '' && fromCountry !== '') {
-		console.log('can press');
 		return (
 			<div>
 				<Grid item xs={12}>
@@ -107,7 +106,9 @@ const DonateForm = ({
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
 							{players.map(function(p) {
-								return <MenuItem value={p}>{p}</MenuItem>;
+								if (p != user) {
+									return <MenuItem value={p}>{p}</MenuItem>;
+								}
 							})}
 						</Select>
 						<FormHelperText style={{ color: 'white' }}>Select Player to Donate to</FormHelperText>
@@ -138,7 +139,7 @@ const DonateForm = ({
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={donate(numTroops)}
+						onClick={() => donate(numTroops, targetPlayer)}
 					>
 						CONFIRM DONATION
 					</Button>
@@ -175,7 +176,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 							name="donateNumTroops"
 							required
 							variant="outlined"
-							label="Number of Troops to Donate"
+							label="Number of Troops for the Assist"
 							value={numTroops}
 							onChange={handleNumTroops}
 							style={{ color: 'yellow', borderColor: 'white' }}
@@ -194,7 +195,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={move(numTroops)}
+						onClick={() => move(numTroops)}
 					>
 						CONFIRM ASSISTANCE
 					</Button>
@@ -250,7 +251,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove })
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={move(numTroops)}
+						onClick={() => move(numTroops)}
 					>
 						CONFIRM MOVE
 					</Button>
@@ -374,15 +375,13 @@ function attack() {
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
 	act.Player = user;
-	console.log('hi');
 	socket.send(JSON.stringify(act));
 }
 
-function donate(numTroops) {
+function donate(numTroops, targetPlayer) {
 	act.Troops = numTroops;
 	act.ActionType = 'donate';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
+	act.Dest = targetPlayer;
 	act.Player = user;
 	socket.send(JSON.stringify(act));
 }
@@ -399,7 +398,7 @@ function move(numTroops) {
 function deploy(numTroops) {
 	act.Troops = numTroops;
 	act.ActionType = 'drop';
-	act.Src = fromCountryISO;
+	act.Dest = fromCountryISO;
 	act.Player = user;
 	socket.send(JSON.stringify(act));
 }

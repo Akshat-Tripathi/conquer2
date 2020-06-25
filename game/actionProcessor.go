@@ -105,12 +105,17 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 		if p.validateAttack(action) {
 			src := p.countryStates[action.Src]
 			dest := p.countryStates[action.Dest]
-			deltaSrc, deltaDest := defaultRng(src.troops, dest.troops)
+
+			deltaSrc, deltaDest := 0, 0
+			if dest.troops != 0 {
+				deltaSrc, deltaDest = defaultRng(src.troops, dest.troops)
+			}
 
 			src.troops -= deltaSrc
 			dest.troops -= deltaDest
 
 			if dest.troops == 0 && src.troops > 0 {
+				//Conquered the country
 				dest.player = action.Player
 				dest.troops++
 				src.troops--
@@ -121,18 +126,17 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				if p.playerTroops[action.Player].countries == len(p.countries) {
 					won = true
 				}
-				return won, UpdateMessage{Type: "updateCountry", Player: action.Player, Country: action.Dest},
-					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Country: action.Src}
+				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
+					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Player: action.Player, Country: action.Src}
 			}
 			return false, UpdateMessage{Type: "updateCountry", Troops: -deltaDest, Country: action.Dest},
-				UpdateMessage{Type: "updateCountry", Troops: -deltaSrc, Country: action.Src}
+				UpdateMessage{Type: "updateCountry", Troops: -deltaSrc, Player: p.countryStates[action.Dest].player, Country: action.Src}
 		}
 	case "donate":
 		if p.validateDonate(action) {
-			recv := p.countryStates[action.Dest].player
 			p.playerTroops[action.Player].troops -= action.Troops //Might cause error
-			p.playerTroops[recv].troops += action.Troops
-			return false, UpdateMessage{Type: "updateTroops", Troops: action.Troops, Player: recv},
+			p.playerTroops[action.Dest].troops += action.Troops
+			return false, UpdateMessage{Type: "updateTroops", Troops: action.Troops, Player: action.Dest},
 				UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player}
 		}
 	case "move":
@@ -140,14 +144,14 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 			p.countryStates[action.Src].troops -= action.Troops
 			p.countryStates[action.Dest].troops += action.Troops
 			return false, UpdateMessage{Type: "updateCountry", Troops: -action.Troops, Player: action.Player, Country: action.Src},
-				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Country: action.Dest}
+				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].player, Country: action.Dest}
 		}
 	case "drop":
 		if p.validateDrop(action) {
 			p.playerTroops[action.Player].troops -= action.Troops
 			p.countryStates[action.Dest].troops += action.Troops
 			return false, UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player},
-				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Country: action.Dest}
+				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].player, Country: action.Dest}
 		}
 		/*
 			case "removeUser":
@@ -173,10 +177,6 @@ func (p defaultProcessor) validateAttack(attack Action) bool {
 	if src.player != attack.Player {
 		return false
 	}
-	//Mustn't own dest
-	if dest.player == attack.Player {
-		return false
-	}
 	//Can't attack self
 	if src.player == dest.player {
 		return false
@@ -188,12 +188,9 @@ func (p defaultProcessor) validateAttack(attack Action) bool {
 	return true
 }
 
+//PRE: donate.Dest is the name of the other player
 func (p defaultProcessor) validateDonate(donate Action) bool {
 	me, ok := p.playerTroops[donate.Player]
-	if !ok {
-		return false
-	}
-	them, ok := p.countryStates[donate.Dest]
 	if !ok {
 		return false
 	}
@@ -202,10 +199,11 @@ func (p defaultProcessor) validateDonate(donate Action) bool {
 		return false
 	}
 	//Can't donate to self
-	if them.player == donate.Player {
+	if donate.Dest == donate.Player {
 		return false
 	}
-	return true
+	_, ok = p.playerTroops[donate.Dest]
+	return ok
 }
 
 func (p defaultProcessor) validateMove(move Action) bool {
@@ -241,16 +239,12 @@ func (p defaultProcessor) validateDrop(drop Action) bool {
 	if !ok {
 		return false
 	}
-	//Must select neighbouring countries
-	if !p.areNeighbours(drop.Src, drop.Dest) {
-		return false
-	}
 	//Must have troops
 	if me.troops < drop.Troops {
 		return false
 	}
-	//Can't donate to nil
-	if them.player != "" {
+	//Must own dest
+	if them.player != drop.Player {
 		return false
 	}
 	return true
