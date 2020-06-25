@@ -1,26 +1,50 @@
 import React, { Component, useState } from 'react';
 import { connect, loaddetails } from '../../api/index.js';
-import { Typography, Paper, makeStyles, IconButton, Snackbar, Grid, Button } from '@material-ui/core';
+import {
+	Typography,
+	Paper,
+	makeStyles,
+	IconButton,
+	Snackbar,
+	Grid,
+	Button,
+	Select,
+	MenuItem,
+	FormHelperText,
+	FormControl
+} from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import HelpIcon from '@material-ui/icons/Help';
 import MuiAlert from '@material-ui/lab/Alert';
 import VectorMap from './VectorMap';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 //FIXME: Username not being imported - has no val??
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
 
-var countriesLoaded = false;
+// ISO_A2 of source country
 var fromCountryISO = '';
+// ISO_A2 of dest country
 var toCountryISO = '';
+// List of ALL countries
 var countries = {};
+// Socket value
 var socket = null;
+// Number of troops in current player's base
 var troops = 0;
+// List of all countries
 var countryStates = {};
+// List of all 'players: colours'
 var playerColours = {};
+// List of all players
 var players = [];
+// List of this player's countries
 var playerCountries = [];
+// Current player name
 var user = '';
+// Number of troops for actions (e.g. donate)
+var numTroops = 0;
 
 class countryState {
 	constructor(Troops, Player) {
@@ -46,7 +70,7 @@ class GameMap extends Component {
 						countryStates[action.Country].Player != action.Player
 					) {
 						if (action.Player == user) {
-                            console.log(user);
+							console.log(user);
 							playerCountries.push(action.Country);
 						}
 						if (countryStates[action.Country] == user) {
@@ -97,6 +121,14 @@ const useStyles = makeStyles((theme) => ({
 	button: {
 		marginTop: theme.spacing(3),
 		marginLeft: theme.spacing(1)
+	},
+	input: {
+		minWidth: 120,
+		marginRight: theme.spacing(2)
+	},
+	select: {
+		borderWidth: '1px',
+		borderColor: 'yellow'
 	}
 }));
 
@@ -123,26 +155,52 @@ function SideBar() {
 	//For the snackbar display settings
 	const [ openHelp, setOpenHelp ] = React.useState(false);
 
+	//Load up map initially
+	const [ countriesLoaded, setcountriesLoaded ] = useState(false);
+
+	//Show Deployment option?
+	const [ allowDeploy, setallowDeploy ] = useState(false);
+
+	//Show Move option?
+	const [ allowMove, setallowMove ] = useState(false);
+
+	//Show Donate drop downs?
+	const [ showDonate, setshowDonate ] = useState(false);
+	const [ targetPlayer, settargetPlayer ] = useState('');
+
 	const handleClick = (geo) => {
 		const { NAME, ISO_A2 } = geo.properties;
-		//TODO: Check if country1 is player's country
-		//TODO: Check if country2 is a neighbouring country, else change country1
+
 		if (fromCountry === '') {
-            if (playerCountries.some((iso) => iso === ISO_A2)) {
-                fromCountryISO = ISO_A2;
-                setfromCountry(NAME);
-            }
+			if (playerCountries.some((iso) => iso === ISO_A2)) {
+				fromCountryISO = ISO_A2;
+
+				setfromCountry(NAME);
+				setallowDeploy(true);
+			}
 		} else if (NAME === fromCountry) {
-            toCountryISO = '';
-            fromCountryISO = '';
+			toCountryISO = '';
+			fromCountryISO = '';
 			setfromCountry('');
 			settoCountry('');
+			setallowDeploy(false);
+			setallowMove(false);
 		} else {
-            console.log(playerCountries);
-			if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
-                settoCountry(NAME);
-				toCountryISO = ISO_A2;
-			}
+			//TODO: Is own country: Enable Move
+			//TODO: Another country: Enable attack/assist
+			console.log(playerCountries);
+			// TODO: Check if neighbouring country
+			// if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
+			// }
+			setallowDeploy(false);
+			settoCountry(NAME);
+			toCountryISO = ISO_A2;
+			//TODO: Add if statements
+			// IF own country
+			setallowMove(true);
+			//ELSE
+			setallowMove(false);
+
 			console.log(toCountry);
 		}
 	};
@@ -152,6 +210,10 @@ function SideBar() {
 		setOpenHelp(true);
 	};
 
+	const handleDonate = () => {
+		setshowDonate(!showDonate);
+	};
+
 	const handleCloseHelp = (event, reason) => {
 		if (reason === 'clickaway') {
 			return;
@@ -159,10 +221,18 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
+	const handleNumTroops = (event) => {
+		numTroops = event.target.value;
+	};
+
+	const handletargetPlayer = (event) => {
+		settargetPlayer(event.target.value);
+	};
+
 	const handleColorFill = (geo) => {
 		if (!countriesLoaded) {
 			loadMap();
-			countriesLoaded = true;
+			setcountriesLoaded(true);
 		}
 
 		const { ISO_A2 } = geo.properties;
@@ -230,11 +300,71 @@ function SideBar() {
 						handleOpenHelp={handleOpenHelp}
 						openHelp={openHelp}
 					/>
+					{/* Show Donation options when clicked on Donate Button */}
+					{fromCountry === '' && (
+						<DonateForm
+							classes={classes}
+							handleDonate={handleDonate}
+							handletargetPlayer={handletargetPlayer}
+							handleNumTroops={handleNumTroops}
+							showDonate={showDonate}
+						/>
+					)}
 
-					{/* Only show Attacka and Donate options when two countries clicked */}
+					{/* Only show Attack and Donate options when two countries clicked */}
 					{toCountry !== '' && (
 						<Grid item xs={12}>
-							<Options classes={classes} toCountry={toCountry} fromCountry={fromCountry} />
+							<Options
+								classes={classes}
+								toCountry={toCountry}
+								fromCountry={fromCountry}
+								allowMove={allowMove}
+								handleNumTroops={handleNumTroops}
+							/>
+						</Grid>
+					)}
+
+					{/* Deploy troops from base to country */}
+					{allowDeploy && (
+						<Grid item xs={12} sm={6}>
+							<Typography variant="h5">
+								<span>
+									Deploy from <span style={{ color: 'green' }}>Base</span> to{' '}
+									<span style={{ color: 'orange' }}>{fromCountry}</span>
+								</span>
+							</Typography>
+							<Grid item xs>
+								<FormControl classes={classes.input}>
+									<Select
+										name="donateNumTroops"
+										required
+										variant="outlined"
+										placeholder={5}
+										label="Number of Troops to Donate"
+										value={numTroops}
+										onChange={handleNumTroops}
+										className={classes.select}
+										style={{ color: 'yellow', borderColor: 'white' }}
+									>
+										<MenuItem value={5}>5</MenuItem>
+										<MenuItem value={10}>10</MenuItem>
+										<MenuItem value={20}>20</MenuItem>
+										<MenuItem value={50}>50</MenuItem>
+									</Select>
+									<FormHelperText style={{ color: 'white' }}>
+										Select Number of Troops to Donate
+									</FormHelperText>
+								</FormControl>
+							</Grid>
+							<Button
+								variant="contained"
+								size="small"
+								color="primary"
+								className={classes.button}
+								onClick={move}
+							>
+								DEPLOY
+							</Button>
 						</Grid>
 					)}
 
@@ -269,7 +399,74 @@ function SideBar() {
 	);
 }
 
-const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
+const DonateForm = ({ handleDonate, classes, handleNumTroops, handletargetPlayer, targetPlayer, showDonate }) => {
+	return !showDonate ? (
+		<Grid item xs={12}>
+			<Button variant="contained" size="small" color="primary" className={classes.button} onClick={handleDonate}>
+				DONATE
+			</Button>
+		</Grid>
+	) : (
+		<div>
+			<Grid container spacing={1} style={{ alignContent: 'center' }}>
+				<Grid item xs>
+					<FormControl className={classes.input}>
+						<Select
+							name="donateTo"
+							required
+							variant="outlined"
+							value={targetPlayer}
+							onChange={handletargetPlayer}
+							style={{ color: 'yellow', borderColor: 'white' }}
+						>
+							{players.map(function(p) {
+								return <MenuItem value={p}>{p}</MenuItem>;
+							})}
+						</Select>
+						<FormHelperText style={{ color: 'white' }}>Select Player to Donate to</FormHelperText>
+					</FormControl>
+				</Grid>
+				<Grid item xs>
+					<FormControl classes={classes.input}>
+						<Select
+							name="donateNumTroops"
+							required
+							variant="outlined"
+							label="Number of Troops to Donate"
+							value={numTroops}
+							onChange={handleNumTroops}
+							style={{ color: 'yellow', borderColor: 'white' }}
+						>
+							<MenuItem value={5}>5</MenuItem>
+							<MenuItem value={10}>10</MenuItem>
+							<MenuItem value={20}>20</MenuItem>
+							<MenuItem value={50}>50</MenuItem>
+						</Select>
+						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to Donate</FormHelperText>
+					</FormControl>
+				</Grid>
+				<Grid item xs={6}>
+					<Button variant="outlined" size="small" color="primary" className={classes.button} onClick={donate}>
+						CONFIRM DONATION
+					</Button>
+				</Grid>
+			</Grid>
+
+			<Grid item xs={12}>
+				<IconButton aria-label="return" color="secondary" onClick={handleDonate}>
+					<ArrowBackIcon
+						style={{
+							fontSize: '30'
+						}}
+					/>
+					<Typography variant="subtitle2">Back</Typography>
+				</IconButton>
+			</Grid>
+		</div>
+	);
+};
+
+const Title = ({ handleCloseHelp, handleOpenHelp, openHelp }) => {
 	return (
 		<div>
 			<IconButton aria-label="help" color="primary" size="small">
@@ -297,6 +494,7 @@ const Title = ({ username, handleCloseHelp, handleOpenHelp, openHelp }) => {
 					Base Troops: {troops}
 				</Typography>
 			</Grid>
+			<br />
 		</div>
 	);
 };
@@ -318,27 +516,27 @@ function attack() {
 	act.ActionType = 'attack';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-    act.Player = user;
-    console.log("hi");
+	act.Player = user;
+	console.log('hi');
 	socket.send(JSON.stringify(act));
 }
 
 function donate() {
-	act.Troops = 5; //TODO: change to troops var
+	act.Troops = numTroops;
 	act.ActionType = 'donate';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-    act.Player = user;
-    socket.send(JSON.stringify(act));
+	act.Player = user;
+	socket.send(JSON.stringify(act));
 }
 
 function move() {
-	act.Troops = 5; //TODO: change to troops var
+	act.Troops = numTroops;
 	act.ActionType = 'move';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-    act.Player = user;
-    socket.send(JSON.stringify(act));
+	act.Player = user;
+	socket.send(JSON.stringify(act));
 }
 
 function assist() {
@@ -346,45 +544,86 @@ function assist() {
 	act.ActionType = 'drop';
 	act.Src = fromCountryISO;
 	act.Dest = toCountryISO;
-    act.Player = user;
-    socket.send(JSON.stringify(act));
+	act.Player = user;
+	socket.send(JSON.stringify(act));
 }
 
-const Options = ({ classes, toCountry, fromCountry }) => {
-    //If toCountry is not your land
+const Options = ({ classes, toCountry, fromCountry, allowMove, handleNumTroops }) => {
 	if (toCountry !== '' && fromCountry !== '') {
-        console.log("can press");
+		console.log('can press');
 		return (
 			<div>
 				<Grid item xs={12}>
 					<Typography variant="h5">
 						{' '}
-						From <div style={{ color: 'lightgreen' }}>{fromCountry}</div> To{' '}
-						<div style={{ color: 'red' }}>{toCountry}</div>
+						From <span style={{ color: 'lightgreen' }}>{fromCountry}</span> To{' '}
+						<span style={{ color: 'red' }}>{toCountry}</span>
 					</Typography>
 				</Grid>
-				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={attack}>
-						ATTACK
-					</Button>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="primary" className={classes.button} onClick={assist}>
-						ASSIST
-					</Button>
-				</Grid>
+				{!allowMove ? (
+					<div>
+						<Grid item xs={12} sm={6}>
+							<Button
+								variant="contained"
+								size="small"
+								color="secondary"
+								className={classes.button}
+								onClick={attack}
+							>
+								ATTACK
+							</Button>
+						</Grid>
+						<Grid item xs={12} sm={6}>
+							<Button
+								variant="contained"
+								size="small"
+								color="primary"
+								className={classes.button}
+								onClick={assist}
+							>
+								ASSIST
+							</Button>
+						</Grid>
+					</div>
+				) : (
+					<div>
+						<Grid item xs>
+							<FormControl classes={classes.input}>
+								<Select
+									name="donateNumTroops"
+									required
+									variant="outlined"
+									placeholder={5}
+									label="Number of Troops to Donate"
+									value={numTroops}
+									onChange={handleNumTroops}
+									className={classes.select}
+									style={{ color: 'yellow', borderColor: 'white' }}
+								>
+									<MenuItem value={5}>5</MenuItem>
+									<MenuItem value={10}>10</MenuItem>
+									<MenuItem value={20}>20</MenuItem>
+									<MenuItem value={50}>50</MenuItem>
+								</Select>
+								<FormHelperText style={{ color: 'white' }}>
+									Select Number of Troops to Donate
+								</FormHelperText>
+							</FormControl>
+						</Grid>
+						<Grid item xs>
+							<Button
+								variant="contained"
+								size="small"
+								color="primary"
+								className={classes.button}
+								onClick={move}
+							>
+								MOVE
+							</Button>
+						</Grid>
+					</div>
+				)}
 			</div>
-		);
-	}
-
-	if (toCountry !== '' && fromCountry !== '') {
-		//If toCountry is your land
-		return (
-			<Grid item xs={12} sm={6}>
-				<Button variant="contained" size="small" color="primary" className={classes.button} onClick={move}>
-					MOVE
-				</Button>
-			</Grid>
 		);
 	}
 
@@ -392,7 +631,13 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 		return (
 			<div>
 				<Grid item xs={12} sm={6}>
-					<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={donate}>
+					<Button
+						variant="contained"
+						size="small"
+						color="secondary"
+						className={classes.button}
+						onClick={donate}
+					>
 						DONATE
 					</Button>
 				</Grid>
@@ -401,19 +646,20 @@ const Options = ({ classes, toCountry, fromCountry }) => {
 	}
 };
 
+//FIXME: Colour appearing not correct?
 const PlayerBox = ({ classes }) => {
 	return (
 		<div>
 			<Paper className={classes.players}>
 				<Typography variant="subtitle1">ONLINE PLAYERS:</Typography>
 				<Grid container spacing={12}>
-					{Object.keys(playerColours).map(function(player, color) {
+					{Object.keys(playerColours).map(function(player, colour) {
 						return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid container spacing={12}>
 									<Grid item xs={12}>
 										<Typography variant="p">{player}</Typography>
-										<FiberManualRecordIcon style={{ color: color }} />
+										<FiberManualRecordIcon style={{ color: colour }} />
 									</Grid>
 								</Grid>
 							</div>
