@@ -82,6 +82,8 @@ func main() {
 		req := c.Request
 		req.ParseForm()
 
+		fmt.Println(req.Form)
+
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 		situation := req.FormValue("situation")
