@@ -22,6 +22,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 //FIXME: Username not being imported - has no val??
 // import { username } from '../Home/StartGameBox';
 import './Map.css';
+import { Options, OptionsDeploy, DonateForm } from './ActionButtons';
 
 // ISO_A2 of source country
 var fromCountryISO = '';
@@ -44,7 +45,7 @@ var playerCountries = [];
 // Current player name
 var user = '';
 // Number of troops for actions (e.g. donate)
-var numTroops = 0;
+// var numTroops = 0;
 
 class countryState {
 	constructor(Troops, Player) {
@@ -164,9 +165,13 @@ function SideBar() {
 	//Show Move option?
 	const [ allowMove, setallowMove ] = useState(false);
 
-	//Show Donate drop downs?
+	//Show drop downs?
 	const [ showDonate, setshowDonate ] = useState(false);
+	const [ showAssist, setshowAssist ] = useState(false);
+	const [ showMove, setshowMove ] = useState(false);
+	//For sending socket message actions (e.g. donate)
 	const [ targetPlayer, settargetPlayer ] = useState('');
+	const [ numTroops, setnumTroops ] = useState(0);
 
 	const handleClick = (geo) => {
 		const { NAME, ISO_A2 } = geo.properties;
@@ -197,10 +202,12 @@ function SideBar() {
 			toCountryISO = ISO_A2;
 			//TODO: Add if statements
 			// IF own country
-			setallowMove(true);
+			if (playerCountries.some((iso) => iso === ISO_A2)) {
+				setallowMove(true);
+			} else {
+				setallowMove(false);
+			}
 			//ELSE
-			setallowMove(false);
-
 			console.log(toCountry);
 		}
 	};
@@ -212,6 +219,23 @@ function SideBar() {
 
 	const handleDonate = () => {
 		setshowDonate(!showDonate);
+		if (!showDonate) {
+			setnumTroops(0);
+		}
+	};
+
+	const handleAssist = () => {
+		setshowAssist(!showAssist);
+		if (!showAssist) {
+			setnumTroops(0);
+		}
+	};
+
+	const handleMove = () => {
+		setshowMove(!showMove);
+		if (!showMove) {
+			setnumTroops(0);
+		}
 	};
 
 	const handleCloseHelp = (event, reason) => {
@@ -221,8 +245,9 @@ function SideBar() {
 		setOpenHelp(false);
 	};
 
+	//FIXME: Use useState hook here to avoid lag ?
 	const handleNumTroops = (event) => {
-		numTroops = event.target.value;
+		setnumTroops(event.target.value);
 	};
 
 	const handletargetPlayer = (event) => {
@@ -308,6 +333,8 @@ function SideBar() {
 							handletargetPlayer={handletargetPlayer}
 							handleNumTroops={handleNumTroops}
 							showDonate={showDonate}
+							numTroops={numTroops}
+							targetPlayer={targetPlayer}
 						/>
 					)}
 
@@ -320,52 +347,22 @@ function SideBar() {
 								fromCountry={fromCountry}
 								allowMove={allowMove}
 								handleNumTroops={handleNumTroops}
+								handleAssist={handleAssist}
+								handleMove={handleMove}
+								showMove={showMove}
+								showAssist={showAssist}
 							/>
 						</Grid>
 					)}
 
 					{/* Deploy troops from base to country */}
 					{allowDeploy && (
-						<Grid item xs={12} sm={6}>
-							<Typography variant="h5">
-								<span>
-									Deploy from <span style={{ color: 'green' }}>Base</span> to{' '}
-									<span style={{ color: 'orange' }}>{fromCountry}</span>
-								</span>
-							</Typography>
-							<Grid item xs>
-								<FormControl classes={classes.input}>
-									<Select
-										name="donateNumTroops"
-										required
-										variant="outlined"
-										placeholder={5}
-										label="Number of Troops to Donate"
-										value={numTroops}
-										onChange={handleNumTroops}
-										className={classes.select}
-										style={{ color: 'yellow', borderColor: 'white' }}
-									>
-										<MenuItem value={5}>5</MenuItem>
-										<MenuItem value={10}>10</MenuItem>
-										<MenuItem value={20}>20</MenuItem>
-										<MenuItem value={50}>50</MenuItem>
-									</Select>
-									<FormHelperText style={{ color: 'white' }}>
-										Select Number of Troops to Donate
-									</FormHelperText>
-								</FormControl>
-							</Grid>
-							<Button
-								variant="contained"
-								size="small"
-								color="primary"
-								className={classes.button}
-								onClick={move}
-							>
-								DEPLOY
-							</Button>
-						</Grid>
+						<OptionsDeploy
+							classes={classes}
+							numTroops={numTroops}
+							handleNumTroops={handleNumTroops}
+							fromCountry={fromCountry}
+						/>
 					)}
 
 					{/* Only Show SpyDetails when not clicked anything */}
@@ -399,73 +396,6 @@ function SideBar() {
 	);
 }
 
-const DonateForm = ({ handleDonate, classes, handleNumTroops, handletargetPlayer, targetPlayer, showDonate }) => {
-	return !showDonate ? (
-		<Grid item xs={12}>
-			<Button variant="contained" size="small" color="primary" className={classes.button} onClick={handleDonate}>
-				DONATE
-			</Button>
-		</Grid>
-	) : (
-		<div>
-			<Grid container spacing={1} style={{ alignContent: 'center' }}>
-				<Grid item xs>
-					<FormControl className={classes.input}>
-						<Select
-							name="donateTo"
-							required
-							variant="outlined"
-							value={targetPlayer}
-							onChange={handletargetPlayer}
-							style={{ color: 'yellow', borderColor: 'white' }}
-						>
-							{players.map(function(p) {
-								return <MenuItem value={p}>{p}</MenuItem>;
-							})}
-						</Select>
-						<FormHelperText style={{ color: 'white' }}>Select Player to Donate to</FormHelperText>
-					</FormControl>
-				</Grid>
-				<Grid item xs>
-					<FormControl classes={classes.input}>
-						<Select
-							name="donateNumTroops"
-							required
-							variant="outlined"
-							label="Number of Troops to Donate"
-							value={numTroops}
-							onChange={handleNumTroops}
-							style={{ color: 'yellow', borderColor: 'white' }}
-						>
-							<MenuItem value={5}>5</MenuItem>
-							<MenuItem value={10}>10</MenuItem>
-							<MenuItem value={20}>20</MenuItem>
-							<MenuItem value={50}>50</MenuItem>
-						</Select>
-						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to Donate</FormHelperText>
-					</FormControl>
-				</Grid>
-				<Grid item xs={6}>
-					<Button variant="outlined" size="small" color="primary" className={classes.button} onClick={donate}>
-						CONFIRM DONATION
-					</Button>
-				</Grid>
-			</Grid>
-
-			<Grid item xs={12}>
-				<IconButton aria-label="return" color="secondary" onClick={handleDonate}>
-					<ArrowBackIcon
-						style={{
-							fontSize: '30'
-						}}
-					/>
-					<Typography variant="subtitle2">Back</Typography>
-				</IconButton>
-			</Grid>
-		</div>
-	);
-};
-
 const Title = ({ handleCloseHelp, handleOpenHelp, openHelp }) => {
 	return (
 		<div>
@@ -497,153 +427,6 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp }) => {
 			<br />
 		</div>
 	);
-};
-
-class action {
-	constructor(Troops, ActionType, Src, Dest, Player) {
-		this.Troops = Troops;
-		this.ActionType = ActionType;
-		this.Src = Src;
-		this.Dest = Dest;
-		this.Player = Player;
-	}
-}
-
-var act = new action();
-
-function attack() {
-	act.Troops = 0;
-	act.ActionType = 'attack';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
-	console.log('hi');
-	socket.send(JSON.stringify(act));
-}
-
-function donate() {
-	act.Troops = numTroops;
-	act.ActionType = 'donate';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
-	socket.send(JSON.stringify(act));
-}
-
-function move() {
-	act.Troops = numTroops;
-	act.ActionType = 'move';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
-	socket.send(JSON.stringify(act));
-}
-
-function assist() {
-	act.Troops = 5; //TODO: change to troops var
-	act.ActionType = 'drop';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
-	socket.send(JSON.stringify(act));
-}
-
-const Options = ({ classes, toCountry, fromCountry, allowMove, handleNumTroops }) => {
-	if (toCountry !== '' && fromCountry !== '') {
-		console.log('can press');
-		return (
-			<div>
-				<Grid item xs={12}>
-					<Typography variant="h5">
-						{' '}
-						From <span style={{ color: 'lightgreen' }}>{fromCountry}</span> To{' '}
-						<span style={{ color: 'red' }}>{toCountry}</span>
-					</Typography>
-				</Grid>
-				{!allowMove ? (
-					<div>
-						<Grid item xs={12} sm={6}>
-							<Button
-								variant="contained"
-								size="small"
-								color="secondary"
-								className={classes.button}
-								onClick={attack}
-							>
-								ATTACK
-							</Button>
-						</Grid>
-						<Grid item xs={12} sm={6}>
-							<Button
-								variant="contained"
-								size="small"
-								color="primary"
-								className={classes.button}
-								onClick={assist}
-							>
-								ASSIST
-							</Button>
-						</Grid>
-					</div>
-				) : (
-					<div>
-						<Grid item xs>
-							<FormControl classes={classes.input}>
-								<Select
-									name="donateNumTroops"
-									required
-									variant="outlined"
-									placeholder={5}
-									label="Number of Troops to Donate"
-									value={numTroops}
-									onChange={handleNumTroops}
-									className={classes.select}
-									style={{ color: 'yellow', borderColor: 'white' }}
-								>
-									<MenuItem value={5}>5</MenuItem>
-									<MenuItem value={10}>10</MenuItem>
-									<MenuItem value={20}>20</MenuItem>
-									<MenuItem value={50}>50</MenuItem>
-								</Select>
-								<FormHelperText style={{ color: 'white' }}>
-									Select Number of Troops to Donate
-								</FormHelperText>
-							</FormControl>
-						</Grid>
-						<Grid item xs>
-							<Button
-								variant="contained"
-								size="small"
-								color="primary"
-								className={classes.button}
-								onClick={move}
-							>
-								MOVE
-							</Button>
-						</Grid>
-					</div>
-				)}
-			</div>
-		);
-	}
-
-	if (fromCountry !== '' && toCountry === '') {
-		return (
-			<div>
-				<Grid item xs={12} sm={6}>
-					<Button
-						variant="contained"
-						size="small"
-						color="secondary"
-						className={classes.button}
-						onClick={donate}
-					>
-						DONATE
-					</Button>
-				</Grid>
-			</div>
-		);
-	}
 };
 
 //FIXME: Colour appearing not correct?
@@ -725,3 +508,4 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 };
 
 export default GameMap;
+export { players, fromCountryISO, toCountryISO, user, socket };
