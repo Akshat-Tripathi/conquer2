@@ -63,7 +63,7 @@ class GameMap extends Component {
 			switch (action.Type) {
 				case 'updateTroops':
 					user = action.Player;
-					troops = action.Troops;
+					troops += action.Troops;
 					break;
 				case 'updateCountry':
 					if (
@@ -434,9 +434,10 @@ const PlayerBox = ({ classes }) => {
 	return (
 		<div>
 			<Paper className={classes.players}>
-				<Typography variant="subtitle1">ONLINE PLAYERS:</Typography>
+				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12}>
-					{Object.keys(playerColours).map(function(player, colour) {
+					{Object.keys(playerColours).map(function(player) {
+                        var colour = playerColours[player];
 						return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid container spacing={12}>
