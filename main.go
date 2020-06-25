@@ -65,9 +65,6 @@ func main() {
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
-	for i := 0; i < 8; i++ {
-		games["test"].AddPlayer(strconv.Itoa(i), "blah")
-	}
 	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
@@ -84,6 +81,8 @@ func main() {
 	r.POST("/create", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
+
+		fmt.Println(req.Form)
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
@@ -155,6 +154,8 @@ func main() {
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 		situation := req.FormValue("situation")
+
+		fmt.Println(username, password)
 
 		//TODO remove this
 		if situation == "" {
