@@ -1,0 +1,2 @@
+# ./.yarnrc
+--modules-folder frontend/node_modules
