@@ -73,8 +73,6 @@ class GameMap extends Component {
 	}
 
 	render() {
-		console.log('countries', countries);
-		console.log('countryStates', countryStates);
 		return <SideBar />;
 	}
 }
@@ -396,8 +394,6 @@ function loadMap() {
 		.then((lines) =>
 			lines.forEach((line) => {
 				countries[line[0]] = line.slice(1);
-				/*console.log(line[0]);
-				console.log(countries[line[0]]);*/
 			})
 		);
 }

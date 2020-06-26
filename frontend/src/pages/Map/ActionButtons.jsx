@@ -273,7 +273,11 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove })
 };
 
 const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy }) => {
-	return (
+    function handleClick(e) {
+        e.preventDefault();
+        deploy(numTroops);
+      }
+    return (
 		<Grid item xs={12} sm={6}>
 			<Typography variant="h5">
 				<span>
@@ -334,7 +338,7 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 								size="small"
 								color="primary"
 								className={classes.button}
-								onClick={deploy(numTroops)}
+								onClick={handleClick}
 							>
 								DEPLOY
 							</Button>
