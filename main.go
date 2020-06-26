@@ -196,7 +196,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.Run(port)
+	r.Run(":" + port)
 }
 
 func redirect(msg string, c *gin.Context) {
