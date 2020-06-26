@@ -23,6 +23,8 @@
 		"react-tooltip": "^4.2.6"
 	},
 	"scripts": {
+        "heroku-prebuild": "cd frontend",
+        "heroku-postbuild": "cd ..",
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
