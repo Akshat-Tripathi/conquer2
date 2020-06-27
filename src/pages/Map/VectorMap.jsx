@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation, Graticule } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
 import ReactTooltip from 'react-tooltip';
-import { countryStates } from './Map';
 
 const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 
@@ -18,6 +17,7 @@ const rounded = (num) => {
 	return num;
 };
 
+//Can I optimise?
 function notThisCountry(geo) {
 	// const { NAME } = geo.properties;
 	// return NAME !== '';
@@ -34,7 +34,8 @@ const MapChart = ({
 	handleColorFill,
 	handleColorStroke,
 	handleStrokeWidth,
-	handleClick
+    handleClick,
+    countryStates
 }) => {
 	return (
 		<div>
@@ -121,7 +122,8 @@ const VectorMap = ({
 	handleColorStroke,
 	handleColorFill,
 	handleStrokeWidth,
-	handleClick
+    handleClick,
+    countryStates
 }) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
@@ -140,7 +142,8 @@ const VectorMap = ({
 				handleColorFill={handleColorFill}
 				handleColorStroke={handleColorStroke}
 				handleStrokeWidth={handleStrokeWidth}
-				handleClick={handleClick}
+                handleClick={handleClick}
+                countryStates={countryStates}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>

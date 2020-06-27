@@ -12,7 +12,7 @@ import {
 	FormControl
 } from '@material-ui/core';
 
-import { players, fromCountryISO, toCountryISO, user, socket } from './Map';
+//import { players, fromCountryISO, toCountryISO, user, socket, countryStates } from './Map';
 
 const Options = ({
 	classes,
@@ -24,7 +24,11 @@ const Options = ({
 	showAssist,
 	showMove,
 	handleMove,
-	handleAssist
+    handleAssist,
+    fromCountryISO,
+    toCountryISO,
+    socket,
+    user
 }) => {
 	if (toCountry !== '' && fromCountry !== '') {
 		return (
@@ -44,7 +48,7 @@ const Options = ({
 								size="small"
 								color="secondary"
 								className={classes.button}
-								onClick={attack}
+								onClick={() => attack(fromCountryISO, toCountryISO, user, socket)}
 							>
 								ATTACK
 							</Button>
@@ -55,8 +59,12 @@ const Options = ({
 								handleNumTroops={handleNumTroops}
 								numTroops={numTroops}
 								classes={classes}
-								handleAssist={handleAssist}
-							/>
+                                handleAssist={handleAssist}
+                                fromCountryISO={fromCountryISO}
+                                toCountryISO={toCountryISO}
+                                socket={socket}
+                                user={user}
+                            />
 						</Grid>
 					</div>
 				) : (
@@ -67,7 +75,11 @@ const Options = ({
 								handleNumTroops={handleNumTroops}
 								numTroops={numTroops}
 								classes={classes}
-								handleMove={handleMove}
+                                handleMove={handleMove}
+                                fromCountryISO={fromCountryISO}
+                                toCountryISO={toCountryISO}
+                                socket={socket}
+                                user={user}
 							/>
 						</Grid>
 					</div>
@@ -84,7 +96,10 @@ const DonateForm = ({
 	handletargetPlayer,
 	targetPlayer,
 	showDonate,
-	numTroops
+    numTroops,
+    socket,
+    user,
+    players
 }) => {
 	return !showDonate ? (
 		<Grid item xs={12}>
@@ -139,7 +154,7 @@ const DonateForm = ({
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => donate(numTroops, targetPlayer)}
+						onClick={() => donate(numTroops, targetPlayer, user, socket)}
 					>
 						CONFIRM DONATION
 					</Button>
@@ -160,8 +175,8 @@ const DonateForm = ({
 	);
 };
 
-const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAssist }) => {
-	return !showAssist ? (
+const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAssist, fromCountryISO, toCountryISO, socket, user }) => {
+    return !showAssist ? (
 		<Grid item xs={12}>
 			<Button variant="contained" size="small" color="primary" className={classes.button} onClick={handleAssist}>
 				ASSIST
@@ -195,7 +210,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => move(numTroops)}
+						onClick={() => move(numTroops, fromCountryISO, toCountryISO, user, socket)}
 					>
 						CONFIRM ASSISTANCE
 					</Button>
@@ -216,7 +231,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 	);
 };
 
-const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove }) => {
+const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, fromCountryISO, toCountryISO, socket, user }) => {
 	return !showMove ? (
 		<Grid item xs={12}>
 			<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={handleMove}>
@@ -251,7 +266,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove })
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => move(numTroops)}
+						onClick={() => move(numTroops, fromCountryISO, toCountryISO, user, socket)}
 					>
 						CONFIRM MOVE
 					</Button>
@@ -272,10 +287,10 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove })
 	);
 };
 
-const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy }) => {
+const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user }) => {
     function handleClick(e) {
         e.preventDefault();
-        deploy(numTroops);
+        deploy(numTroops, fromCountryISO, user, socket);
       }
     return (
 		<Grid item xs={12} sm={6}>
@@ -371,39 +386,47 @@ class action {
 	}
 }
 
-var act = new action();
-
-function attack() {
-	act.Troops = 0;
-	act.ActionType = 'attack';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
+function attack(fromCountryISO, toCountryISO, user, socket) {
+    const act = new action(
+        0,
+        'attack',
+        fromCountryISO,
+        toCountryISO,
+        user
+    );
 	socket.send(JSON.stringify(act));
 }
 
-function donate(numTroops, targetPlayer) {
-	act.Troops = numTroops;
-	act.ActionType = 'donate';
-	act.Dest = targetPlayer;
-	act.Player = user;
+function donate(numTroops, targetPlayer, user, socket) {
+    const act = new action(
+        numTroops,
+        'donate',
+        '',
+        targetPlayer,
+        user
+    )
 	socket.send(JSON.stringify(act));
 }
 
-function move(numTroops) {
-	act.Troops = numTroops;
-	act.ActionType = 'move';
-	act.Src = fromCountryISO;
-	act.Dest = toCountryISO;
-	act.Player = user;
+function move(numTroops, fromCountryISO, toCountryISO, user, socket) {
+    const act = new action(
+        numTroops,
+        'move',
+        fromCountryISO,
+        toCountryISO,
+        user
+    );
 	socket.send(JSON.stringify(act));
 }
 
-function deploy(numTroops) {
-	act.Troops = numTroops;
-	act.ActionType = 'drop';
-	act.Dest = fromCountryISO;
-	act.Player = user;
+function deploy(numTroops, fromCountryISO, user, socket) {
+    const act = new action(
+        numTroops,
+        'drop',
+        '',
+        fromCountryISO,
+        user
+    );
 	socket.send(JSON.stringify(act));
 }
 
