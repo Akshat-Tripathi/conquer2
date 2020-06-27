@@ -1,1 +1,1 @@
-web: cd frontend & yarn & yarn build & cd .. & conquer2
+web: yarn & yarn build & go build & conquer2

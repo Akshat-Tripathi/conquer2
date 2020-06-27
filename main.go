@@ -20,7 +20,7 @@ const (
 func pain() {
 	router := gin.Default()
 	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+	router.Use(static.Serve("/", static.LocalFile("./build", true)))
 
 	// Setup route group for the API
 	api := router.Group("/api")
@@ -67,12 +67,12 @@ func main() {
 	games["test"].Start(ctx)
 	games["test"].AddPlayer("Akshat", "asdf")
 
-	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
-	r.Use(static.Serve("/game", static.LocalFile("./frontend/build", true)))
-	r.Use(static.Serve("/game_intro", static.LocalFile("./frontend/build", true)))
+	r.Use(static.Serve("/", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
 
-	r.LoadHTMLGlob("frontend/**/*.html")
+	r.LoadHTMLGlob("./**/*.html")
 
 	r.GET("/maps/", func(c *gin.Context) {
 		c.File("world.txt")
