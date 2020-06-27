@@ -5,9 +5,8 @@ let connect = () => {
     .map((s) => s.split("="))
     .filter((arr) => arr[0] == "id")[0][1];
   const socketURL =
-    window.location.href.replace("http://", "ws://") + "/" + id + "/ws";
-  
-  console.log(socketURL);
+    window.location.href.replace("http", "ws") + "/" + id + "/ws";
+
   var socket = new WebSocket(socketURL);
   console.log("Attempting connection to: " + socketURL);
 
