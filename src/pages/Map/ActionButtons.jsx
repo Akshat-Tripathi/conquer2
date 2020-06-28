@@ -3,10 +3,10 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import {
 	Typography,
 	IconButton,
-	Snackbar,
-	Grid,
-	Button,
 	Select,
+	Grid,
+    Button,
+    Input,
 	MenuItem,
 	FormHelperText,
 	FormControl
@@ -135,7 +135,9 @@ const DonateForm = ({
 				</Grid>
 				<Grid item xs>
 					<FormControl classes={classes.input}>
-						<Select
+                        <Input
+                            type="number"
+                            min="0"
 							name="donateNumTroops"
 							required
 							variant="outlined"
@@ -144,11 +146,7 @@ const DonateForm = ({
 							onChange={handleNumTroops}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
-							<MenuItem value={5}>5</MenuItem>
-							<MenuItem value={10}>10</MenuItem>
-							<MenuItem value={20}>20</MenuItem>
-							<MenuItem value={50}>50</MenuItem>
-						</Select>
+						</Input>
 						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to Donate</FormHelperText>
 					</FormControl>
 				</Grid>
@@ -191,7 +189,9 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 			<Grid container spacing={2} style={{ alignContent: 'center' }}>
 				<Grid item xs>
 					<FormControl classes={classes.input}>
-						<Select
+						<Input
+                            type="number"
+                            min="0"
 							name="donateNumTroops"
 							required
 							variant="outlined"
@@ -200,11 +200,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 							onChange={handleNumTroops}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
-							<MenuItem value={5}>5</MenuItem>
-							<MenuItem value={10}>10</MenuItem>
-							<MenuItem value={20}>20</MenuItem>
-							<MenuItem value={50}>50</MenuItem>
-						</Select>
+						</Input>
 						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to send </FormHelperText>
 					</FormControl>
 				</Grid>
@@ -247,7 +243,9 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 			<Grid container spacing={2} style={{ alignContent: 'center' }}>
 				<Grid item xs>
 					<FormControl classes={classes.input}>
-						<Select
+						<Input
+                            type="number"
+                            min="0"
 							name="donateNumTroops"
 							required
                             variant="outlined"
@@ -255,14 +253,10 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 							label="Number of Troops to Move"
 							value={numTroops}
                             onChange={handleNumTroops}
-                            className={classes.select}
+                            className={classes.input}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
-							<MenuItem value={5}>5</MenuItem>
-							<MenuItem value={10}>10</MenuItem>
-							<MenuItem value={20}>20</MenuItem>
-							<MenuItem value={50}>50</MenuItem>
-						</Select>
+						</Input>
 						<FormHelperText style={{ color: 'white' }}>
                             Select Number of Troops to move
                         </FormHelperText>
@@ -332,7 +326,9 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 					<Grid container spacing={2} style={{ alignContent: 'center' }}>
 						<Grid item xs>
 							<FormControl classes={classes.input}>
-								<Select
+								<Input
+                                    type="number"
+                                    min="0"
 									name="donateNumTroops"
 									required
 									variant="outlined"
@@ -340,16 +336,10 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 									label="Number of Troops to Deploy"
 									value={numTroops}
 									onChange={handleNumTroops}
-									className={classes.select}
+									className={classes.input}
 									style={{ color: 'yellow', borderColor: 'white' }}
 								>
-									{/* //TODO: Update value= num of base troops */}
-									<MenuItem value={troops}>All Base Troops</MenuItem>
-									<MenuItem value={5}>5</MenuItem>
-									<MenuItem value={10}>10</MenuItem>
-									<MenuItem value={20}>20</MenuItem>
-									<MenuItem value={50}>50</MenuItem>
-								</Select>
+								</Input>
 								<FormHelperText style={{ color: 'white' }}>
 									Select Number of Base Troops to Deploy
 								</FormHelperText>
@@ -407,7 +397,7 @@ function attack(fromCountryISO, toCountryISO, user, socket) {
 
 function donate(numTroops, targetPlayer, user, socket) {
     const dnt = new action(
-        numTroops,
+        parseInt(numTroops, 10),
         'donate',
         '',
         targetPlayer,
@@ -418,7 +408,7 @@ function donate(numTroops, targetPlayer, user, socket) {
 
 function move(numTroops, fromCountryISO, toCountryISO, user, socket) {
     const mve = new action(
-        numTroops,
+        parseInt(numTroops, 10),
         'move',
         fromCountryISO,
         toCountryISO,
@@ -429,7 +419,7 @@ function move(numTroops, fromCountryISO, toCountryISO, user, socket) {
 
 function deploy(numTroops, fromCountryISO, user, socket) {
     const dpl = new action(
-        numTroops,
+        parseInt(numTroops, 10),
         'drop',
         '',
         fromCountryISO,
