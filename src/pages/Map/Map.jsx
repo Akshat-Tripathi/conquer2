@@ -63,6 +63,7 @@ class GameMap extends Component {
                         players.push(action.Player);
                     }
             }
+            this.forceUpdate();
         };
 	}
 
@@ -272,7 +273,6 @@ class GameMap extends Component {
                 <Paper className={classes.sidebar}>
                     <Grid container style={{ alignText: 'center' }}>
                         <Title
-                            username={user}
                             handleCloseHelp={handleCloseHelp}
                             handleOpenHelp={handleOpenHelp}
                             openHelp={openHelp}
