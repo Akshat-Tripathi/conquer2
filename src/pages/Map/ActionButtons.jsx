@@ -16,74 +16,78 @@ import {
 
 const Options = ({
 	classes,
-	toCountry,
 	fromCountry,
-	allowMove,
-	handleNumTroops,
-	numTroops,
-	showAssist,
-	showMove,
-	handleMove,
-    handleAssist,
+    toCountry,
+    toCountryOwner,
     fromCountryISO,
     toCountryISO,
+	allowMove,
+	handleNumTroops,
+    numTroops,
+    showMove,
+	showAssist,
+	handleMove,
+    handleAssist,
     socket,
     user
 }) => {
 	if (toCountry !== '' && fromCountry !== '') {
 		return (
 			<div>
-				<Grid item xs={12}>
-					<Typography variant="h5">
-						{' '}
-						From <span style={{ color: 'lightgreen' }}>{fromCountry}</span> To{' '}
-						<span style={{ color: 'red' }}>{toCountry}</span>
-					</Typography>
-				</Grid>
-				{!allowMove ? (
-					<div>
-						<Grid item xs={12} sm={6}>
-							<Button
-								variant="contained"
-								size="small"
-								color="secondary"
-								className={classes.button}
-								onClick={() => attack(fromCountryISO, toCountryISO, user, socket)}
-							>
-								ATTACK
-							</Button>
-						</Grid>
-						<Grid item xs={12} sm={6}>
-							<AssistForm
-								showAssist={showAssist}
-								handleNumTroops={handleNumTroops}
-								numTroops={numTroops}
-								classes={classes}
-                                handleAssist={handleAssist}
-                                fromCountryISO={fromCountryISO}
-                                toCountryISO={toCountryISO}
-                                socket={socket}
-                                user={user}
-                            />
-						</Grid>
-					</div>
-				) : (
-					<div>
-						<Grid item xs>
-							<MoveForm
-								showMove={showMove}
-								handleNumTroops={handleNumTroops}
-								numTroops={numTroops}
-								classes={classes}
-                                handleMove={handleMove}
-                                fromCountryISO={fromCountryISO}
-                                toCountryISO={toCountryISO}
-                                socket={socket}
-                                user={user}
-							/>
-						</Grid>
-					</div>
-				)}
+                <Grid item xs={12}>
+                    <Typography variant="h5">
+                        {' '}
+                        From <span style={{ color: 'lightgreen' }}>{fromCountry}</span> To{' '}
+                        <span style={{ color: 'red' }}>{toCountry}</span>
+                    </Typography>
+                </Grid>
+                { !allowMove ? (
+                        <div>
+                            {toCountryOwner != user ? (
+                                <Grid item xs={12} sm={6}>
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        color="secondary"
+                                        className={classes.button}
+                                        onClick={() => attack(fromCountryISO, toCountryISO, user, socket)}
+                                    >
+                                        ATTACK
+                                    </Button>
+                                </Grid>
+                            ) : (null)}
+                            <Grid item xs={12} sm={6}>
+                                <AssistForm
+                                    showAssist={showAssist}
+                                    handleNumTroops={handleNumTroops}
+                                    numTroops={numTroops}
+                                    classes={classes}
+                                    handleAssist={handleAssist}
+                                    fromCountryISO={fromCountryISO}
+                                    toCountryISO={toCountryISO}
+                                    socket={socket}
+                                    user={user}
+                                />
+                            </Grid>
+                        </div>
+                    ) : (
+                        <div>
+                            <Grid item xs>
+                                <MoveForm
+                                    showMove={showMove}
+                                    handleNumTroops={handleNumTroops}
+                                    numTroops={numTroops}
+                                    classes={classes}
+                                    handleMove={handleMove}
+                                    fromCountryISO={fromCountryISO}
+                                    toCountryISO={toCountryISO}
+                                    socket={socket}
+                                    user={user}
+                                />
+                            </Grid>
+                        </div>
+                    )
+                }
 			</div>
 		);
 	}
@@ -246,10 +250,12 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 						<Select
 							name="donateNumTroops"
 							required
-							variant="outlined"
-							label="Number of Troops to Donate"
+                            variant="outlined"
+                            placeholder={5}
+							label="Number of Troops to Move"
 							value={numTroops}
-							onChange={handleNumTroops}
+                            onChange={handleNumTroops}
+                            className={classes.select}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
 							<MenuItem value={5}>5</MenuItem>
@@ -257,7 +263,9 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 							<MenuItem value={20}>20</MenuItem>
 							<MenuItem value={50}>50</MenuItem>
 						</Select>
-						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to move </FormHelperText>
+						<FormHelperText style={{ color: 'white' }}>
+                            Select Number of Troops to move
+                        </FormHelperText>
 					</FormControl>
 				</Grid>
 				<Grid item xs={6}>
@@ -287,7 +295,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 	);
 };
 
-const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user }) => {
+const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user, troops }) => {
     function handleClick(e) {
         e.preventDefault();
         deploy(numTroops, fromCountryISO, user, socket);
@@ -329,14 +337,14 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 									required
 									variant="outlined"
 									placeholder={5}
-									label="Number of Troops to Donate"
+									label="Number of Troops to Deploy"
 									value={numTroops}
 									onChange={handleNumTroops}
 									className={classes.select}
 									style={{ color: 'yellow', borderColor: 'white' }}
 								>
 									{/* //TODO: Update value= num of base troops */}
-									<MenuItem value={0}>All Base Troops</MenuItem>
+									<MenuItem value={troops}>All Base Troops</MenuItem>
 									<MenuItem value={5}>5</MenuItem>
 									<MenuItem value={10}>10</MenuItem>
 									<MenuItem value={20}>20</MenuItem>
@@ -387,47 +395,47 @@ class action {
 }
 
 function attack(fromCountryISO, toCountryISO, user, socket) {
-    const act = new action(
+    const atk = new action(
         0,
         'attack',
         fromCountryISO,
         toCountryISO,
         user
     );
-	socket.send(JSON.stringify(act));
+	socket.send(JSON.stringify(atk));
 }
 
 function donate(numTroops, targetPlayer, user, socket) {
-    const act = new action(
+    const dnt = new action(
         numTroops,
         'donate',
         '',
         targetPlayer,
         user
     )
-	socket.send(JSON.stringify(act));
+	socket.send(JSON.stringify(dnt));
 }
 
 function move(numTroops, fromCountryISO, toCountryISO, user, socket) {
-    const act = new action(
+    const mve = new action(
         numTroops,
         'move',
         fromCountryISO,
         toCountryISO,
         user
     );
-	socket.send(JSON.stringify(act));
+	socket.send(JSON.stringify(mve));
 }
 
 function deploy(numTroops, fromCountryISO, user, socket) {
-    const act = new action(
+    const dpl = new action(
         numTroops,
         'drop',
         '',
         fromCountryISO,
         user
     );
-	socket.send(JSON.stringify(act));
+	socket.send(JSON.stringify(dpl));
 }
 
 export { Options, OptionsDeploy, DonateForm };

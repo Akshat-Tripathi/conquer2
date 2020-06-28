@@ -57,9 +57,11 @@ class GameMap extends Component {
                     }
                     break;
                 case 'newPlayer':
-                    console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
-                    playerColours[action.Player] = action.Country;
-                    players.push(action.Player);
+                    if (!players.some((player) => player == action.Player)) {
+                        console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
+                        playerColours[action.Player] = action.Country;
+                        players.push(action.Player);
+                    }
             }
         };
 	}
@@ -79,6 +81,7 @@ class GameMap extends Component {
         //Currently Clicked Countries
         const [ fromCountry, setfromCountry ] = useState('');
         const [ toCountry, settoCountry ] = useState('');
+        const [ toCountryOwner, settoCountryOwner ] = useState('');
     
         //For the snackbar display settings
         const [ openHelp, setOpenHelp ] = React.useState(false);
@@ -104,7 +107,7 @@ class GameMap extends Component {
         const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
         // Map of ALL countries and their borders
-        var countries = {}; 
+        const [ countries, changeCountries ] = useState({})
         
         function loadMap() {
             fetch('/maps/world.txt')
@@ -113,7 +116,11 @@ class GameMap extends Component {
                 .then((lines) => lines.map((s) => s.split(' ')))
                 .then((lines) =>
                     lines.forEach((line) => {
-                        countries[line[0]] = line.slice(1);
+                        changeCountries(state => ({
+                            ...state,
+                            [line[0]]: line.slice(1),
+                        }));
+                        //countries[line[0]] = line.slice(1);
                     })
                 );
         }
@@ -143,27 +150,21 @@ class GameMap extends Component {
                 setFromCountryISO('');
                 setfromCountry('');
                 settoCountry('');
+                settoCountryOwner('');
                 setallowDeploy(false);
                 setallowMove(false);
-            } else {
-                //TODO: Is own country: Enable Move
-                //TODO: Another country: Enable attack/assist
-                // TODO: Check if neighbouring country
-                // if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
-                // }
+            } else if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
                 setallowDeploy(false);
                 settoCountry(NAME);
+                settoCountryOwner(countryStates[ISO_A2].Player);
                 setToCountryISO(ISO_A2);
-                //TODO: Add if statements
-                // IF own country
                 if (playerCountries.some((iso) => iso === ISO_A2)) {
                     setallowMove(true);
                 } else {
                     setallowMove(false);
                 }
-                //ELSE
-                console.log(toCountry);
             }
+            console.log(countries[fromCountryISO], ISO_A2)
         };
     
         //Handle functions for snackbar
@@ -191,7 +192,7 @@ class GameMap extends Component {
                 setnumTroops(0);
             }
         };
-    
+
         const handleDeploy = () => {
             setshowDeploy(!showDeploy);
             if (!showDeploy) {
@@ -217,16 +218,8 @@ class GameMap extends Component {
     
         const handleColorFill = (geo) => {
             while (!countriesLoaded) {
-                console.log("hi");
             }
             const { ISO_A2 } = geo.properties;
-    
-            // if (NAME === fromCountry) {
-            // 	return '#002984';
-            // } else if (NAME === toCountry) {
-            // 	return '#ffcd38';
-            // }
-    
             if (
                 fromCountryISO !== '' &&
                 countries[fromCountryISO] !== undefined &&
@@ -302,17 +295,19 @@ class GameMap extends Component {
                             />
                         )}
     
-                        {/* Only show Attack and Donate options when two countries clicked */}
+                        {/* Only show Attack and move/assist options when two countries clicked */}
                         {toCountry !== '' && (
                             <Grid item xs={12}>
                                 <Options
                                     classes={classes}
                                     toCountry={toCountry}
                                     fromCountry={fromCountry}
+                                    toCountryOwner={toCountryOwner}
                                     allowMove={allowMove}
+                                    numTroops={numTroops}
                                     handleNumTroops={handleNumTroops}
-                                    handleAssist={handleAssist}
                                     handleMove={handleMove}
+                                    handleAssist={handleAssist}
                                     showMove={showMove}
                                     showAssist={showAssist}
                                     fromCountryISO={fromCountryISO}
@@ -335,6 +330,7 @@ class GameMap extends Component {
                                 fromCountryISO={fromCountryISO}
                                 socket={socket}
                                 user={user}
+                                troops={troops}
                             />
                         )}
     

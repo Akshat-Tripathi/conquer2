@@ -111,10 +111,10 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				deltaSrc, deltaDest = defaultRng(src.troops, dest.troops)
 			}
 
-			src.troops -= deltaSrc
-			dest.troops -= deltaDest
+			src.troops += deltaSrc
+			dest.troops += deltaDest
 
-			if dest.troops == 0 && src.troops > 0 {
+			if dest.troops <= 0 && src.troops > 0 {
 				//Conquered the country
 				dest.player = action.Player
 				dest.troops++
@@ -129,8 +129,8 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
 					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Player: action.Player, Country: action.Src}
 			}
-			return false, UpdateMessage{Type: "updateCountry", Troops: -deltaDest, Country: action.Dest},
-				UpdateMessage{Type: "updateCountry", Troops: -deltaSrc, Player: p.countryStates[action.Dest].player, Country: action.Src}
+			return false, UpdateMessage{Type: "updateCountry", Troops: deltaDest, Country: action.Dest, Player: p.countryStates[action.Dest].player},
+				UpdateMessage{Type: "updateCountry", Troops: deltaSrc, Player: action.Player, Country: action.Src}
 		}
 	case "donate":
 		if p.validateDonate(action) {
@@ -194,6 +194,10 @@ func (p defaultProcessor) validateDonate(donate Action) bool {
 	if !ok {
 		return false
 	}
+	//troops must be > 0
+	if donate.Troops < 0 {
+		return false
+	}
 	//Must have troops
 	if me.troops < donate.Troops {
 		return false
@@ -213,6 +217,10 @@ func (p defaultProcessor) validateMove(move Action) bool {
 	}
 	//Must select neighbouring countries
 	if !p.areNeighbours(move.Src, move.Dest) {
+		return false
+	}
+	//troops must be > 0
+	if move.Troops < 0 {
 		return false
 	}
 	//Must have troops
@@ -237,6 +245,10 @@ func (p defaultProcessor) validateDrop(drop Action) bool {
 	}
 	them, ok := p.countryStates[drop.Dest]
 	if !ok {
+		return false
+	}
+	//troops must be > 0
+	if drop.Troops < 0 {
 		return false
 	}
 	//Must have troops
