@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"log"
 	"sync/atomic"
 	"time"
@@ -49,15 +48,10 @@ func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 //AddPlayer - returns whether or not the player was successfully added
 func (g *DefaultGame) AddPlayer(name, password string) bool {
 	if g.numPlayers >= int32(g.maxPlayerNum) {
-		log.Println("false")
 		return false
 	}
-	fmt.Println(g.colours)
-	fmt.Println(g.numPlayers)
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
-	log.Println(g.colours[g.numPlayers])
 	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
-		log.Println("Processing troops")
 		go g.processTroops()
 	}
 	return true
@@ -131,11 +125,9 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 
 func (g *DefaultGame) processTroops() {
 	for g.numPlayers > 0 {
-		fmt.Println(g.troopInterval)
 		time.Sleep(g.troopInterval)
 		for _, v := range g.processor.processTroops() {
 			go func(v UpdateMessage) {
-				fmt.Println(v.Troops)
 				g.conn.sendToPlayer(v, v.Player)
 			}(v)
 		}
