@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -58,9 +57,6 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan
 		if len(c.players) > 0 {
 			select {
 			case msg := <-c.players[name]:
-				if msg.Type == "updateTroops" {
-					fmt.Println(msg)
-				}
 				err := conn.WriteJSON(msg)
 				if err != nil {
 					//log.Println("write ", err)

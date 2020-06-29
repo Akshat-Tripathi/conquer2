@@ -116,11 +116,13 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 
 			if dest.troops <= 0 && src.troops > 0 {
 				//Conquered the country
-				dest.player = action.Player
 				dest.troops++
 				src.troops--
 				p.playerTroops[action.Player].countries++
-				p.playerTroops[dest.player].countries--
+				if dest.player != "" {
+					p.playerTroops[dest.player].countries--
+				}
+				dest.player = action.Player
 
 				won := false
 				if p.playerTroops[action.Player].countries == len(p.countries) {

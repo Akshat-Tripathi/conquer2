@@ -45,8 +45,6 @@ func main() {
 	situations := loadMaps()
 	colours := loadColours() //Temporary
 
-	log.Println(colours)
-
 	games := make(map[string]game.Game)
 
 	r := gin.Default()
