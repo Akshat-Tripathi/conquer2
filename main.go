@@ -49,8 +49,6 @@ func main() {
 
 	r := gin.Default()
 
-	gin.SetMode(gin.ReleaseMode)
-
 	//TEST CODE - REMOVE IN PRODUCTION
 	/*ctx := game.Context{
 		ID:                    "test",
@@ -191,6 +189,8 @@ func main() {
 	r.GET("/game_intro", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
+
+	gin.SetMode(gin.ReleaseMode)
 
 	r.Run(":" + port)
 }
