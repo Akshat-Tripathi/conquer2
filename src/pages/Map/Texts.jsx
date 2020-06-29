@@ -77,11 +77,11 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops }) => {
 			</Grid>
 			<br />
 		</div>
-	);
+	)
 };
 
-const PlayerBox = ({ classes, playerColours }) => {
-	return (
+const PlayerBox = ({ classes, playerColours, hidden }) => {
+	return !hidden ? (
 		<div>
 			<Paper className={classes.players}>
 				<Typography variant="subtitle1">PLAYERS:</Typography>
@@ -102,7 +102,7 @@ const PlayerBox = ({ classes, playerColours }) => {
 				</Grid>
 			</Paper>
 		</div>
-	);
+	) : (null);
 };
 
 export { SpyDetails, PlayerBox, Title };

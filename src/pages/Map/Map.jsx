@@ -6,6 +6,7 @@ import VectorMap from './VectorMap';
 import './Map.css';
 import { Options, OptionsDeploy, DonateForm } from './ActionButtons';
 import { SpyDetails, PlayerBox, Title } from './Texts';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 class countryState {
 	constructor(Troops, Player) {
@@ -74,12 +75,16 @@ class GameMap extends Component {
             }
             this.forceUpdate();
         };
-	}
-
+    }
+    
+    
     SideBar() {
         //CSS
         const classes = useStyles();
         //TODO: Fetch #troops, attack, move options, fix data vals
+        
+        const [ hidden, setHidden ] = useState(false);
+        useHotkeys("q", () => setHidden(bool => {return !bool}));
 
         // Spy Detail Information
         const [ name, setname ] = useState('');
@@ -260,8 +265,8 @@ class GameMap extends Component {
     
         return (
             <div>
-                {players.length !== 0 && <PlayerBox classes={classes} playerColours={playerColours} />}
-                <Paper className={classes.sidebar}>
+                {players.length !== 0 && <PlayerBox classes={classes} playerColours={playerColours} hidden={hidden} />}
+                {!hidden ? (<Paper className={classes.sidebar}>
                     <Grid container style={{ alignText: 'center' }}>
                         <Title
                             handleCloseHelp={handleCloseHelp}
@@ -339,7 +344,7 @@ class GameMap extends Component {
                                 ))}
                         </Grid>
                     </Grid>
-                </Paper>
+                </Paper>) : (null)};
     
                 <VectorMap
                     setname={setname}
@@ -355,9 +360,9 @@ class GameMap extends Component {
             </div>
         );
     }
-
+    
 	render() {
-		return <this.SideBar />;
+        return <this.SideBar />;
 	}
 }
 
