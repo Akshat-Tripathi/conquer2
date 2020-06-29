@@ -49,7 +49,10 @@ func main() {
 
 	r := gin.Default()
 
-	ctx := game.Context{
+	gin.SetMode(gin.ReleaseMode)
+
+	//TEST CODE - REMOVE IN PRODUCTION
+	/*ctx := game.Context{
 		ID:                    "test",
 		MaxPlayerNumber:       10,
 		StartingTroopNumber:   1,
@@ -59,11 +62,10 @@ func main() {
 		TroopInterval:         time.Second * 10,
 	}
 
-	//TEST CODE - REMOVE IN PRODUCTION
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
-	games["test"].AddPlayer("Akshat", "asdf")
+	games["test"].AddPlayer("Akshat", "asdf")*/
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
@@ -79,8 +81,6 @@ func main() {
 	r.POST("/create", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
-
-		fmt.Println(req.Form)
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
@@ -142,7 +142,7 @@ func main() {
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
-		c.Redirect(http.StatusFound, "/game")
+		c.Redirect(http.StatusFound, "/game_intro")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -152,8 +152,6 @@ func main() {
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 		situation := req.FormValue("situation")
-
-		fmt.Println(username, password)
 
 		//TODO remove this
 		if situation == "" {
@@ -176,7 +174,7 @@ func main() {
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
-			c.Redirect(http.StatusFound, "/game")
+			c.Redirect(http.StatusFound, "/game_intro")
 		default:
 			redirect("Invalid username/password combo", c)
 		}

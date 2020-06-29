@@ -18,7 +18,7 @@ let connect = () => {
     console.log("Socket Closed Connection: ", event);
     alert("Invalid login");
 
-    //window.location.replace(window.location.href.replace("/game", "/error"));
+    window.location.replace(window.location.href.replace("/game", "/"));
   };
 
   socket.onerror = (error) => {
