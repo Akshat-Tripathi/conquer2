@@ -85,13 +85,13 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 		<div>
 			<Paper className={classes.players}>
 				<Typography variant="subtitle1">PLAYERS:</Typography>
-				<Grid container spacing={12}>
+				<Grid container spacing={12} direction={"column"}>
 					{Object.keys(playerColours).map(function(player) {
 						var colour = playerColours[player];
 						return (
 							<div key={player} style={{ padding: '5%' }}>
-								<Grid container spacing={12}>
-									<Grid item xs={12}>
+								<Grid container spacing={12} direction={"row"}>
+									<Grid item xs={12} alignItems={"stretch"}>
 										<Typography variant="p">{player}</Typography>
 										<FiberManualRecordIcon style={{ color: colour }} />
 									</Grid>
