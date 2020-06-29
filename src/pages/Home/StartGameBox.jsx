@@ -256,8 +256,8 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 								aria-labelledby="troopInterval"
 								step={1}
 								marks
-								min={4}
-								max={20}
+								min={1}
+								max={5}
 								valueLabelDisplay="auto"
 								name="troopInterval"
 							/>
