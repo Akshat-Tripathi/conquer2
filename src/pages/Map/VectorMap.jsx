@@ -32,10 +32,9 @@ const MapChart = ({
 	setcontinent,
 	setgdp,
 	handleColorFill,
-	handleColorStroke,
-	handleStrokeWidth,
     handleClick,
-    countryStates
+    countryStates,
+    convertISO
 }) => {
 	return (
 		<div>
@@ -48,15 +47,11 @@ const MapChart = ({
 						{({ geographies }) =>
 							geographies.map((geo) => {
 								const fillcolor = handleColorFill(geo);
-								const strokecolor = handleColorStroke(geo);
-								const strokewidth = handleStrokeWidth(geo);
 								return notThisCountry(geo) ? (
 									<Geography
 										key={geo.rsmKey}
 										geography={geo}
-										stroke={strokecolor}
 										fill={fillcolor}
-										strokeWidth={strokewidth}
 										onMouseEnter={() => {
 											const { NAME, POP_EST, SUBREGION, CONTINENT, GDP_MD_EST } = geo.properties;
 											setTooltipContent(`${NAME}`);
@@ -82,7 +77,7 @@ const MapChart = ({
 												outline: 'none'
 											},
 											hover: {
-												fill: '#F53',
+												fill: '#997f53',
 												outline: 'none'
 											}
 										}}
@@ -93,12 +88,13 @@ const MapChart = ({
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
-								const { ISO_A2 } = geo.properties;
+                                const { NAME, ISO_A2 } = geo.properties;
+                                var iso_a2 = convertISO(NAME, ISO_A2);
 								return notThisCountry(geo) ? (
 									<Marker coordinates={geoCentroid(geo)}>
-										<text y="2" fontSize={3} textAnchor="middle" fill="#FF">
-											{countryStates !== undefined && ISO_A2.toString() in countryStates ? (
-												countryStates[ISO_A2.toString()]['Troops']
+										<text y="2" fontSize={3} textAnchor="middle" fill="#FF" style={{pointerEvents: 'none'}}>
+											{countryStates !== undefined && iso_a2.toString() in countryStates ? (
+												countryStates[iso_a2.toString()]['Troops']
 											) : (
 												0
 											)}
@@ -119,11 +115,10 @@ const VectorMap = ({
 	setsubrg,
 	setcontinent,
 	setgdp,
-	handleColorStroke,
 	handleColorFill,
-	handleStrokeWidth,
     handleClick,
-    countryStates
+    countryStates,
+    convertISO
 }) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
@@ -140,10 +135,9 @@ const VectorMap = ({
 				setcontinent={setcontinent}
 				setgdp={setgdp}
 				handleColorFill={handleColorFill}
-				handleColorStroke={handleColorStroke}
-				handleStrokeWidth={handleStrokeWidth}
                 handleClick={handleClick}
                 countryStates={countryStates}
+                convertISO={convertISO}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>

@@ -392,7 +392,7 @@ function attack(fromCountryISO, toCountryISO, user, socket) {
         toCountryISO,
         user
     );
-	socket.send(JSON.stringify(atk));
+    socket.send(JSON.stringify(atk));
 }
 
 function donate(numTroops, targetPlayer, user, socket) {

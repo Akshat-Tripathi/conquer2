@@ -28,6 +28,15 @@ var playerCountries = [];
 // Current player name
 var user = '';
 
+//PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
+//POST: The hex colour, p% darker
+function darken(hex, p) {
+    const r = Math.round(parseInt(hex.slice(1, 3), 16) * (1 - p));
+    const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - p));
+    const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - p));
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
 class GameMap extends Component {
 
 	constructor() {
@@ -131,6 +140,12 @@ class GameMap extends Component {
             setcountriesLoaded(true);
         }
     
+        const convertISO = (NAME, ISO_A2) => {
+            if (NAME === "Somaliland") return "ZZ";
+            if (NAME === "N. Cyprus") return "CP";
+            return ISO_A2;
+        }
+
         // ISO_A2 of source country
         const [ fromCountryISO, setFromCountryISO ] = useState('');
         // ISO_A2 of dest country
@@ -139,9 +154,11 @@ class GameMap extends Component {
         const handleClick = (geo) => {
             const { NAME, ISO_A2 } = geo.properties;
     
+            var iso_a2 = convertISO(NAME, ISO_A2);
+
             if (fromCountry === '') {
-                if (playerCountries.some((iso) => iso === ISO_A2)) {
-                    setFromCountryISO(ISO_A2);
+                if (playerCountries.some((iso) => iso === iso_a2)) {
+                    setFromCountryISO(iso_a2);
     
                     setfromCountry(NAME);
                     setallowDeploy(true);
@@ -154,18 +171,17 @@ class GameMap extends Component {
                 settoCountryOwner('');
                 setallowDeploy(false);
                 setallowMove(false);
-            } else if (countries[fromCountryISO].some((iso) => iso === ISO_A2)) {
+            } else if (countries[fromCountryISO].some((iso) => iso === iso_a2)) {
                 setallowDeploy(false);
                 settoCountry(NAME);
-                settoCountryOwner(countryStates[ISO_A2].Player);
-                setToCountryISO(ISO_A2);
-                if (playerCountries.some((iso) => iso === ISO_A2)) {
+                settoCountryOwner(countryStates[iso_a2].Player);
+                setToCountryISO(iso_a2);
+                if (playerCountries.some((iso) => iso === iso_a2)) {
                     setallowMove(true);
                 } else {
                     setallowMove(false);
                 }
             }
-            console.log(countries[fromCountryISO], ISO_A2)
         };
     
         //Handle functions for snackbar
@@ -220,51 +236,26 @@ class GameMap extends Component {
         const handleColorFill = (geo) => {
             while (!countriesLoaded) {
             }
-            const { ISO_A2 } = geo.properties;
-            if (
-                fromCountryISO !== '' &&
-                countries[fromCountryISO] !== undefined &&
-                countries[fromCountryISO].some((iso) => iso === ISO_A2)
-            ) {
-                return '#be90d4';
-            }
-    
-            try {
-                var col = playerColours[countryStates[ISO_A2].Player];
-                if (typeof col == 'undefined') {
-                    col = '#B9A37E';
-                }
-                return col;
-            } catch (TypeError) {
-                return '#B9A37E';
-            }
-        };
-    
-        //TODO: Change stroke according to action
-        const handleColorStroke = (geo) => {
             const { NAME, ISO_A2 } = geo.properties;
-            if (NAME === fromCountry) {
-                return '#002984';
-            } else if (NAME === toCountry) {
-                return '#ff9800';
-            }
+            
+            var iso_a2 = convertISO(NAME, ISO_A2);
+
             try {
-                var col = playerColours[countryStates[ISO_A2].Player];
+                var col = playerColours[countryStates[iso_a2].Player];
                 if (typeof col == 'undefined') {
-                    col = '#B9A37E';
+                    col = '#a69374';
+                }
+                if (
+                    fromCountryISO !== '' &&
+                    countries[fromCountryISO] !== undefined &&
+                    countries[fromCountryISO].some((iso) => iso === iso_a2)
+                    ) {
+                        return darken(col, 0.2);
                 }
                 return col;
             } catch (TypeError) {
-                col = '#B9A37E';
+                return '#a69374';
             }
-        };
-    
-        const handleStrokeWidth = (geo) => {
-            const { NAME } = geo.properties;
-            if (NAME === fromCountry || NAME === toCountry) {
-                return 2;
-            }
-            return 0.3;
         };
     
         return (
@@ -357,10 +348,9 @@ class GameMap extends Component {
                     setcontinent={setcontinent}
                     setgdp={setgdp}
                     handleColorFill={handleColorFill}
-                    handleColorStroke={handleColorStroke}
-                    handleStrokeWidth={handleStrokeWidth}
                     handleClick={handleClick}
                     countryStates={countryStates}
+                    convertISO={convertISO}
                 />
             </div>
         );
