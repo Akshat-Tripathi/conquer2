@@ -51,8 +51,8 @@ func main() {
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	ctx := game.Context{
-		ID:                    "fireNationSux",
-		MaxPlayerNumber:       5,
+		ID:                    "test",
+		MaxPlayerNumber:       10,
 		StartingTroopNumber:   10,
 		StartingCountryNumber: 5,
 		Situation:             situations["world"],
@@ -140,7 +140,7 @@ func main() {
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
-		c.Redirect(http.StatusFound, "/game_intro")
+		c.Redirect(http.StatusFound, "/game")
 	})
 
 	r.POST("/join", func(c *gin.Context) {
@@ -172,7 +172,7 @@ func main() {
 			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
-			c.Redirect(http.StatusFound, "/game_intro")
+			c.Redirect(http.StatusFound, "/game")
 		default:
 			redirect("Invalid username/password combo", c)
 		}
