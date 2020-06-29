@@ -77,6 +77,17 @@ class GameMap extends Component {
         };
     }
     
+    componentDidMount() {
+        window.addEventListener('load', this.onLoad);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('load', this.onLoad);
+    }
+
+    onLoad() {
+        window.scrollTo( 0, window.screen.height/3.8);
+    }
     
     SideBar() {
         //CSS
