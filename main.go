@@ -50,20 +50,20 @@ func main() {
 	r := gin.Default()
 
 	//TEST CODE - REMOVE IN PRODUCTION
-	/*ctx := game.Context{
-		ID:                    "test",
-		MaxPlayerNumber:       10,
-		StartingTroopNumber:   1,
-		StartingCountryNumber: 20,
+	ctx := game.Context{
+		ID:                    "fireNationSux",
+		MaxPlayerNumber:       5,
+		StartingTroopNumber:   10,
+		StartingCountryNumber: 5,
 		Situation:             situations["world"],
 		Colours:               colours,
-		TroopInterval:         time.Second * 10,
+		TroopInterval:         time.Minute,
 	}
 
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
-	games["test"].AddPlayer("Akshat", "asdf")*/
+	games["test"].AddPlayer("General Iroh", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
