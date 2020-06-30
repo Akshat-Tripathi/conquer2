@@ -85,7 +85,7 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	}
 	g.conn.register(username)
 	for _, msg := range g.processor.getState(username) {
-		if msg.Player == username {
+		if msg.Type == "newPlayer" {
 			g.conn.sendToAll(msg)
 		} else {
 			g.conn.sendToPlayer(msg, username)
