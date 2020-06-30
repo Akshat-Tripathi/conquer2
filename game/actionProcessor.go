@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -124,6 +125,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				won := false
 				if p.playerTroops[action.Player].countries == len(p.countries) {
 					won = true
+					fmt.Println(action.Player + " won the game")
 				}
 				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
 					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Player: action.Player, Country: action.Src}

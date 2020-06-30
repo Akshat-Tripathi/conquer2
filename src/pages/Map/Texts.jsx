@@ -3,6 +3,7 @@ import { Grid, Typography, Paper, Snackbar, IconButton } from '@material-ui/core
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import MuiAlert from '@material-ui/lab/Alert';
 import HelpIcon from '@material-ui/icons/Help';
+import { createMuiTheme } from "@material-ui/core/styles";
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
@@ -87,13 +88,19 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12} direction={"column"}>
 					{Object.keys(playerColours).map(function(player) {
-						var colour = playerColours[player];
-						return (
+                        var colour = playerColours[player];
+                        const theme = createMuiTheme({
+                            palette: {
+                                text: {
+                                    primary: colour
+                                }
+                            }
+                        })
+                        return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid container spacing={12} direction={"row"}>
 									<Grid item xs={12} alignItems={"stretch"}>
-										<Typography variant="p">{player}</Typography>
-										<FiberManualRecordIcon style={{ color: colour }} />
+                                        <Typography variant="p" color="primary">{player}</Typography>
 									</Grid>
 								</Grid>
 							</div>

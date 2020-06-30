@@ -54,14 +54,14 @@ class GameMap extends Component {
                 case 'updateCountry':
                     let ok = typeof countryStates[action.Country] === 'undefined'
                     if (
-                        !ok ||
+                        ok ||
                         countryStates[action.Country].Player !== action.Player
                     ) {
                         if (action.Player === user) {
                             playerCountries.push(action.Country);
                         }
                         //If I have lost this country
-                        if (ok && countryStates[action.Country] === user) {
+                        if (!ok && countryStates[action.Country] === user) {
                             playerCountries.filter((country) => country !== action.Country);
                         }
                         countryStates[action.Country] = new countryState(action.Troops, action.Player);
