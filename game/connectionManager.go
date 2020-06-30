@@ -50,6 +50,7 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan
 			}
 			act.Player = name
 			log.Println(act)
+			//FIXME
 			msgs <- act
 		}
 	}()
@@ -80,6 +81,8 @@ func (c *connectionManager) sendToAll(msg UpdateMessage) {
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 	go func() {
-		c.players[player] <- msg
+		if p, ok := c.players[player]; ok {
+			p <- msg
+		}
 	}()
 }

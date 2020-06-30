@@ -17,29 +17,12 @@ const (
 	cookieMaxAge = 365 * 24 * 60 * 60
 )
 
-func pain() {
-	router := gin.Default()
-	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("./build", true)))
-
-	// Setup route group for the API
-	api := router.Group("/api")
-	{
-		api.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "pong",
-			})
-		})
-	}
-	router.Run(":8080")
-}
-
 func main() {
 
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = "8080"
+		port = "80"
 	}
 
 	situations := loadMaps()
@@ -52,18 +35,18 @@ func main() {
 	//TEST CODE - REMOVE IN PRODUCTION
 	ctx := game.Context{
 		ID:                    "test",
-		MaxPlayerNumber:       10,
+		MaxPlayerNumber:       20,
 		StartingTroopNumber:   10,
 		StartingCountryNumber: 5,
 		Situation:             situations["world"],
 		Colours:               colours,
-		TroopInterval:         time.Minute,
+		TroopInterval:         time.Second * 10,
 	}
 
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
-	games["test"].AddPlayer("General Iroh", "asdf")
+	games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
@@ -136,7 +119,7 @@ func main() {
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 
@@ -144,6 +127,7 @@ func main() {
 	})
 
 	r.POST("/join", func(c *gin.Context) {
+		fmt.Println("joining")
 		req := c.Request
 		req.ParseForm()
 
@@ -161,6 +145,7 @@ func main() {
 		if !validID {
 			redirect("Invalid game ID", c)
 		}
+		fmt.Println(username, password)
 		switch thisGame.CheckPlayer(username, password) {
 		case 0:
 			if !thisGame.AddPlayer(username, password) {
@@ -169,7 +154,7 @@ func main() {
 			fallthrough
 		case 1:
 			c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, true)
+			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 			c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 			c.Redirect(http.StatusFound, "/game")
@@ -189,8 +174,6 @@ func main() {
 	r.GET("/game_intro", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
-
-	gin.SetMode(gin.ReleaseMode)
 
 	r.Run(":" + port)
 }

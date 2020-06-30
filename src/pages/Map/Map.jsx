@@ -47,18 +47,21 @@ class GameMap extends Component {
             var action = JSON.parse(msg.data);
             switch (action.Type) {
                 case 'updateTroops':
+                    console.log(action);
                     user = action.Player;
                     troops += action.Troops;
                     break;
                 case 'updateCountry':
+                    let ok = typeof countryStates[action.Country] === 'undefined'
                     if (
-                        typeof countryStates[action.Country] === 'undefined' ||
+                        !ok ||
                         countryStates[action.Country].Player !== action.Player
                     ) {
                         if (action.Player === user) {
                             playerCountries.push(action.Country);
                         }
-                        if (countryStates[action.Country] === user) {
+                        //If I have lost this country
+                        if (ok && countryStates[action.Country] === user) {
                             playerCountries.filter((country) => country !== action.Country);
                         }
                         countryStates[action.Country] = new countryState(action.Troops, action.Player);
