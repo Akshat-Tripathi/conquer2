@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>{{ .Title }}</title>
+  <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdn.auth0.com/js/auth0/9.0/auth0.min.js"></script>
+  <script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+  <script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+  <script type="application/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+  <script type="application/javascript" src="/static/game/js/src/svg-world-map.js"></script>
+  <script type="text/babel" src="/static/game/js/app.jsx"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  
+  <script type = "text/javascript">
+    let socket = new WebSocket(window.location.href.replace("http://", "ws://") + "ws")
+    socket.onopen = () => {
+        console.log("Connection successful")
+    }
+
+    socket.onmessage = (msg) => {
+        console.log(msg)
+        socket.send("general kenobi")
+    }
+
+    socket.onclose = () => {
+        console.log("Socket closing")
+    }
+</script>
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+</html>

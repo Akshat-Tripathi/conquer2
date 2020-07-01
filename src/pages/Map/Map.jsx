@@ -61,7 +61,7 @@ class GameMap extends Component {
                             playerCountries.push(action.Country);
                         }
                         //If I have lost this country
-                        if (!ok && countryStates[action.Country] === user) {
+                        if (!ok && countryStates[action.Country].Player === user) {
                             playerCountries.filter((country) => country !== action.Country);
                         }
                         countryStates[action.Country] = new countryState(action.Troops, action.Player);
