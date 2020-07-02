@@ -1,6 +1,8 @@
 package game
 
 import (
+	"sync"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,8 +42,8 @@ func (rtg *RealTimeGame) Start(ctx Context) {
 	rtg.id = ctx.ID
 	rtg.maxPlayerNum = ctx.MaxPlayerNumber
 	rtg.colours = ctx.Colours //TODO shuffle these
-	rtg.conn = connectionManager{make(map[string]chan UpdateMessage)}
-	rtg.actions = make(chan Action)
+	rtg.conn = connectionManager{sync.Map{}}
+	rtg.requests = make(chan Action)
 	rtg.processor = &processor
 	rtg.troopInterval = ctx.TroopInterval
 	go rtg.processActions()

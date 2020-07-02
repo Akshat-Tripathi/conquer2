@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"math/rand"
+	"sync"
 )
 
 type stateProcessor interface {
@@ -14,6 +15,7 @@ type stateProcessor interface {
 }
 
 type defaultProcessor struct {
+	sync.Mutex
 	countries             []string
 	situation             map[string][]string
 	countryStates         map[string]*countryState //Maps countries to players / number of troops
@@ -26,10 +28,10 @@ type defaultProcessor struct {
 //PRE: Username is valid ie it is in playerTroops
 func (p *defaultProcessor) getState(username string) []UpdateMessage {
 	msgs := make([]UpdateMessage, len(p.countries)+1+len(p.playerTroops))
-	//Sends initial state -- If you encounter sync issues, force all monitor goroutines to pause sending until this is done probably with a mutex
+	//Sends initial state
 	i := 0
 	msgs[i] = UpdateMessage{
-		Troops: p.playerTroops[username].troops,
+		Troops: p.playerTroops[username].getTroops(),
 		Type:   "updateTroops",
 		Player: username}
 	i++
@@ -55,14 +57,20 @@ func (p *defaultProcessor) getState(username string) []UpdateMessage {
 
 //Calculates number of troops to send
 func (p *defaultProcessor) processTroops() []UpdateMessage {
+	p.Lock()
+	defer p.Unlock()
 	msgs := make([]UpdateMessage, len(p.playerTroops))
 	i := 0
 	deltaTroops := 0
 	for name, vals := range p.playerTroops {
-		deltaTroops = 3 + vals.countries/3
-		msgs[i] = UpdateMessage{Type: "updateTroops", Troops: deltaTroops, Player: name}
-		vals.troops += deltaTroops //Might lead to break
-		i++
+		func() {
+			vals.Lock()
+			defer vals.Unlock()
+			deltaTroops = 3 + vals.countries/3
+			msgs[i] = UpdateMessage{Type: "updateTroops", Troops: deltaTroops, Player: name}
+			vals.troops += deltaTroops
+			i++
+		}()
 	}
 	return msgs
 }
@@ -80,6 +88,8 @@ func (p *defaultProcessor) checkPlayer(name, password string) int8 {
 
 //PRE: the player name and password are unique
 func (p *defaultProcessor) addPlayer(name, password, colour string) {
+	p.Lock()
+	defer p.Unlock()
 	p.playerTroops[name] = &playerState{
 		troops:    p.startingTroopNumber,
 		countries: p.startingCountryNumber,
@@ -116,9 +126,9 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				//Conquered the country
 				dest.troops++
 				src.troops--
-				p.playerTroops[action.Player].countries++
+				p.playerTroops[action.Player].incrementCountries()
 				if dest.player != "" {
-					p.playerTroops[dest.player].countries--
+					p.playerTroops[dest.player].decrementCountries()
 				}
 				dest.player = action.Player
 
@@ -135,8 +145,8 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 		}
 	case "donate":
 		if p.validateDonate(action) {
-			p.playerTroops[action.Player].troops -= action.Troops //Might cause error
-			p.playerTroops[action.Dest].troops += action.Troops
+			p.playerTroops[action.Player].addTroops(-action.Troops)
+			p.playerTroops[action.Dest].addTroops(action.Troops)
 			return false, UpdateMessage{Type: "updateTroops", Troops: action.Troops, Player: action.Dest},
 				UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player}
 		}
@@ -149,7 +159,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 		}
 	case "drop":
 		if p.validateDrop(action) {
-			p.playerTroops[action.Player].troops -= action.Troops
+			p.playerTroops[action.Player].addTroops(-action.Troops)
 			p.countryStates[action.Dest].troops += action.Troops
 			return false, UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player},
 				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].player, Country: action.Dest}
@@ -161,7 +171,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 	return false, UpdateMessage{}, UpdateMessage{}
 }
 
-func (p defaultProcessor) validateAttack(attack Action) bool {
+func (p *defaultProcessor) validateAttack(attack Action) bool {
 	src, ok := p.countryStates[attack.Src]
 	if !ok {
 		return false
@@ -190,7 +200,7 @@ func (p defaultProcessor) validateAttack(attack Action) bool {
 }
 
 //PRE: donate.Dest is the name of the other player
-func (p defaultProcessor) validateDonate(donate Action) bool {
+func (p *defaultProcessor) validateDonate(donate Action) bool {
 	me, ok := p.playerTroops[donate.Player]
 	if !ok {
 		return false
@@ -200,7 +210,7 @@ func (p defaultProcessor) validateDonate(donate Action) bool {
 		return false
 	}
 	//Must have troops
-	if me.troops < donate.Troops {
+	if me.getTroops() < donate.Troops {
 		return false
 	}
 	//Can't donate to self
@@ -211,7 +221,7 @@ func (p defaultProcessor) validateDonate(donate Action) bool {
 	return ok
 }
 
-func (p defaultProcessor) validateMove(move Action) bool {
+func (p *defaultProcessor) validateMove(move Action) bool {
 	src, ok := p.countryStates[move.Src]
 	if !ok {
 		return false
@@ -239,7 +249,7 @@ func (p defaultProcessor) validateMove(move Action) bool {
 	return ok
 }
 
-func (p defaultProcessor) validateDrop(drop Action) bool {
+func (p *defaultProcessor) validateDrop(drop Action) bool {
 	me, ok := p.playerTroops[drop.Player]
 	if !ok {
 		return false
@@ -253,7 +263,7 @@ func (p defaultProcessor) validateDrop(drop Action) bool {
 		return false
 	}
 	//Must have troops
-	if me.troops < drop.Troops {
+	if me.getTroops() < drop.Troops {
 		return false
 	}
 	//Must own dest
@@ -264,7 +274,7 @@ func (p defaultProcessor) validateDrop(drop Action) bool {
 }
 
 //PRE: src and dest are valid strings
-func (p defaultProcessor) areNeighbours(src, dest string) bool {
+func (p *defaultProcessor) areNeighbours(src, dest string) bool {
 	situation := p.situation[src]
 	for _, v := range situation {
 		if v == dest {

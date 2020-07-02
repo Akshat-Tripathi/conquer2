@@ -1,6 +1,10 @@
 package game
 
-import "github.com/gin-gonic/gin"
+import (
+	"sync"
+
+	"github.com/gin-gonic/gin"
+)
 
 //CampaignGame - a subclass of DefaultGame which is a slower game lasting 2 weeks
 type CampaignGame struct {
@@ -38,8 +42,8 @@ func (cg *CampaignGame) Start(ctx Context) {
 	cg.id = ctx.ID
 	cg.maxPlayerNum = ctx.MaxPlayerNumber
 	cg.colours = ctx.Colours //TODO shuffle these
-	cg.conn = connectionManager{make(map[string]chan UpdateMessage)}
-	cg.actions = make(chan Action)
+	cg.conn = connectionManager{sync.Map{}}
+	cg.requests = make(chan Action)
 	cg.processor = &processor
 	cg.troopInterval = ctx.TroopInterval
 	go cg.processActions()

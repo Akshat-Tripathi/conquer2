@@ -2,7 +2,7 @@ package game
 
 import (
 	"log"
-	"sync/atomic"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,12 +30,13 @@ type Game interface {
 
 //DefaultGame - basic test version
 type DefaultGame struct {
+	sync.Mutex
 	colours       []string
 	id            string
 	conn          connectionManager
-	numPlayers    int32
+	numPlayers    int
 	maxPlayerNum  int
-	actions       chan Action
+	requests      chan Action
 	processor     stateProcessor
 	troopInterval time.Duration
 }
@@ -47,11 +48,14 @@ func (g *DefaultGame) CheckPlayer(name, password string) int8 {
 
 //AddPlayer - returns whether or not the player was successfully added
 func (g *DefaultGame) AddPlayer(name, password string) bool {
-	if g.numPlayers >= int32(g.maxPlayerNum) {
+	g.Lock()
+	defer g.Unlock()
+	if g.numPlayers >= g.maxPlayerNum {
 		return false
 	}
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
-	if atomic.AddInt32(&g.numPlayers, 1) == 1 {
+	g.numPlayers++
+	if g.numPlayers == 1 {
 		go g.processTroops()
 	}
 	return true
@@ -83,15 +87,15 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 		redirect(conn)
 		return
 	}
-	g.conn.register(username)
+	responses := g.conn.register(username)
 	for _, msg := range g.processor.getState(username) {
-		if msg.Type == "newPlayer" {
+		if msg.Type == "newPlayer" || (msg.Player == username && msg.Troops == 0) {
 			g.conn.sendToAll(msg)
 		} else {
 			g.conn.sendToPlayer(msg, username)
 		}
 	}
-	g.conn.monitor(username, conn, g.actions)
+	g.conn.monitor(username, conn, g.requests, responses)
 }
 
 func redirect(conn *websocket.Conn) {
@@ -100,15 +104,16 @@ func redirect(conn *websocket.Conn) {
 
 //Takes actions from the websocket connections and processes them
 func (g *DefaultGame) processActions() {
-	for action := range g.actions {
+	for action := range g.requests {
 		won, msg1, msg2 := g.processor.processAction(action)
 		g.send(msg1)
 		g.send(msg2)
 		if won {
+
 			g.numPlayers = 0
 			go func() {
 				time.Sleep(time.Second * 5)
-				close(g.actions)
+				close(g.requests)
 			}()
 		}
 	}
@@ -124,12 +129,19 @@ func (g *DefaultGame) send(msg UpdateMessage) {
 }
 
 func (g *DefaultGame) processTroops() {
-	for g.numPlayers > 0 {
-		time.Sleep(g.troopInterval)
-		for _, v := range g.processor.processTroops() {
-			go func(v UpdateMessage) {
-				g.conn.sendToPlayer(v, v.Player)
-			}(v)
+	for {
+		if func() bool {
+			time.Sleep(g.troopInterval)
+			for _, v := range g.processor.processTroops() {
+				go func(v UpdateMessage) {
+					g.conn.sendToPlayer(v, v.Player)
+				}(v)
+			}
+			g.Lock()
+			defer g.Unlock()
+			return g.numPlayers == 0
+		}() {
+			break
 		}
 	}
 }

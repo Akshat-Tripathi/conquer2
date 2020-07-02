@@ -2,6 +2,7 @@ package game
 
 import (
 	"log"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -11,11 +12,13 @@ var (
 )
 
 type connectionManager struct {
-	players map[string]chan UpdateMessage
+	players sync.Map //map[string]chan UpdateMessage
 }
 
-func (c *connectionManager) register(name string) {
-	c.players[name] = make(chan UpdateMessage)
+func (c *connectionManager) register(name string) chan UpdateMessage {
+	responses := make(chan UpdateMessage, 100)
+	c.players.Store(name, responses)
+	return responses
 }
 
 //UpdateMessage - sent to client
@@ -26,63 +29,53 @@ type UpdateMessage struct {
 	Country string //Could be the colour iff the type is newPlayer
 }
 
-func (c *connectionManager) read(name string, conn *websocket.Conn) Action {
-	var act Action
-	err := conn.ReadJSON(&act)
-	if err != nil {
-		log.Println("read ", err)
-		delete(c.players, name)
-	}
-	act.Player = name
-	return act
-}
-
 //Monitor - monitors a player's websocket
-func (c *connectionManager) monitor(name string, conn *websocket.Conn, msgs chan<- Action) {
+func (c *connectionManager) monitor(name string, conn *websocket.Conn,
+	requests chan<- Action, responses chan UpdateMessage) {
 	go func() {
 		var act Action
 		for {
 			err := conn.ReadJSON(&act)
 			if err != nil {
-				log.Println("read ", err)
-				delete(c.players, name)
+				//log.Println("read ", err)
+				close(responses)
+				c.players.Delete(name)
 				return
 			}
 			act.Player = name
 			log.Println(act)
 			//FIXME
-			msgs <- act
+			requests <- act
 		}
 	}()
+Out:
 	for {
-		if len(c.players) > 0 {
-			select {
-			case msg := <-c.players[name]:
-				err := conn.WriteJSON(msg)
-				if err != nil {
-					//log.Println("write ", err)
-					delete(c.players, name)
-					return
-				}
+		select {
+		case msg := <-responses:
+			err := conn.WriteJSON(msg)
+			if err != nil {
+				//log.Println("write ", err)
+				c.players.Delete(name)
+				break Out
 			}
-		} else {
-			log.Println("zero players")
 		}
 	}
+	//fmt.Println("leak avoided")
 }
 
 func (c *connectionManager) sendToAll(msg UpdateMessage) {
-	for _, v := range c.players {
+	c.players.Range(func(k interface{}, v interface{}) bool {
 		go func(v chan UpdateMessage) {
 			v <- msg
-		}(v)
-	}
+		}(v.(chan UpdateMessage))
+		return true
+	})
 }
 
 func (c *connectionManager) sendToPlayer(msg UpdateMessage, player string) {
 	go func() {
-		if p, ok := c.players[player]; ok {
-			p <- msg
+		if p, ok := c.players.Load(player); ok {
+			p.(chan UpdateMessage) <- msg
 		}
 	}()
 }

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"sync"
 	"time"
 )
 
@@ -10,10 +11,35 @@ type countryState struct {
 }
 
 type playerState struct {
+	sync.Mutex
 	colour    string
 	troops    int
 	countries int
 	password  string
+}
+
+func (p *playerState) incrementCountries() {
+	p.Lock()
+	defer p.Unlock()
+	p.countries++
+}
+
+func (p *playerState) decrementCountries() {
+	p.Lock()
+	defer p.Unlock()
+	p.countries--
+}
+
+func (p *playerState) getTroops() int {
+	p.Lock()
+	defer p.Unlock()
+	return p.troops
+}
+
+func (p *playerState) addTroops(troops int) {
+	p.Lock()
+	defer p.Unlock()
+	p.troops += troops
 }
 
 //Context - used to specify game parameters

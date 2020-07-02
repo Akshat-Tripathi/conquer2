@@ -46,7 +46,7 @@ func main() {
 	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
-	games["test"].AddPlayer("Akshat", "asdf")
+	//games["test"].AddPlayer("Akshat", "asdf")
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
