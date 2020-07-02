@@ -210,7 +210,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => move(numTroops, fromCountryISO, toCountryISO, user, socket)}
+						onClick={() => assist(numTroops, fromCountryISO, toCountryISO, user, socket)}
 					>
 						CONFIRM ASSISTANCE
 					</Button>
@@ -415,6 +415,17 @@ function move(numTroops, fromCountryISO, toCountryISO, user, socket) {
         user
     );
 	socket.send(JSON.stringify(mve));
+}
+
+function assist(numTroops, fromCountryISO, toCountryISO, user, socket) {
+    const ast = new action(
+        parseInt(numTroops, 10),
+        'assist',
+        fromCountryISO,
+        toCountryISO,
+        user
+    );
+	socket.send(JSON.stringify(ast));
 }
 
 function deploy(numTroops, fromCountryISO, user, socket) {
