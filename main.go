@@ -40,7 +40,7 @@ func main() {
 		StartingCountryNumber: 40,
 		Situation:             situations["world"],
 		Colours:               colours,
-		TroopInterval:         time.Second * 10,
+		TroopInterval:         time.Minute * 60,
 	}
 
 	//g := &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}

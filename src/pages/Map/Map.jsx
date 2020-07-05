@@ -41,9 +41,16 @@ function darken(hex, p) {
 class GameMap extends Component {
 	constructor() {
 		super();
-		socket = connect();
+        socket = connect();
+        var keepAlive = keepAlive = window.setInterval(() => {
+            socket.send("{}");
+        }, 54 * 1000);
 		socket.onmessage = (msg) => {
-			var action = JSON.parse(msg.data);
+            var action = JSON.parse(msg.data);
+            window.clearInterval(keepAlive);
+            keepAlive = window.setInterval(() => {
+                socket.send("{}");
+            }, 54 * 1000);
 			switch (action.Type) {
 				case 'updateTroops':
 					console.log(action);

@@ -3,7 +3,7 @@ let connect = () => {
 	const id = document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1];
 	const socketURL = window.location.href.replace('http', 'ws') + '/' + id + '/ws';
 
-	var socket = new WebSocket(socketURL);
+    var socket = new WebSocket(socketURL);
 	console.log('Attempting connection to: ' + socketURL);
 
 	socket.onopen = () => {
@@ -12,13 +12,12 @@ let connect = () => {
 
 	socket.onclose = (event) => {
 		console.log('Socket Closed Connection: ', event);
-		alert('Invalid login');
-
-		window.location.replace(window.location.href.replace('/game', '/'));
 	};
-
+    
 	socket.onerror = (error) => {
-		console.log('Socket Error: ', error);
+        console.log('Socket Error: ', error);
+        alert('Invalid login');
+        window.location.replace(window.location.href.replace('/game', '/'));
 	};
 	return socket;
 	// socket.send

@@ -36,6 +36,10 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn,
 		var act Action
 		for {
 			err := conn.ReadJSON(&act)
+			//To check if the message is a keepAlive message from the client
+			if act.Player == "" {
+				continue
+			}
 			if err != nil {
 				//log.Println("read ", err)
 				close(responses)
