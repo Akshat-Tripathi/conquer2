@@ -88,13 +88,7 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 		return
 	}
 	responses := g.conn.register(username)
-	for _, msg := range g.processor.getState(username) {
-		if msg.Type == "newPlayer" || (msg.Player == username && msg.Troops == 0) {
-			g.conn.sendToAll(msg)
-		} else {
-			g.conn.sendToPlayer(msg, username)
-		}
-	}
+	sendState(username, g.processor, &g.conn)
 	g.conn.monitor(username, conn, g.requests, responses)
 }
 
@@ -109,7 +103,6 @@ func (g *DefaultGame) processActions() {
 		g.send(msg1)
 		g.send(msg2)
 		if won {
-
 			g.numPlayers = 0
 			go func() {
 				time.Sleep(time.Second * 5)
