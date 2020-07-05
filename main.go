@@ -22,11 +22,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-<<<<<<< HEAD
-		port = "3000"
-=======
-		port = "8080"
->>>>>>> 124fe36de2df974c48a22776ff8d67df109f4dbe
+		port = "80"
 	}
 
 	situations := loadMaps()
