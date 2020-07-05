@@ -22,7 +22,11 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
+<<<<<<< HEAD
 		port = "3000"
+=======
+		port = "8080"
+>>>>>>> 124fe36de2df974c48a22776ff8d67df109f4dbe
 	}
 
 	situations := loadMaps()
@@ -35,15 +39,16 @@ func main() {
 	//TEST CODE - REMOVE IN PRODUCTION
 	ctx := game.Context{
 		ID:                    "test",
-		MaxPlayerNumber:       20,
+		MaxPlayerNumber:       2,
 		StartingTroopNumber:   10,
-		StartingCountryNumber: 5,
+		StartingCountryNumber: 40,
 		Situation:             situations["world"],
 		Colours:               colours,
 		TroopInterval:         time.Second * 10,
 	}
 
-	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+	g := &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
+	//g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
 	//games["test"].AddPlayer("Akshat", "asdf")
@@ -175,7 +180,7 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	r.Run(":" + port)
+	r.Run("192.168.1.2:" + port)
 }
 
 func redirect(msg string, c *gin.Context) {

@@ -29,7 +29,8 @@ const Options = ({
 	handleMove,
     handleAssist,
     socket,
-    user
+    user,
+    reset
 }) => {
 	if (toCountry !== '' && fromCountry !== '') {
 		return (
@@ -50,7 +51,7 @@ const Options = ({
                                         size="small"
                                         color="secondary"
                                         className={classes.button}
-                                        onClick={() => attack(fromCountryISO, toCountryISO, user, socket)}
+                                        onClick={() => {attack(fromCountryISO, toCountryISO, user, socket); reset()}}
                                     >
                                         ATTACK
                                     </Button>
@@ -67,6 +68,7 @@ const Options = ({
                                     toCountryISO={toCountryISO}
                                     socket={socket}
                                     user={user}
+                                    reset={reset}
                                 />
                             </Grid>
                         </div>
@@ -83,6 +85,7 @@ const Options = ({
                                     toCountryISO={toCountryISO}
                                     socket={socket}
                                     user={user}
+                                    reset={reset}
                                 />
                             </Grid>
                         </div>
@@ -103,7 +106,8 @@ const DonateForm = ({
     numTroops,
     socket,
     user,
-    players
+    players,
+    reset
 }) => {
 	return !showDonate ? (
 		<Grid item xs={12}>
@@ -156,7 +160,7 @@ const DonateForm = ({
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => donate(numTroops, targetPlayer, user, socket)}
+						onClick={() => {donate(numTroops, targetPlayer, user, socket); reset()}}
 					>
 						CONFIRM DONATION
 					</Button>
@@ -177,7 +181,7 @@ const DonateForm = ({
 	);
 };
 
-const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAssist, fromCountryISO, toCountryISO, socket, user }) => {
+const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAssist, fromCountryISO, toCountryISO, socket, user, reset }) => {
     return !showAssist ? (
 		<Grid item xs={12}>
 			<Button variant="contained" size="small" color="primary" className={classes.button} onClick={handleAssist}>
@@ -210,7 +214,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => assist(numTroops, fromCountryISO, toCountryISO, user, socket)}
+						onClick={() => {assist(numTroops, fromCountryISO, toCountryISO, user, socket); reset()}}
 					>
 						CONFIRM ASSISTANCE
 					</Button>
@@ -231,7 +235,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 	);
 };
 
-const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, fromCountryISO, toCountryISO, socket, user }) => {
+const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, fromCountryISO, toCountryISO, socket, user, reset }) => {
 	return !showMove ? (
 		<Grid item xs={12}>
 			<Button variant="contained" size="small" color="secondary" className={classes.button} onClick={handleMove}>
@@ -268,7 +272,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 						size="small"
 						color="primary"
 						className={classes.button}
-						onClick={() => move(numTroops, fromCountryISO, toCountryISO, user, socket)}
+						onClick={() => {move(numTroops, fromCountryISO, toCountryISO, user, socket); reset()}}
 					>
 						CONFIRM MOVE
 					</Button>
@@ -289,10 +293,11 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 	);
 };
 
-const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user, troops }) => {
+const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user, troops, reset }) => {
     function handleClick(e) {
         e.preventDefault();
         deploy(numTroops, fromCountryISO, user, socket);
+        reset();
       }
     return (
 		<Grid item xs={12} sm={6}>
