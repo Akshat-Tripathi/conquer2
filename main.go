@@ -43,8 +43,8 @@ func main() {
 		TroopInterval:         time.Second * 10,
 	}
 
-	g := &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
-	//g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+	//g := &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
+	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
 	games["test"] = g
 	games["test"].Start(ctx)
 	//games["test"].AddPlayer("Akshat", "asdf")
