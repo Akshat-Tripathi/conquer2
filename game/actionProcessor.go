@@ -11,7 +11,7 @@ type stateProcessor interface {
 	processTroops() []UpdateMessage
 	checkPlayer(string, string) int8
 	addPlayer(name, password, colour string)
-	getState(string) []UpdateMessage
+	sendState(string, *connectionManager)
 }
 
 type defaultProcessor struct {
@@ -26,33 +26,35 @@ type defaultProcessor struct {
 }
 
 //PRE: Username is valid ie it is in playerTroops
-func (p *defaultProcessor) getState(username string) []UpdateMessage {
-	msgs := make([]UpdateMessage, len(p.countries)+1+len(p.playerTroops))
-	//Sends initial state
-	i := 0
-	msgs[i] = UpdateMessage{
+//Sends initial state
+func (p *defaultProcessor) sendState(username string, conn *connectionManager) {
+	conn.sendToPlayer(UpdateMessage{
 		Troops: p.playerTroops[username].getTroops(),
 		Type:   "updateTroops",
-		Player: username}
-	i++
+		Player: username}, username)
 
+	var msg UpdateMessage
 	for country, state := range p.countryStates {
-		msgs[i] = UpdateMessage{
+		//if state.troops > 0 || state.player != "" {
+		msg = UpdateMessage{
 			Troops:  state.troops,
 			Type:    "updateCountry",
 			Player:  state.player,
 			Country: country}
-		i++
+		if state.player == username && state.troops == 0 {
+			conn.sendToAll(msg)
+		} else {
+			conn.sendToPlayer(msg, username)
+		}
+		//}
 	}
 	for player, state := range p.playerTroops {
-		msgs[i] = UpdateMessage{
+		conn.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  player,
 			Country: state.colour,
-		}
-		i++
+		})
 	}
-	return msgs
 }
 
 //Calculates number of troops to send
@@ -97,6 +99,7 @@ func (p *defaultProcessor) addPlayer(name, password, colour string) {
 		colour:    colour}
 	country := ""
 	//Assign countries
+	//Can cause an error if there are no more countries
 	for n := p.startingCountryNumber; n > 0; {
 		country = p.countries[rand.Intn(len(p.countries))]
 		if p.countryStates[country].player != "" {
@@ -140,7 +143,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
 					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Player: action.Player, Country: action.Src}
 			}
-			return false, UpdateMessage{Type: "updateCountry", Troops: deltaDest, Country: action.Dest, Player: p.countryStates[action.Dest].player},
+			return false, UpdateMessage{Type: "updateCountry", Troops: deltaDest, Player: p.countryStates[action.Dest].player, Country: action.Dest},
 				UpdateMessage{Type: "updateCountry", Troops: deltaSrc, Player: action.Player, Country: action.Src}
 		}
 	case "donate":
@@ -163,6 +166,11 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 		}
 		fallthrough
 	case "move":
+		if action.ActionType == "move" {
+			if action.Player != p.countryStates[action.Dest].player {
+				break
+			}
+		}
 		if p.validateMove(action) {
 			p.countryStates[action.Src].troops -= action.Troops
 			p.countryStates[action.Dest].troops += action.Troops
@@ -283,4 +291,8 @@ func (p *defaultProcessor) areNeighbours(src, dest string) bool {
 		}
 	}
 	return false
+}
+
+func sendState(username string, sp stateProcessor, conn *connectionManager) {
+	sp.sendState(username, conn)
 }
