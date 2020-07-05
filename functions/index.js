@@ -75,6 +75,11 @@ app.get('/states', (req, res) => {
 			data.forEach((doc) => {
 				states.push({
 					statesId: doc.id,
+					// color: doc.data().color,
+					// troops: doc.data().troops,
+					// countries: doc.data().countries,
+					// password: doc.data().password,
+
 					countryStates: doc.data().countryStates,
 					playerTroops: doc.data().playerTroops,
 					troopNumber: doc.data().troopNumber,
