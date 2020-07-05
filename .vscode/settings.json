@@ -1,0 +1,14 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/1a08ebb6-99a7-41ac-ad84-4f49f30cbac9/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/conquer2",
+    "appService.deploySubpath": ".",
+    "azureFunctions.deploySubpath": "campaign-mode-api",
+    "azureFunctions.postDeployTask": "npm install",
+    "azureFunctions.projectLanguage": "JavaScript",
+    "azureFunctions.projectRuntime": "~3",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "npm prune"
+}

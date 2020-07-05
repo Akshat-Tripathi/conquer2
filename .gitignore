@@ -1,5 +1,6 @@
 /node_modules/*
 /Misc/*
 /build/*
-.vscode
+
 /discord/auth.token
+/src/api/environment.js

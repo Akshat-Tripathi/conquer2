@@ -90,6 +90,7 @@ const MapChart = ({
 							geographies.map((geo) => {
 								const { NAME, ISO_A2 } = geo.properties;
 								var iso_a2 = convertISO(NAME, ISO_A2);
+								const centroid = geoCentroid(geo);
 								return notThisCountry(geo) ? (
 									<Marker
 										coordinates={[ centroid[0] + OffsetsX(NAME), centroid[1] + OffsetsY(NAME) ]}
