@@ -38,7 +38,7 @@ func (cg *CampaignGame) Start(ctx Context) {
 	processor.countryStates = countryStates
 	processor.playerTroops = make(map[string]*playerState)
 	processor.startingTroopNumber = ctx.StartingTroopNumber
-	processor.startingCountryNumber = 20
+	processor.startingCountryNumber = ctx.StartingCountryNumber
 	processor.maxPlayerNum = ctx.MaxPlayerNumber
 
 	cg.id = ctx.ID
