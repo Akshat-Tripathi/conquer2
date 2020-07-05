@@ -3,7 +3,7 @@ import { Grid, Typography, Paper, Snackbar, IconButton } from '@material-ui/core
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import MuiAlert from '@material-ui/lab/Alert';
 import HelpIcon from '@material-ui/icons/Help';
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createMuiTheme } from '@material-ui/core/styles';
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
@@ -78,7 +78,7 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops }) => {
 			</Grid>
 			<br />
 		</div>
-	)
+	);
 };
 
 const PlayerBox = ({ classes, playerColours, hidden }) => {
@@ -86,21 +86,31 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 		<div>
 			<Paper className={classes.players}>
 				<Typography variant="subtitle1">PLAYERS:</Typography>
-				<Grid container spacing={12} direction={"column"}>
+				<Grid container spacing={12} direction={'column'}>
 					{Object.keys(playerColours).map(function(player) {
-                        var colour = playerColours[player];
-                        const theme = createMuiTheme({
-                            palette: {
-                                text: {
-                                    primary: colour
-                                }
-                            }
-                        })
-                        return (
+						var colour = playerColours[player];
+						const theme = createMuiTheme({
+							palette: {
+								text: {
+									primary: colour
+								}
+							}
+						});
+						return (
 							<div key={player} style={{ padding: '5%' }}>
-								<Grid container spacing={12} direction={"row"}>
-									<Grid item xs={12} alignItems={"stretch"}>
-                                        <Typography variant="p" color="primary">{player}</Typography>
+								<Grid
+									container
+									spacing={12}
+									direction="row"
+									style={{ display: 'flex', alignItems: 'center' }}
+								>
+									<Grid item xs={9}>
+										<Typography variant="p">
+											<span style={{ color: colour }}>{player}</span>
+										</Typography>
+									</Grid>
+									<Grid item xs={3}>
+										<FiberManualRecordIcon style={{ color: colour }} />
 									</Grid>
 								</Grid>
 							</div>
@@ -109,7 +119,7 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 				</Grid>
 			</Paper>
 		</div>
-	) : (null);
+	) : null;
 };
 
 export { SpyDetails, PlayerBox, Title };

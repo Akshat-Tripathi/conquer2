@@ -32,17 +32,17 @@ const MapChart = ({
 	setcontinent,
 	setgdp,
 	handleColorFill,
-    handleClick,
-    countryStates,
-    convertISO
+	handleClick,
+	countryStates,
+	convertISO
 }) => {
 	return (
 		<div>
 			{/* <ComposableMap data-tip="" projectionConfig={{ scale: 200 }} width={mapWidth} height={mapHeight}> */}
 			{/* <ZoomableGroup translateExtent={[ [ 0, -mapHeight ], [ mapWidth, mapHeight ] ]}> */}
-            <ComposableMap data-tip="" /*projection="geoOrthographic"*/ projectionConfig={{ scale: 140 }}>
+			<ComposableMap data-tip="" /*projection="geoOrthographic"*/ projectionConfig={{ scale: 140 }}>
 				<ZoomableGroup>
-                    <Graticule stroke="#2e3131" />
+					<Graticule stroke="#2e3131" />
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
@@ -88,11 +88,19 @@ const MapChart = ({
 					<Geographies geography={geoUrl}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
-                                const { NAME, ISO_A2 } = geo.properties;
-                                var iso_a2 = convertISO(NAME, ISO_A2);
+								const { NAME, ISO_A2 } = geo.properties;
+								var iso_a2 = convertISO(NAME, ISO_A2);
 								return notThisCountry(geo) ? (
-									<Marker coordinates={geoCentroid(geo)}>
-										<text y="2" fontSize={3} textAnchor="middle" fill="#FF" style={{pointerEvents: 'none'}}>
+									<Marker
+										coordinates={[ centroid[0] + OffsetsX(NAME), centroid[1] + OffsetsY(NAME) ]}
+									>
+										<text
+											y="2"
+											fontSize={3}
+											textAnchor="middle"
+											fill="#FF"
+											style={{ pointerEvents: 'none' }}
+										>
 											{countryStates !== undefined && iso_a2.toString() in countryStates ? (
 												countryStates[iso_a2.toString()]['Troops']
 											) : (
@@ -109,6 +117,42 @@ const MapChart = ({
 	);
 };
 
+// France 		[9,4]
+// Indonesia 	[-4,2]
+// Malaysia 	[-7,0]
+// Antarctica 	[-30,8]
+// United Kingdom [2,0]
+
+function OffsetsX(NAME) {
+	switch (NAME) {
+		case 'France':
+			return 9;
+		case 'Indonesia':
+			return -4;
+		case 'Malaysia':
+			return -7;
+		case 'Antarctica':
+			return -30;
+		case 'United Kingdom':
+			return 2;
+		default:
+			return 0;
+	}
+}
+
+function OffsetsY(NAME) {
+	switch (NAME) {
+		case 'France':
+			return 4;
+		case 'Indonesia':
+			return 2;
+		case 'Antarctica':
+			return 8;
+		default:
+			return 0;
+	}
+}
+
 const VectorMap = ({
 	setname,
 	setpop_est,
@@ -116,9 +160,9 @@ const VectorMap = ({
 	setcontinent,
 	setgdp,
 	handleColorFill,
-    handleClick,
-    countryStates,
-    convertISO
+	handleClick,
+	countryStates,
+	convertISO
 }) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
@@ -135,9 +179,9 @@ const VectorMap = ({
 				setcontinent={setcontinent}
 				setgdp={setgdp}
 				handleColorFill={handleColorFill}
-                handleClick={handleClick}
-                countryStates={countryStates}
-                convertISO={convertISO}
+				handleClick={handleClick}
+				countryStates={countryStates}
+				convertISO={convertISO}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>
