@@ -1,55 +1,49 @@
 package game
 
 import (
-	"bytes"
-	"context"
-	"io/ioutil"
+	"fmt"
 
 	"cloud.google.com/go/firestore"
+	"golang.org/x/net/context"
 )
 
-func connect() *firestore.Client {
-	file, err := ioutil.ReadFile("./game/fire.key")
-	if err != nil {
-		panic("No key provided")
-	}
-	tokens := bytes.Split(file, []byte{'\n'})
-	client, err := firestore.NewClient(context.Background(), string(tokens[0]))
-	if err != nil {
-		panic(err)
-	}
-	return client
+type persistence struct {
+	docs *firestore.CollectionRef
 }
 
-type firebase struct {
-	ref *firestore.CollectionRef
-}
-
-//loads only countries which exist in the firebase - ie those which have been updated
-func (f *firebase) load(countryStates map[string]*countryState) {
-	states, err := f.ref.Doc("state").Get(context.Background())
-	if err != nil {
-		return
-	}
-	for country, state := range states.Data() {
-		countryStates[country] = state.(*countryState)
+func newPersistence(id string, client *firestore.Client) *persistence {
+	return &persistence{
+		docs: client.Collection(id),
 	}
 }
 
-//Stores all countries which have a player or troops
-func (f *firebase) store(countryStates map[string]*countryState) {
+func (p *persistence) load(countryStates map[string]*countryState) error {
+	docs, err := p.docs.DocumentRefs(context.Background()).GetAll()
+	if err != nil {
+		return err
+	}
+	for _, data := range docs {
+		cState := countryState{}
+		state, err := data.Get(context.Background())
+		if err != nil {
+			return err
+		}
+		fmt.Println(state.Data())
+		err = state.DataTo(&cState)
+		if err != nil {
+			return err
+		}
+		countryStates[data.ID] = &cState
+	}
+	return nil
+}
+
+func (p *persistence) store(countryStates map[string]*countryState) error {
 	for country, state := range countryStates {
-		f.ref.Doc("state/"+country).Set(context.Background(), *state, firestore.MergeAll)
+		_, err := p.docs.Doc(country).Set(context.Background(), *state)
+		if err != nil {
+			return err
+		}
 	}
-}
-
-func Main() {
-	m := make(map[string]*countryState)
-	m["a"] = &countryState{
-		player: "me",
-		troops: 4,
-	}
-	client := connect()
-	f := &firebase{client.Collection("lol")}
-	f.store(m)
+	return nil
 }
