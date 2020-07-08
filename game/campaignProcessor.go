@@ -9,12 +9,24 @@ type campaignProcessor struct {
 	startTime time.Time
 }
 
-func (cp *campaignProcessor) manageEra() {
-
-}
-
-func (cp *campaignProcessor) store() {
-
+func (cp *campaignProcessor) nextEra() {
+	if time.Now().After(cp.startTime.AddDate(0, 0, 14)) {
+		var winner string
+		max := 0
+		for name, player := range cp.playerTroops {
+			if player.Countries > max {
+				winner = name
+				max = player.Countries
+			}
+		}
+		cp.winner = winner
+	} else if time.Now().After(cp.startTime.AddDate(0, 0, 2)) {
+		cp.attackDisabled = false
+		time.AfterFunc(time.Hour*24*12, cp.nextEra)
+	} else {
+		cp.attackDisabled = true
+		time.AfterFunc(time.Hour*48, cp.nextEra)
+	}
 }
 
 //Overrides sendState

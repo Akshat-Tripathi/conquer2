@@ -11,6 +11,7 @@ type persistence struct {
 	docs *firestore.CollectionRef
 }
 
+//NewPersistence creates a persistence struct
 func NewPersistence(id string, client *firestore.Client) *persistence {
 	return &persistence{
 		docs: client.Collection(id),

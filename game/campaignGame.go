@@ -13,6 +13,7 @@ type CampaignGame struct {
 	*DefaultGame
 	cp     *campaignProcessor //! This only exists to remove extra casting
 	Router *gin.Engine
+	store  *time.Timer
 }
 
 //Init is specific to the campaignProcessor
@@ -24,6 +25,12 @@ func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
 
 //Start - starts a DefaultGame
 func (cg *CampaignGame) Start(ctx Context) {
+	cg.store = time.NewTimer(time.Minute * 15)
+	go func() {
+		<-cg.store.C
+		cg.cp.p.store(cg.cp.countryStates, cg.cp.playerTroops)
+	}()
+
 	countries := make([]string, len(ctx.Situation))
 	countryStates := make(map[string]*countryState)
 
@@ -47,7 +54,6 @@ func (cg *CampaignGame) Start(ctx Context) {
 	processor.startingTroopNumber = ctx.StartingTroopNumber
 	processor.startingCountryNumber = ctx.StartingCountryNumber
 	processor.maxPlayerNum = ctx.MaxPlayerNumber
-	processor.p = *cg.Persistence
 
 	cg.id = ctx.ID
 	cg.maxPlayerNum = ctx.MaxPlayerNumber
@@ -58,6 +64,7 @@ func (cg *CampaignGame) Start(ctx Context) {
 	cg.troopInterval = time.Hour * 8
 	cg.cp = &processor
 	go cg.processActions()
+	go cg.cp.nextEra()
 
 	//TODO abstract the router out of this struct
 	cg.Router.GET("/game/"+ctx.ID+"/ws", cg.handleGame)
@@ -71,6 +78,7 @@ func (cg *CampaignGame) processActions() {
 			prevPlayer = cg.cp.countryStates[action.Dest].Player
 		}
 		won, msg1, msg2 := cg.processor.processAction(action)
+		cg.store.Reset(time.Minute * 15)
 		cg.send(msg1)
 		cg.send(msg2)
 		//If a country has just been conquered

@@ -132,7 +132,7 @@ func (g *DefaultGame) processTroops() {
 			}
 			g.Lock()
 			defer g.Unlock()
-			return g.numPlayers == 0
+			return g.numPlayers == 0 || g.processor.getWinner() != ""
 		}() {
 			break
 		}

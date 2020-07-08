@@ -12,6 +12,7 @@ type stateProcessor interface {
 	checkPlayer(string, string) int8
 	addPlayer(name, password, colour string)
 	sendState(string, *connectionManager)
+	getWinner() string
 }
 
 type defaultProcessor struct {
@@ -23,6 +24,15 @@ type defaultProcessor struct {
 	startingTroopNumber   int
 	startingCountryNumber int
 	maxPlayerNum          int
+	attackDisabled        bool
+	donateDisabled        bool
+	moveDisabled          bool
+	dropDisabled          bool
+	winner                string
+}
+
+func (p *defaultProcessor) getWinner() string {
+	return p.winner
 }
 
 //PRE: Username is valid ie it is in playerTroops
@@ -138,6 +148,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				won := false
 				if p.playerTroops[action.Player].Countries == len(p.countries) {
 					won = true
+					p.winner = action.Player
 					fmt.Println(action.Player + " won the game")
 				}
 				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
@@ -185,6 +196,9 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 }
 
 func (p *defaultProcessor) validateAttack(attack Action) bool {
+	if p.attackDisabled {
+		return false
+	}
 	src, ok := p.countryStates[attack.Src]
 	if !ok {
 		return false
@@ -214,6 +228,9 @@ func (p *defaultProcessor) validateAttack(attack Action) bool {
 
 //PRE: donate.Dest is the name of the other player
 func (p *defaultProcessor) validateDonate(donate Action) bool {
+	if p.donateDisabled {
+		return false
+	}
 	me, ok := p.playerTroops[donate.Player]
 	if !ok {
 		return false
@@ -235,6 +252,9 @@ func (p *defaultProcessor) validateDonate(donate Action) bool {
 }
 
 func (p *defaultProcessor) validateMove(move Action) bool {
+	if p.moveDisabled {
+		return false
+	}
 	src, ok := p.countryStates[move.Src]
 	if !ok {
 		return false
@@ -259,6 +279,9 @@ func (p *defaultProcessor) validateMove(move Action) bool {
 }
 
 func (p *defaultProcessor) validateDrop(drop Action) bool {
+	if p.dropDisabled {
+		return false
+	}
 	me, ok := p.playerTroops[drop.Player]
 	if !ok {
 		return false
