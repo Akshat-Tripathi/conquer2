@@ -15,6 +15,13 @@ type CampaignGame struct {
 	Router *gin.Engine
 }
 
+//Init is specific to the campaignProcessor
+func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
+	cg.cp.startTime = startTime
+	cg.cp.p = persistence
+	persistence.load(cg.cp.countryStates, cg.cp.playerTroops) //Ignores error
+}
+
 //Start - starts a DefaultGame
 func (cg *CampaignGame) Start(ctx Context) {
 	countries := make([]string, len(ctx.Situation))
@@ -40,6 +47,7 @@ func (cg *CampaignGame) Start(ctx Context) {
 	processor.startingTroopNumber = ctx.StartingTroopNumber
 	processor.startingCountryNumber = ctx.StartingCountryNumber
 	processor.maxPlayerNum = ctx.MaxPlayerNumber
+	processor.p = *cg.Persistence
 
 	cg.id = ctx.ID
 	cg.maxPlayerNum = ctx.MaxPlayerNumber

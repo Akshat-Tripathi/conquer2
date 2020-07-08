@@ -2,5 +2,8 @@
 /Misc/*
 /build/*
 
+/.vscode/*
+
+/game/*.json
 /discord/auth.token
 /src/api/environment.js

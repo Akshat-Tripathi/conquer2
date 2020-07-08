@@ -1,11 +1,23 @@
 package game
 
+import "time"
+
 //A state processor for campaign games
 type campaignProcessor struct {
 	defaultProcessor
+	p         *persistence
+	startTime time.Time
 }
 
-//Overrides getState
+func (cp *campaignProcessor) manageEra() {
+
+}
+
+func (cp *campaignProcessor) store() {
+
+}
+
+//Overrides sendState
 func (cp *campaignProcessor) sendState(username string, conn *connectionManager) {
 	conn.sendToPlayer(UpdateMessage{
 		Troops: cp.playerTroops[username].getTroops(),
@@ -57,7 +69,7 @@ func (cp *campaignProcessor) sendState(username string, conn *connectionManager)
 		conn.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  player,
-			Country: state.colour,
+			Country: state.Colour,
 		})
 	}
 }

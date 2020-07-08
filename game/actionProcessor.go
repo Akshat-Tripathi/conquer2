@@ -52,7 +52,7 @@ func (p *defaultProcessor) sendState(username string, conn *connectionManager) {
 		conn.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  player,
-			Country: state.colour,
+			Country: state.Colour,
 		})
 	}
 }
@@ -68,9 +68,9 @@ func (p *defaultProcessor) processTroops() []UpdateMessage {
 		func() {
 			vals.Lock()
 			defer vals.Unlock()
-			deltaTroops = 3 + vals.countries/3
+			deltaTroops = 3 + vals.Countries/3
 			msgs[i] = UpdateMessage{Type: "updateTroops", Troops: deltaTroops, Player: name}
-			vals.troops += deltaTroops
+			vals.Troops += deltaTroops
 			i++
 		}()
 	}
@@ -82,7 +82,7 @@ func (p *defaultProcessor) checkPlayer(name, password string) int8 {
 	if !ok {
 		return 0
 	}
-	if state.password == password {
+	if state.Password == password {
 		return 1
 	}
 	return 2
@@ -93,10 +93,10 @@ func (p *defaultProcessor) addPlayer(name, password, colour string) {
 	p.Lock()
 	defer p.Unlock()
 	p.playerTroops[name] = &playerState{
-		troops:    p.startingTroopNumber,
-		countries: p.startingCountryNumber,
-		password:  password,
-		colour:    colour}
+		Troops:    p.startingTroopNumber,
+		Countries: p.startingCountryNumber,
+		Password:  password,
+		Colour:    colour}
 	country := ""
 	//Assign countries
 	//Can cause an error if there are no more countries
@@ -136,7 +136,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				dest.Player = action.Player
 
 				won := false
-				if p.playerTroops[action.Player].countries == len(p.countries) {
+				if p.playerTroops[action.Player].Countries == len(p.countries) {
 					won = true
 					fmt.Println(action.Player + " won the game")
 				}

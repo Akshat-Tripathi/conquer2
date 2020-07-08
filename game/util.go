@@ -12,34 +12,34 @@ type countryState struct {
 
 type playerState struct {
 	sync.Mutex
-	colour    string
-	troops    int
-	countries int
-	password  string
+	Colour    string
+	Troops    int
+	Countries int
+	Password  string
 }
 
 func (p *playerState) incrementCountries() {
 	p.Lock()
 	defer p.Unlock()
-	p.countries++
+	p.Countries++
 }
 
 func (p *playerState) decrementCountries() {
 	p.Lock()
 	defer p.Unlock()
-	p.countries--
+	p.Countries--
 }
 
 func (p *playerState) getTroops() int {
 	p.Lock()
 	defer p.Unlock()
-	return p.troops
+	return p.Troops
 }
 
 func (p *playerState) addTroops(troops int) {
 	p.Lock()
 	defer p.Unlock()
-	p.troops += troops
+	p.Troops += troops
 }
 
 //Context - used to specify game parameters

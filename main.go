@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,9 +9,11 @@ import (
 	"strconv"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/Akshat-Tripathi/conquer2/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/option"
 )
 
 const (
@@ -18,7 +21,6 @@ const (
 )
 
 func main() {
-
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -31,6 +33,39 @@ func main() {
 	games := make(map[string]game.Game)
 
 	r := gin.Default()
+
+	//Load existing games
+	auth := option.WithCredentialsFile("./game/conquer2.json")
+	app, err := firebase.NewApp(context.Background(), nil, auth)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client, err := app.Firestore(context.Background())
+
+	campaigns, err := client.Collections(context.Background()).GetAll()
+
+	if err == nil {
+		for _, campaign := range campaigns {
+			info, err := campaign.Doc("ctx").Get(context.Background())
+			if err != nil {
+				continue
+			}
+			information := info.Data()
+			ctx := game.Context{
+				ID:              campaign.ID,
+				MaxPlayerNumber: information["MaxPlayerNumber"].(int),
+				Situation:       situations[information["Situation"].(string)],
+				Colours:         colours,
+			}
+			g := &game.CampaignGame{
+				DefaultGame: new(game.DefaultGame),
+				Router:      r,
+			}
+			g.Init(information["StartTime"].(time.Time), game.NewPersistence(campaign.ID, client))
+			g.Start(ctx)
+			games[campaign.ID] = g
+		}
+	}
 
 	//TEST CODE - REMOVE IN PRODUCTION
 	ctx := game.Context{
@@ -106,13 +141,20 @@ func main() {
 			Colours:               colours,
 		}
 
-		var g game.Game
-		switch req.FormValue("type") {
-		case "realtime":
-			g = &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
-		case "campaign":
-			g = &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
-		}
+		g := func() game.Game {
+			switch req.FormValue("type") {
+			case "realtime":
+				return &game.RealTimeGame{DefaultGame: new(game.DefaultGame), Router: r}
+			case "campaign":
+				year, month, day := time.Now().Date()
+				g := &game.CampaignGame{DefaultGame: new(game.DefaultGame), Router: r}
+				g.Init(time.Date(year, month, day+1, 0, 0, 0, 0, time.Now().Location()),
+					game.NewPersistence(id, client))
+				return g
+			default:
+				return nil
+			}
+		}()
 		g.Start(ctx)
 		g.AddPlayer(username, password)
 		games[id] = g
@@ -181,7 +223,7 @@ func main() {
 
 func redirect(msg string, c *gin.Context) {
 	fmt.Fprint(c.Writer, `<script>
-			alert("`+msg+`");
-			window.location.replace(window.location.href.replace("/join", ""));
-			</script>`)
+					alert("`+msg+`");
+					window.location.replace(window.location.href.replace("/join", ""));
+					</script>`)
 }
