@@ -60,7 +60,7 @@ func (cg *CampaignGame) processActions() {
 	for action := range cg.requests {
 		var prevPlayer string
 		if action.ActionType == "attack" {
-			prevPlayer = cg.cp.countryStates[action.Dest].player
+			prevPlayer = cg.cp.countryStates[action.Dest].Player
 		}
 		won, msg1, msg2 := cg.processor.processAction(action)
 		cg.send(msg1)
@@ -78,20 +78,20 @@ func (cg *CampaignGame) processActions() {
 			//And hide ones which aren't visible anymore
 			var isNew bool
 			for _, neighbour := range cg.cp.situation[msg1.Country] {
-				if cg.cp.countryStates[neighbour].player != msg2.Player {
+				if cg.cp.countryStates[neighbour].Player != msg2.Player {
 					//TODO put this in canSee
 					isNew = true
 					//* neighbour squared since it's the neighbour of a neighbour
 					for _, neighbourSq := range cg.cp.situation[neighbour] {
-						if neighbourSq != msg1.Country && cg.cp.countryStates[neighbourSq].player == msg2.Player {
+						if neighbourSq != msg1.Country && cg.cp.countryStates[neighbourSq].Player == msg2.Player {
 							isNew = false
 						}
 					}
 					if isNew {
 						cg.conn.sendToPlayer(UpdateMessage{
-							Troops:  cg.cp.countryStates[neighbour].troops,
+							Troops:  cg.cp.countryStates[neighbour].Troops,
 							Type:    "updateCountry",
-							Player:  cg.cp.countryStates[neighbour].player,
+							Player:  cg.cp.countryStates[neighbour].Player,
 							Country: neighbour,
 						}, msg2.Player)
 					}

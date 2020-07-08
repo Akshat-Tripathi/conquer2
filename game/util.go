@@ -6,8 +6,8 @@ import (
 )
 
 type countryState struct {
-	player string //Player that owns the country
-	troops int    //Troops in country
+	Player string //Player that owns the country
+	Troops int    //Troops in country
 }
 
 type playerState struct {

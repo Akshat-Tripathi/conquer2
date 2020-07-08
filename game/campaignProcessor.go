@@ -16,9 +16,9 @@ func (cp *campaignProcessor) sendState(username string, conn *connectionManager)
 
 	for country, state := range cp.countryStates {
 		//Send my countries to everyone iff they have no troops
-		if state.player == username {
+		if state.Player == username {
 			//0 troops implies that this is the first time the player has logged in
-			if state.troops == 0 {
+			if state.Troops == 0 {
 				cp.rangeRelevantPlayers(country, func(player string) {
 					conn.sendToPlayer(UpdateMessage{
 						Troops:  0,
@@ -29,7 +29,7 @@ func (cp *campaignProcessor) sendState(username string, conn *connectionManager)
 				})
 			} else {
 				conn.sendToPlayer(UpdateMessage{
-					Troops:  state.troops,
+					Troops:  state.Troops,
 					Type:    "updateCountry",
 					Player:  username,
 					Country: country,
@@ -43,11 +43,11 @@ func (cp *campaignProcessor) sendState(username string, conn *connectionManager)
 	}
 
 	for neighbour := range neighbourSet {
-		if cp.countryStates[neighbour].player != username {
+		if cp.countryStates[neighbour].Player != username {
 			conn.sendToPlayer(UpdateMessage{
-				Troops:  cp.countryStates[neighbour].troops,
+				Troops:  cp.countryStates[neighbour].Troops,
 				Type:    "updateCountry",
-				Player:  cp.countryStates[neighbour].player,
+				Player:  cp.countryStates[neighbour].Player,
 				Country: neighbour,
 			}, username)
 		}
@@ -64,7 +64,7 @@ func (cp *campaignProcessor) sendState(username string, conn *connectionManager)
 
 func (cp *campaignProcessor) canSee(player, country string) bool {
 	for _, neighbour := range cp.situation[country] {
-		if cp.countryStates[neighbour].player == player {
+		if cp.countryStates[neighbour].Player == player {
 			return true
 		}
 	}
@@ -75,10 +75,10 @@ func (cp *campaignProcessor) canSee(player, country string) bool {
 //PRE: The country already exists
 func (cp *campaignProcessor) rangeRelevantPlayers(country string, function func(player string)) {
 	playerSet := make(map[string]bool)
-	playerSet[cp.countryStates[country].player] = true
+	playerSet[cp.countryStates[country].Player] = true
 	for _, neighbour := range cp.situation[country] {
-		if cp.countryStates[neighbour].player != "" {
-			playerSet[cp.countryStates[neighbour].player] = true
+		if cp.countryStates[neighbour].Player != "" {
+			playerSet[cp.countryStates[neighbour].Player] = true
 		}
 	}
 	for player := range playerSet {

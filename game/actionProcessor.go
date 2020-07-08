@@ -37,11 +37,11 @@ func (p *defaultProcessor) sendState(username string, conn *connectionManager) {
 	for country, state := range p.countryStates {
 		//if state.troops > 0 || state.player != "" {
 		msg = UpdateMessage{
-			Troops:  state.troops,
+			Troops:  state.Troops,
 			Type:    "updateCountry",
-			Player:  state.player,
+			Player:  state.Player,
 			Country: country}
-		if state.player == username && state.troops == 0 {
+		if state.Player == username && state.Troops == 0 {
 			conn.sendToAll(msg)
 		} else {
 			conn.sendToPlayer(msg, username)
@@ -102,10 +102,10 @@ func (p *defaultProcessor) addPlayer(name, password, colour string) {
 	//Can cause an error if there are no more countries
 	for n := p.startingCountryNumber; n > 0; {
 		country = p.countries[rand.Intn(len(p.countries))]
-		if p.countryStates[country].player != "" {
+		if p.countryStates[country].Player != "" {
 			continue
 		}
-		p.countryStates[country].player = name
+		p.countryStates[country].Player = name
 		n--
 	}
 }
@@ -118,22 +118,22 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 			dest := p.countryStates[action.Dest]
 
 			deltaSrc, deltaDest := 0, 0
-			if dest.troops != 0 {
-				deltaSrc, deltaDest = defaultRng(src.troops, dest.troops)
+			if dest.Troops != 0 {
+				deltaSrc, deltaDest = defaultRng(src.Troops, dest.Troops)
 			}
 
-			src.troops += deltaSrc
-			dest.troops += deltaDest
+			src.Troops += deltaSrc
+			dest.Troops += deltaDest
 
-			if dest.troops <= 0 && src.troops > 0 {
+			if dest.Troops <= 0 && src.Troops > 0 {
 				//Conquered the country
-				dest.troops++
-				src.troops--
+				dest.Troops++
+				src.Troops--
 				p.playerTroops[action.Player].incrementCountries()
-				if dest.player != "" {
-					p.playerTroops[dest.player].decrementCountries()
+				if dest.Player != "" {
+					p.playerTroops[dest.Player].decrementCountries()
 				}
-				dest.player = action.Player
+				dest.Player = action.Player
 
 				won := false
 				if p.playerTroops[action.Player].countries == len(p.countries) {
@@ -143,7 +143,7 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 				return won, UpdateMessage{Type: "updateCountry", Troops: 1, Player: action.Player, Country: action.Dest},
 					UpdateMessage{Type: "updateCountry", Troops: -1 - deltaSrc, Player: action.Player, Country: action.Src}
 			}
-			return false, UpdateMessage{Type: "updateCountry", Troops: deltaDest, Player: p.countryStates[action.Dest].player, Country: action.Dest},
+			return false, UpdateMessage{Type: "updateCountry", Troops: deltaDest, Player: p.countryStates[action.Dest].Player, Country: action.Dest},
 				UpdateMessage{Type: "updateCountry", Troops: deltaSrc, Player: action.Player, Country: action.Src}
 		}
 	case "donate":
@@ -156,26 +156,26 @@ func (p *defaultProcessor) processAction(action Action) (bool, UpdateMessage, Up
 	case "drop":
 		if p.validateDrop(action) {
 			p.playerTroops[action.Player].addTroops(-action.Troops)
-			p.countryStates[action.Dest].troops += action.Troops
+			p.countryStates[action.Dest].Troops += action.Troops
 			return false, UpdateMessage{Type: "updateTroops", Troops: -action.Troops, Player: action.Player},
-				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].player, Country: action.Dest}
+				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].Player, Country: action.Dest}
 		}
 	case "assist":
-		if action.Player == p.countryStates[action.Dest].player {
+		if action.Player == p.countryStates[action.Dest].Player {
 			break
 		}
 		fallthrough
 	case "move":
 		if action.ActionType == "move" {
-			if action.Player != p.countryStates[action.Dest].player {
+			if action.Player != p.countryStates[action.Dest].Player {
 				break
 			}
 		}
 		if p.validateMove(action) {
-			p.countryStates[action.Src].troops -= action.Troops
-			p.countryStates[action.Dest].troops += action.Troops
+			p.countryStates[action.Src].Troops -= action.Troops
+			p.countryStates[action.Dest].Troops += action.Troops
 			return false, UpdateMessage{Type: "updateCountry", Troops: -action.Troops, Player: action.Player, Country: action.Src},
-				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].player, Country: action.Dest}
+				UpdateMessage{Type: "updateCountry", Troops: action.Troops, Player: p.countryStates[action.Dest].Player, Country: action.Dest}
 		}
 		/*
 			case "removeUser":
@@ -198,15 +198,15 @@ func (p *defaultProcessor) validateAttack(attack Action) bool {
 		return false
 	}
 	//Must own src
-	if src.player != attack.Player {
+	if src.Player != attack.Player {
 		return false
 	}
 	//Can't attack self
-	if src.player == dest.player {
+	if src.Player == dest.Player {
 		return false
 	}
 	//Must have at least 1 troop to attack
-	if src.troops < 1 {
+	if src.Troops < 1 {
 		return false
 	}
 	return true
@@ -248,10 +248,10 @@ func (p *defaultProcessor) validateMove(move Action) bool {
 		return false
 	}
 	//Must have troops
-	if src.troops < move.Troops {
+	if src.Troops < move.Troops {
 		return false
 	}
-	if src.player != move.Player {
+	if src.Player != move.Player {
 		return false
 	}
 	_, ok = p.countryStates[move.Dest]
@@ -276,7 +276,7 @@ func (p *defaultProcessor) validateDrop(drop Action) bool {
 		return false
 	}
 	//Must own dest
-	if them.player != drop.Player {
+	if them.Player != drop.Player {
 		return false
 	}
 	return true
