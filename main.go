@@ -39,15 +39,15 @@ func main() {
 	client := loadCampaigns(func(ID string, info map[string]interface{}, client *firestore.Client) {
 		ctx := game.Context{
 			ID:              ID,
-			MaxPlayerNumber: info["MaxPlayerNumber"].(int),
+			MaxPlayerNumber: int(info["MaxPlayerNumber"].(int64)),
 			Situation:       situations[info["Situation"].(string)],
 			Colours:         colours,
 		}
 		g := &game.CampaignGame{
 			DefaultGame: new(game.DefaultGame),
 		}
-		g.Init(info["StartTime"].(time.Time), game.NewPersistence(ID, client))
 		g.Start(ctx, r)
+		g.Init(info["StartTime"].(time.Time), game.NewPersistence(ID, client))
 		games[ID] = g
 	})
 
@@ -118,6 +118,7 @@ func main() {
 				year, month, day := time.Now().Date()
 				g := &game.CampaignGame{DefaultGame: new(game.DefaultGame)}
 				g.Start(ctx, r)
+				g.Situation = situation
 				g.Init(time.Date(year, month, day+1, 0, 0, 0, 0, time.Now().Location()),
 					game.NewPersistence(id, client))
 				return g
@@ -195,12 +196,17 @@ func loadCampaigns(registerGame func(ID string, info map[string]interface{},
 	}
 	client, err := app.Firestore(context.Background())
 
+	if err != nil {
+		panic(err)
+	}
+
 	campaigns, err := client.Collections(context.Background()).GetAll()
 
 	if err == nil {
 		for _, campaign := range campaigns {
 			info, err := campaign.Doc("ctx").Get(context.Background())
 			if err != nil {
+				fmt.Println(err)
 				continue
 			}
 			registerGame(campaign.ID, info.Data(), client)

@@ -46,6 +46,7 @@ func (rtg *RealTimeGame) Start(ctx Context, router *gin.Engine) {
 	rtg.processor = &processor
 	rtg.troopInterval = ctx.TroopInterval
 	go rtg.processActions()
+	go rtg.processTroops()
 
 	router.GET("/game/"+ctx.ID+"/ws", rtg.handleGame)
 }

@@ -11,20 +11,25 @@ import (
 //CampaignGame - a subclass of DefaultGame which is a slower game lasting 2 weeks
 type CampaignGame struct {
 	*DefaultGame
-	cp    *campaignProcessor //! This only exists to remove extra casting
-	store *time.Timer
+	cp        *campaignProcessor //! This only exists to remove extra casting
+	store     *time.Timer
+	Situation string
 }
 
 //Init is specific to the campaignProcessor
 func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
 	cg.cp.startTime = startTime
 	cg.cp.p = persistence
+	persistence.storeContext(cg.maxPlayerNum, cg.Situation, startTime)
 	persistence.load(cg.cp.countryStates, cg.cp.playerTroops) //Ignores error
+	time.AfterFunc(startTime.Sub(time.Now()), func() {
+		go cg.processActions()
+	})
 }
 
 //Start - starts a DefaultGame
 func (cg *CampaignGame) Start(ctx Context, router *gin.Engine) {
-	cg.store = time.NewTimer(time.Minute * 15)
+	cg.store = time.NewTimer(time.Minute * 1)
 	go func() {
 		<-cg.store.C
 		cg.cp.p.store(cg.cp.countryStates, cg.cp.playerTroops)

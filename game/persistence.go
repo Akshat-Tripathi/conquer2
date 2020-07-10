@@ -78,7 +78,7 @@ func (p *persistence) store(countryStates map[string]*countryState,
 		}
 	}
 	for player, state := range playerStates {
-		_, err := p.docs.Doc(player).Set(context.Background(), &struct {
+		_, err := p.docs.Doc("."+player).Set(context.Background(), &struct {
 			Colour    string
 			Troops    int
 			Countries int

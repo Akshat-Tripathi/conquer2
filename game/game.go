@@ -55,9 +55,6 @@ func (g *DefaultGame) AddPlayer(name, password string) bool {
 	}
 	g.processor.addPlayer(name, password, g.colours[g.numPlayers])
 	g.numPlayers++
-	if g.numPlayers == 1 {
-		go g.processTroops()
-	}
 	return true
 }
 
