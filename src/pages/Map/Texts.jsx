@@ -85,6 +85,12 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 	return !hidden ? (
 		<div>
 			<Paper className={classes.players}>
+                <Typography variant="subtitle2">
+                {"Game ID: " +
+                    document.cookie.split("; ")
+                        .map((s) => s.split("="))
+                        .filter((arr) => arr[0] == "id")[0][1]}
+                </Typography>
 				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12} direction={'column'}>
 					{Object.keys(playerColours).map(function(player) {

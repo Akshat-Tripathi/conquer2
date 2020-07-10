@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -37,17 +36,16 @@ func (c *connectionManager) monitor(name string, conn *websocket.Conn,
 		for {
 			err := conn.ReadJSON(&act)
 			//To check if the message is a keepAlive message from the client
-			if act.Player == "" {
-				continue
-			}
 			if err != nil {
 				//log.Println("read ", err)
 				close(responses)
 				c.players.Delete(name)
 				return
 			}
+			if act.Player == "" {
+				continue
+			}
 			act.Player = name
-			log.Println(act)
 			//FIXME
 			requests <- act
 		}

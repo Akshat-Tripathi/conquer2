@@ -204,9 +204,10 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 								label="Gamemode"
 								required
 								variant="outlined"
-								placeholder="World War III"
+								placeholder="Regular"
 							>
-								<MenuItem value="realtime">World War III</MenuItem>
+								<MenuItem value="realtime">Regular</MenuItem>
+								<MenuItem value="campaign">Campaign</MenuItem>
 							</Select>
 						</Grid>
 						<Grid item xs={12}>

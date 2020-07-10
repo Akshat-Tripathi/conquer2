@@ -9,11 +9,10 @@ import (
 //RealTimeGame - a subclass of DefaultGame where actions happen as they are sent
 type RealTimeGame struct {
 	*DefaultGame
-	Router *gin.Engine
 }
 
 //Start - starts a DefaultGame
-func (rtg *RealTimeGame) Start(ctx Context) {
+func (rtg *RealTimeGame) Start(ctx Context, router *gin.Engine) {
 	countries := make([]string, len(ctx.Situation))
 	countryStates := make(map[string]*countryState)
 
@@ -48,6 +47,5 @@ func (rtg *RealTimeGame) Start(ctx Context) {
 	rtg.troopInterval = ctx.TroopInterval
 	go rtg.processActions()
 
-	//TODO abstract the router out of this struct
-	rtg.Router.GET("/game/"+ctx.ID+"/ws", rtg.handleGame)
+	router.GET("/game/"+ctx.ID+"/ws", rtg.handleGame)
 }

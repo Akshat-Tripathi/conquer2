@@ -23,7 +23,7 @@ When the game receives an action as input, it validates it then processes it, an
 
 //Game - the set of methods that every DefaultGame should be able to perform
 type Game interface {
-	Start(Context)
+	Start(Context, *gin.Engine)
 	CheckPlayer(string, string) int8
 	AddPlayer(string, string) bool
 }
@@ -66,6 +66,7 @@ func (g *DefaultGame) handleGame(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("Error establishing a websocket connection")
+		return
 	}
 	username, err := c.Cookie("username")
 	if err != nil {

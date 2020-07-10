@@ -11,9 +11,8 @@ import (
 //CampaignGame - a subclass of DefaultGame which is a slower game lasting 2 weeks
 type CampaignGame struct {
 	*DefaultGame
-	cp     *campaignProcessor //! This only exists to remove extra casting
-	Router *gin.Engine
-	store  *time.Timer
+	cp    *campaignProcessor //! This only exists to remove extra casting
+	store *time.Timer
 }
 
 //Init is specific to the campaignProcessor
@@ -24,7 +23,7 @@ func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
 }
 
 //Start - starts a DefaultGame
-func (cg *CampaignGame) Start(ctx Context) {
+func (cg *CampaignGame) Start(ctx Context, router *gin.Engine) {
 	cg.store = time.NewTimer(time.Minute * 15)
 	go func() {
 		<-cg.store.C
@@ -66,8 +65,7 @@ func (cg *CampaignGame) Start(ctx Context) {
 	go cg.processActions()
 	go cg.cp.nextEra()
 
-	//TODO abstract the router out of this struct
-	cg.Router.GET("/game/"+ctx.ID+"/ws", cg.handleGame)
+	router.GET("/game/"+ctx.ID+"/ws", cg.handleGame)
 }
 
 //Overrides processActions
