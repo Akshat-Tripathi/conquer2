@@ -20,8 +20,9 @@ type CampaignGame struct {
 func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
 	cg.cp.startTime = startTime
 	cg.cp.p = persistence
-	persistence.storeContext(cg.maxPlayerNum, cg.Situation, startTime)
+	persistence.storeContext(cg.maxPlayerNum, cg.Situation, startTime, cg.cp.startingTroopNumber, cg.cp.startingTroopNumber)
 	persistence.load(cg.cp.countryStates, cg.cp.playerTroops) //Ignores error
+	cg.numPlayers = len(cg.cp.playerTroops)
 	time.AfterFunc(startTime.Sub(time.Now()), func() {
 		go cg.processActions()
 	})
@@ -29,7 +30,7 @@ func (cg *CampaignGame) Init(startTime time.Time, persistence *persistence) {
 
 //Start - starts a DefaultGame
 func (cg *CampaignGame) Start(ctx Context, router *gin.Engine) {
-	cg.store = time.NewTimer(time.Minute * 1)
+	cg.store = time.NewTimer(time.Minute * 20)
 	go func() {
 		<-cg.store.C
 		cg.cp.p.store(cg.cp.countryStates, cg.cp.playerTroops)

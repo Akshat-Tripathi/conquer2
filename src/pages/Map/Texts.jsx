@@ -115,9 +115,6 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 											<span style={{ color: colour }}>{player}</span>
 										</Typography>
 									</Grid>
-									<Grid item xs={3}>
-										<FiberManualRecordIcon style={{ color: colour }} />
-									</Grid>
 								</Grid>
 							</div>
 						);

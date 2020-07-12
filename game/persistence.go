@@ -54,15 +54,24 @@ func (p *persistence) load(countryStates map[string]*countryState,
 	return nil
 }
 
-func (p *persistence) storeContext(maxPlayerNumber int, situation string, startTime time.Time) error {
+func (p *persistence) storeContext(
+	maxPlayerNumber int,
+	situation string,
+	startTime time.Time,
+	startingTroops int,
+	startingCountries int) error {
 	_, err := p.docs.Doc("ctx").Set(context.Background(), struct {
-		MaxPlayerNumber int
-		Situation       string
-		StartTime       time.Time
+		MaxPlayerNumber   int
+		Situation         string
+		StartTime         time.Time
+		StartingTroops    int
+		StartingCountries int
 	}{
-		MaxPlayerNumber: maxPlayerNumber,
-		Situation:       situation,
-		StartTime:       startTime,
+		MaxPlayerNumber:   maxPlayerNumber,
+		Situation:         situation,
+		StartTime:         startTime,
+		StartingTroops:    startingTroops,
+		StartingCountries: startingTroops,
 	})
 	return err
 }

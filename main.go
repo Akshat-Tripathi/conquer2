@@ -38,10 +38,12 @@ func main() {
 	//Load existing games
 	client := loadCampaigns(func(ID string, info map[string]interface{}, client *firestore.Client) {
 		ctx := game.Context{
-			ID:              ID,
-			MaxPlayerNumber: int(info["MaxPlayerNumber"].(int64)),
-			Situation:       situations[info["Situation"].(string)],
-			Colours:         colours,
+			ID:                    ID,
+			MaxPlayerNumber:       int(info["MaxPlayerNumber"].(int64)),
+			Situation:             situations[info["Situation"].(string)],
+			StartingCountryNumber: int(info["StartingCountries"].(int64)),
+			StartingTroopNumber:   int(info["StartingTroops"].(int64)),
+			Colours:               colours,
 		}
 		g := &game.CampaignGame{
 			DefaultGame: new(game.DefaultGame),

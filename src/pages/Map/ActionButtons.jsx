@@ -140,13 +140,14 @@ const DonateForm = ({
 				<Grid item xs>
 					<FormControl classes={classes.input}>
                         <Input
+                            autoFocus
                             type="number"
                             min="0"
 							name="donateNumTroops"
 							required
 							variant="outlined"
 							label="Number of Troops to Donate"
-							value={numTroops}
+							value={numTroops > 0 ? numTroops : null}
 							onChange={handleNumTroops}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
@@ -194,13 +195,14 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 				<Grid item xs>
 					<FormControl classes={classes.input}>
 						<Input
+                            autoFocus
                             type="number"
                             min="0"
 							name="donateNumTroops"
 							required
 							variant="outlined"
 							label="Number of Troops for the Assist"
-							value={numTroops}
+							value={numTroops > 0 ? numTroops : null}
 							onChange={handleNumTroops}
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
@@ -248,6 +250,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 				<Grid item xs>
 					<FormControl classes={classes.input}>
 						<Input
+                            autoFocus
                             type="number"
                             min="0"
 							name="donateNumTroops"
@@ -255,7 +258,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
                             variant="outlined"
                             placeholder={5}
 							label="Number of Troops to Move"
-							value={numTroops}
+							value={numTroops > 0 ? numTroops : null}
                             onChange={handleNumTroops}
                             className={classes.input}
 							style={{ color: 'yellow', borderColor: 'white' }}
@@ -332,6 +335,7 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 						<Grid item xs>
 							<FormControl classes={classes.input}>
 								<Input
+                                    autoFocus
                                     type="number"
                                     min="0"
 									name="donateNumTroops"
@@ -339,7 +343,7 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 									variant="outlined"
 									placeholder={5}
 									label="Number of Troops to Deploy"
-									value={numTroops}
+									value={numTroops > 0 ? numTroops : null}
 									onChange={handleNumTroops}
 									className={classes.input}
 									style={{ color: 'yellow', borderColor: 'white' }}
