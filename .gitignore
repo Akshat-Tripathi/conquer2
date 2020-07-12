@@ -4,6 +4,6 @@
 
 /.vscode/*
 
-/game/*.json
+#/game/*.json
 /discord/auth.token
 /src/api/environment.js
