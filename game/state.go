@@ -22,31 +22,31 @@ type state struct {
 	countryNames []string //A slice of all keys in countries
 }
 
-func (s *state) rangeState(callback func(string, interface{})) {
+func (s *state) rangeCountries(callback func(string, *countryState)) {
 	for name, country := range s.countries {
 		func(name string, country *countryState) {
 			country.Lock()
 			defer country.Unlock()
-			callback(name, *country)
+			callback(name, country)
 		}(name, country)
 	}
+}
 
+func (s *state) rangePlayers(callback func(string, *playerState)) {
 	for name, player := range s.players {
-		go func(name string, player *playerState) {
+		func(name string, player *playerState) {
 			player.Lock()
 			defer player.Unlock()
-			callback(name, *player)
+			callback(name, player)
 		}(name, player)
 	}
 }
 
 func (s *state) destroy() {
-	s.rangeState(func(name string, i interface{}) {
-		switch i.(type) {
-		case playerState:
-			delete(s.players, name)
-		case countryState:
-			delete(s.countries, name)
-		}
+	s.rangeCountries(func(name string, _ *countryState) {
+		delete(s.countries, name)
+	})
+	s.rangePlayers(func(name string, _ *playerState) {
+		delete(s.players, name)
 	})
 }

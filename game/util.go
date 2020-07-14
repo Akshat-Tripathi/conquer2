@@ -1,58 +1,5 @@
 package game
 
-import (
-	"sync"
-	"time"
-)
-
-type countryState struct {
-	Player string //Player that owns the country
-	Troops int    //Troops in country
-}
-
-type playerState struct {
-	sync.Mutex
-	Colour    string
-	Troops    int
-	Countries int
-	Password  string
-}
-
-func (p *playerState) incrementCountries() {
-	p.Lock()
-	defer p.Unlock()
-	p.Countries++
-}
-
-func (p *playerState) decrementCountries() {
-	p.Lock()
-	defer p.Unlock()
-	p.Countries--
-}
-
-func (p *playerState) getTroops() int {
-	p.Lock()
-	defer p.Unlock()
-	return p.Troops
-}
-
-func (p *playerState) addTroops(troops int) {
-	p.Lock()
-	defer p.Unlock()
-	p.Troops += troops
-}
-
-//Context - used to specify game parameters
-type Context struct {
-	ID                    string
-	MaxPlayerNumber       int
-	StartingTroopNumber   int
-	StartingCountryNumber int
-	TroopInterval         time.Duration
-	Situation             map[string][]string
-	Colours               []string
-}
-
 func sort(vals []int) []int {
 	if len(vals) == 1 {
 		return vals
