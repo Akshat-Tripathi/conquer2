@@ -296,7 +296,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 	);
 };
 
-const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user, troops, reset }) => {
+const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handleDeploy, showDeploy, fromCountryISO, socket, user, reset }) => {
     function handleClick(e) {
         e.preventDefault();
         deploy(numTroops, fromCountryISO, user, socket);
@@ -440,7 +440,7 @@ function assist(numTroops, fromCountryISO, toCountryISO, user, socket) {
 function deploy(numTroops, fromCountryISO, user, socket) {
     const dpl = new action(
         parseInt(numTroops, 10),
-        'drop',
+        'deploy',
         '',
         fromCountryISO,
         user

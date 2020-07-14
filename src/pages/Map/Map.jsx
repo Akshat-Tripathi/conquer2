@@ -189,13 +189,7 @@ class GameMap extends Component {
 					setallowDeploy(true);
 				}
 			} else if (NAME === fromCountry) {
-				setToCountryISO('');
-				setFromCountryISO('');
-				setfromCountry('');
-				settoCountry('');
-				settoCountryOwner('');
-				setallowDeploy(false);
-				setallowMove(false);
+                reset()
 			} else if (countries[fromCountryISO].some((iso) => iso === iso_a2)) {
 				setallowDeploy(false);
 				settoCountry(NAME);
@@ -207,7 +201,17 @@ class GameMap extends Component {
 					setallowMove(false);
 				}
 			}
-		};
+        };
+        
+        const reset = () => {
+            setToCountryISO('');
+            setFromCountryISO('');
+            setfromCountry('');
+            settoCountry('');
+            settoCountryOwner('');
+            setallowDeploy(false);
+            setallowMove(false);
+        }
 
 		//Handle functions for snackbar
 		const handleOpenHelp = () => {
@@ -307,7 +311,8 @@ class GameMap extends Component {
 									targetPlayer={targetPlayer}
 									socket={socket}
 									user={user}
-									players={players}
+                                    players={players}
+                                    reset={reset}
 								/>
 							)}
 
@@ -329,7 +334,8 @@ class GameMap extends Component {
 										fromCountryISO={fromCountryISO}
 										toCountryISO={toCountryISO}
 										socket={socket}
-										user={user}
+                                        user={user}
+                                        reset={reset}
 									/>
 								</Grid>
 							)}
@@ -346,7 +352,8 @@ class GameMap extends Component {
 									fromCountryISO={fromCountryISO}
 									socket={socket}
 									user={user}
-									troops={troops}
+                                    troops={troops}
+                                    reset={reset}
 								/>
 							)}
 
