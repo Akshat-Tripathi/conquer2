@@ -53,7 +53,6 @@ class GameMap extends Component {
             }, 54 * 1000);
 			switch (action.Type) {
 				case 'updateTroops':
-					console.log(action);
 					user = action.Player;
 					troops += action.Troops;
 					break;
@@ -155,7 +154,6 @@ class GameMap extends Component {
 							...state,
 							[line[0]]: line.slice(1)
 						}));
-						//countries[line[0]] = line.slice(1);
 					})
 				);
 		}
@@ -192,8 +190,9 @@ class GameMap extends Component {
                 reset()
 			} else if (countries[fromCountryISO].some((iso) => iso === iso_a2)) {
 				setallowDeploy(false);
-				settoCountry(NAME);
-				settoCountryOwner(countryStates[iso_a2].Player);
+                settoCountry(NAME);
+                let c = countryStates[iso_a2];
+				settoCountryOwner(c === undefined ? "" : c.Player);
 				setToCountryISO(iso_a2);
 				if (playerCountries.some((iso) => iso === iso_a2)) {
 					setallowMove(true);
@@ -269,9 +268,9 @@ class GameMap extends Component {
 			var iso_a2 = convertISO(NAME, ISO_A2);
 
 			try {
-				var col = playerColours[countryStates[iso_a2].Player];
-				if (typeof col == 'undefined') {
-					col = '#a69374';
+                var col = '#a69374';
+				if (countryStates[iso_a2] !== undefined) {
+                    col = playerColours[countryStates[iso_a2].Player]
 				}
 				if (
 					fromCountryISO !== '' &&
