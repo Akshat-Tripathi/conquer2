@@ -12,8 +12,9 @@ type stateMachine interface {
 	deploy(dest string, troops int, player string) (valid bool)
 	processTroops() map[string]int
 
-	addPlayer(name, password, colour string, troops, countries int) bool
+	addPlayer(name, password, colour string, troops, countries int) int8
 	getOwner(country string) string
+	stopAccepting()
 
 	destroy()
 }
