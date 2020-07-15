@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -11,96 +12,118 @@ type persistence struct {
 	docs *firestore.CollectionRef
 }
 
-//NewPersistence creates a persistence struct
-func NewPersistence(id string, client *firestore.Client) *persistence {
-	return &persistence{
-		docs: client.Collection(id),
+func loadSnapshot(id string, docs *firestore.CollectionRef) *firestore.DocumentSnapshot {
+	snapshot, err := docs.Doc(id).Get(context.Background())
+	if err != nil {
+		//log.Println(err)
+		return nil
+	}
+	return snapshot
+}
+
+func (p *persistence) loadContext(ctx *Context) {
+	snapshot := loadSnapshot("ctx", p.docs)
+	if snapshot == nil {
+		return
+	}
+	err := snapshot.DataTo(ctx)
+	if err != nil {
+		log.Println(err)
 	}
 }
 
-func (p *persistence) load(countryStates map[string]*countryState,
-	playerStates map[string]*playerState) error {
-	docs, err := p.docs.DocumentRefs(context.Background()).GetAll()
-	if err != nil {
-		return err
+func (p *persistence) loadPlayers(machine stateMachine) {
+	snapshot := loadSnapshot("ctx", p.docs)
+	if snapshot == nil {
+		return
 	}
-	for _, data := range docs {
-		if data.ID != "ctx" {
-			if data.ID[0] == '.' {
-				pState := playerState{}
-				state, err := data.Get(context.Background())
-				if err != nil {
-					return err
-				}
-				err = state.DataTo(&pState)
-				if err != nil {
-					return err
-				}
-				playerStates[data.ID[1:]] = &pState
-			} else {
-				cState := countryState{}
-				state, err := data.Get(context.Background())
-				if err != nil {
-					return err
-				}
-				err = state.DataTo(&cState)
-				if err != nil {
-					return err
-				}
-				countryStates[data.ID] = &cState
-			}
+	players := snapshot.Data()["Players"].([]interface{})
+	//Load players
+	for _, player := range players {
+		stateSnapshot := loadSnapshot("."+player.(string), p.docs)
+		if stateSnapshot != nil {
+			data := stateSnapshot.Data()
+			machine.addPlayer(
+				player.(string),
+				data["Password"].(string),
+				data["Colour"].(string),
+				int(data["Troops"].(int64)),
+				int(data["Countries"].(int64)),
+			)
 		}
 	}
-	return nil
 }
 
-func (p *persistence) storeContext(
-	maxPlayerNumber int,
-	situation string,
-	startTime time.Time,
-	startingTroops int,
-	startingCountries int) error {
-	_, err := p.docs.Doc("ctx").Set(context.Background(), struct {
-		MaxPlayerNumber   int
-		Situation         string
-		StartTime         time.Time
-		StartingTroops    int
-		StartingCountries int
-	}{
-		MaxPlayerNumber:   maxPlayerNumber,
-		Situation:         situation,
-		StartTime:         startTime,
-		StartingTroops:    startingTroops,
-		StartingCountries: startingTroops,
+func (p *persistence) loadCountries(machine stateMachine) {
+	machine.rangeCountries(func(name string, state *countryState) {
+		snapshot := loadSnapshot(name, p.docs)
+		if snapshot == nil {
+			return
+		}
+		err := snapshot.DataTo(state)
+		if err != nil {
+			log.Println(err)
+		}
 	})
-	return err
 }
 
-func (p *persistence) store(countryStates map[string]*countryState,
-	playerStates map[string]*playerState) error {
-	for country, state := range countryStates {
+//TODO reduce the number of things stored
+func (p *persistence) storeContext(ctx Context) {
+	_, err := p.docs.Doc("ctx").Set(context.Background(), getPersistentContext(ctx))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func (p *persistence) store(machine stateMachine) {
+	machine.rangeCountries(func(country string, state *countryState) {
 		if state.Player != "" {
 			_, err := p.docs.Doc(country).Set(context.Background(), *state)
 			if err != nil {
-				return err
+				log.Println(err)
 			}
 		}
-	}
-	for player, state := range playerStates {
-		_, err := p.docs.Doc("."+player).Set(context.Background(), &struct {
-			Colour    string
-			Troops    int
-			Countries int
-			Password  string
-		}{
-			Colour:    state.Colour,
-			Troops:    state.Troops,
-			Countries: state.Countries,
-			Password:  state.Password,
-		})
+	})
+
+	players := make([]string, 0)
+	machine.rangePlayers(func(player string, state *playerState) {
+		_, err := p.docs.Doc("."+player).Set(context.Background(), *state)
 		if err != nil {
-			return err
+			log.Println(err)
 		}
+		players = append(players, player)
+	})
+
+	_, err := p.docs.Doc("ctx").Set(context.Background(), map[string]interface{}{
+		"Players": players,
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Println(err)
 	}
-	return nil
+}
+
+func (p *persistence) delete() {
+	if _, err := p.docs.Parent.Delete(context.Background()); err != nil {
+		log.Println(err)
+	}
+}
+
+type persistentContext struct {
+	MaxPlayers        int
+	StartingCountries int
+	StartingTroops    int
+	StartTime         time.Time
+	Situation         string
+	Minutes           int
+}
+
+func getPersistentContext(ctx Context) persistentContext {
+	return persistentContext{
+		MaxPlayers:        ctx.MaxPlayers,
+		StartingCountries: ctx.StartingCountries,
+		StartingTroops:    ctx.StartingTroops,
+		StartTime:         ctx.StartTime,
+		Situation:         ctx.Situation,
+		Minutes:           ctx.Minutes,
+	}
 }
