@@ -2,15 +2,24 @@ package game
 
 import "math/rand"
 
+const (
+	playerAdded = iota + 1
+	playerAlreadyExists
+	playerRejected
+	gameFull
+)
+
 type defaultMachine struct {
 	state
-	maxPlayerNum   int
-	attackDisabled bool
-	donateDisabled bool
-	moveDisabled   bool
-	dropDisabled   bool
-	winCountries   int
+	canAcceptPlayers bool
+	attackDisabled   bool
+	donateDisabled   bool
+	moveDisabled     bool
+	dropDisabled     bool
+	winCountries     int
 }
+
+var _ stateMachine = (*defaultMachine)(nil)
 
 func (d *defaultMachine) init(countries []string) {
 	d.countryNames = countries
@@ -19,6 +28,7 @@ func (d *defaultMachine) init(countries []string) {
 	for _, country := range countries {
 		d.countries[country] = &countryState{}
 	}
+	d.canAcceptPlayers = true
 }
 
 func (d *defaultMachine) withLockedCountries(src, dest string, op func(src, dest *countryState) bool) bool {
@@ -177,9 +187,15 @@ func (d *defaultMachine) deploy(dest string, troops int, player string) bool {
 }
 
 //PRE: There will be countries available to assign
-func (d *defaultMachine) addPlayer(name, password, colour string, troops, countries int) bool {
+func (d *defaultMachine) addPlayer(name, password, colour string, troops, countries int) int8 {
 	if player, ok := d.players[name]; ok {
-		return player.Password == password
+		if player.Password == password {
+			return playerAlreadyExists
+		}
+		return playerRejected
+	}
+	if !d.canAcceptPlayers {
+		return gameFull
 	}
 	d.players[name] = &playerState{
 		Colour:    colour,
@@ -200,7 +216,7 @@ func (d *defaultMachine) addPlayer(name, password, colour string, troops, countr
 			}
 		}(d.countries[countryName])
 	}
-	return true
+	return playerAdded
 }
 
 //PRE: the country exists
@@ -305,4 +321,8 @@ func (d *defaultMachine) processTroops() map[string]int {
 	}
 
 	return playerTroops
+}
+
+func (d *defaultMachine) stopAccepting() {
+	d.canAcceptPlayers = false
 }
