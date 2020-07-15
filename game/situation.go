@@ -8,13 +8,17 @@ import (
 
 var situations = make(map[string]situation)
 
+func init() {
+	loadSituations()
+}
+
 //situation provides wrappers for different world maps
 type situation struct {
 	Map map[string][]string
 }
 
-//LoadSituations data from https://github.com/FnTm/country-neighbors
-func LoadSituations() {
+//loadSituations data from https://github.com/FnTm/country-neighbors
+func loadSituations() {
 	var mapTypes = []string{"world", "cold", "asia", "europe"}
 
 	for _, v := range mapTypes {
