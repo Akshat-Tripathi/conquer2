@@ -19,6 +19,7 @@ var (
 type sockets struct {
 	players sync.Map //map[string]*websocket.Conn
 	close   chan struct{}
+	handle  func(name string, action Action)
 }
 
 //Action - sent by the client, it encodes all the information about an action. Player is set by the server
@@ -56,7 +57,7 @@ func (s *sockets) newPlayer(w http.ResponseWriter, r *http.Request, name string)
 }
 
 //PRE: name is in players
-func (s *sockets) listen(name string, process func(string, Action)) {
+func (s *sockets) listen(name string) {
 	c, ok := s.players.Load(name)
 	if !ok {
 		log.Println("Player doesn't exist - PRE violated")
@@ -76,7 +77,7 @@ func (s *sockets) listen(name string, process func(string, Action)) {
 				log.Println(err)
 				return
 			}
-			process(name, action)
+			s.handle(name, action)
 		}
 	}
 }

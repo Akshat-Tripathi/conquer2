@@ -1,5 +1,13 @@
 package game
 
+/*
+The stateMachine interface provided methods used to manage the state of a game.
+Therefore a stateMachine shouldn't contain data which isn't relevant to the state
+for example, the defaultMachine has the field canAcceptPlayers, which was chosen
+instead of having maxPlayerNumber and currentPlayer number, as neither of these are
+related to the state
+*/
+
 type stateMachine interface {
 	init(countries []string)
 	rangePlayers(callback func(string, *playerState))
