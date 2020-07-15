@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -63,6 +64,7 @@ func (s *sockets) listen(name string, process func(string, Action)) {
 	}
 	conn := c.(*websocket.Conn)
 	defer conn.Close()
+	defer s.players.Delete(name)
 	var action Action
 	for {
 		select {
@@ -79,9 +81,11 @@ func (s *sockets) listen(name string, process func(string, Action)) {
 	}
 }
 
-//PRE: the player already exists
 func (s *sockets) sendToPlayer(name string, msg UpdateMessage) {
-	conn, _ := s.players.Load(name)
+	conn, ok := s.players.Load(name)
+	if !ok {
+		return
+	}
 	err := conn.(*websocket.Conn).WriteJSON(msg)
 	if err != nil {
 		log.Println(err)
@@ -97,4 +101,13 @@ func (s *sockets) sendToAll(msg UpdateMessage) {
 		}
 		return true
 	})
+}
+
+func closeWithMessage(conn *websocket.Conn, msg string) {
+	err := conn.WriteControl(websocket.CloseMessage,
+		websocket.FormatCloseMessage(websocket.ClosePolicyViolation, msg), time.Now().Add(time.Second))
+	if err != nil {
+		return
+	}
+	conn.Close()
 }
