@@ -9,7 +9,7 @@ import (
 
 func minuteCron(minutes int, job func()) *cron.Cron {
 	c := cron.New()
-	if c.AddFunc(fmt.Sprintf("*/%d * * * *", minutes), job) != nil {
+	if c.AddFunc(fmt.Sprintf("*/%d * * * *", minutes*60), job) != nil {
 		return nil
 	}
 	return c
