@@ -11,7 +11,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
-	"github.com/Akshat-Tripathi/conquer2/game"
+	"github.com/Akshat-Tripathi/conquer2/internal/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
@@ -28,30 +28,12 @@ func main() {
 		port = "80"
 	}
 
-	situations := loadMaps()
 	colours := loadColours()
 
-	games := make(map[string]game.Game)
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	//Load existing games
-	client := loadCampaigns(func(ID string, info map[string]interface{}, client *firestore.Client) {
-		ctx := game.Context{
-			ID:                    ID,
-			MaxPlayerNumber:       int(info["MaxPlayerNumber"].(int64)),
-			Situation:             situations[info["Situation"].(string)],
-			StartingCountryNumber: int(info["StartingCountries"].(int64)),
-			StartingTroopNumber:   int(info["StartingTroops"].(int64)),
-			Colours:               colours,
-		}
-		g := &game.CampaignGame{
-			DefaultGame: new(game.DefaultGame),
-		}
-		g.Start(ctx, r)
-		g.Init(info["StartTime"].(time.Time), game.NewPersistence(ID, client))
-		games[ID] = g
-	})
+	client, games := loadGames(colours, r)
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
@@ -81,56 +63,56 @@ func main() {
 			id = genID()
 		}
 		maxPlayers, err := strconv.Atoi(req.FormValue("maxPlayers"))
-		if err != nil {
+		if err != nil || maxPlayers < 1 {
 			log.Fatal(err)
 		}
 
 		startingTroops, err := strconv.Atoi(req.FormValue("startingTroops"))
-		if err != nil {
+		if err != nil || startingTroops < 0 {
 			log.Fatal(err)
 		}
 
 		startingCountries, err := strconv.Atoi(req.FormValue("startingCountries"))
-		if err != nil {
+		if err != nil || startingCountries < 1 {
 			log.Fatal(err)
 		}
 
-		troopInterval, err := strconv.Atoi(req.FormValue("troopInterval"))
-		if err != nil {
+		minutes, err := strconv.Atoi(req.FormValue("troopInterval"))
+		if err != nil || minutes < 1 {
 			log.Fatal(err)
 		}
 
 		ctx := game.Context{
-			ID:                    id,
-			MaxPlayerNumber:       maxPlayers,
-			StartingTroopNumber:   startingTroops,
-			StartingCountryNumber: startingCountries,
-			TroopInterval:         time.Duration(troopInterval) * time.Minute,
-			Situation:             situations[situation],
-			Colours:               colours,
+			ID:                id,
+			MaxPlayers:        maxPlayers,
+			Minutes:           minutes,
+			Situation:         situation,
+			StartingCountries: startingCountries,
+			StartingTroops:    startingTroops,
+			Colours:           colours,
+			Client:            client,
 		}
 
 		g := func() game.Game {
 			switch req.FormValue("type") {
 			case "realtime":
-				g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame)}
-				g.Start(ctx, r)
+				g := &game.DefaultGame{}
+				g.Init(ctx)
 				return g
 			case "campaign":
 				year, month, day := time.Now().Date()
-				g := &game.CampaignGame{DefaultGame: new(game.DefaultGame)}
-				g.Start(ctx, r)
-				g.Situation = situation
-				g.Init(time.Date(year, month, day+1, 0, 0, 0, 0, time.Now().Location()),
-					game.NewPersistence(id, client))
+				ctx.StartTime = time.Date(year, month, day, 0, 0, 0, 0, time.Now().Location())
+				g := &game.CampaignGame{}
+				g.Init(ctx)
 				return g
 			default:
 				fmt.Println(req.FormValue("type"))
 				return nil
 			}
 		}()
-		g.AddPlayer(username, password)
+
 		games[id] = g
+		r.GET("/game/"+id+"/ws", g.Run())
 
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
@@ -150,29 +132,19 @@ func main() {
 		password := req.FormValue("password")
 
 		id := req.FormValue("id")
-		thisGame, validID := games[id]
+		_, validID := games[id]
 		if !validID {
-			redirect("Invalid game ID", c)
+			fmt.Fprint(c.Writer, `<script>
+			alert("Invalid game ID");
+			window.location.replace(window.location.href.replace("/join", ""));
+			</script>`)
 			return
 		}
-		switch thisGame.CheckPlayer(username, password) {
-		case 0:
-			if !thisGame.AddPlayer(username, password) {
-				redirect("Game full", c)
-				return
-			}
-			fallthrough
-		case 1:
-			c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-			c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
-			c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
-			//c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
-			c.Redirect(http.StatusFound, "/game")
-		default:
-			redirect("Invalid username/password combo", c)
-			return
-		}
+		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
+		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
+		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 
+		c.Redirect(http.StatusFound, "/game")
 	})
 
 	r.GET("/", func(c *gin.Context) {
@@ -189,9 +161,8 @@ func main() {
 	r.Run(":" + port)
 }
 
-func loadCampaigns(registerGame func(ID string, info map[string]interface{},
-	client *firestore.Client)) *firestore.Client {
-	auth := option.WithCredentialsFile("./game/conquer2.json")
+func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]game.Game) {
+	auth := option.WithCredentialsFile("./internal/game/conquer2.json")
 	app, err := firebase.NewApp(context.Background(), nil, auth)
 	if err != nil {
 		log.Fatalln(err)
@@ -199,47 +170,24 @@ func loadCampaigns(registerGame func(ID string, info map[string]interface{},
 	client, err := app.Firestore(context.Background())
 
 	if err != nil {
-		panic(err)
+		log.Println("Error retrieving saved games")
+		return client, make(map[string]game.Game)
 	}
 
-	campaigns, err := client.Collections(context.Background()).GetAll()
+	allRefs, err := client.Collections(context.Background()).GetAll()
 
+	games := make(map[string]game.Game)
 	if err == nil {
-		for _, campaign := range campaigns {
-			info, err := campaign.Doc("ctx").Get(context.Background())
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			registerGame(campaign.ID, info.Data(), client)
+		for _, refs := range allRefs {
+			g := &game.CampaignGame{}
+			g.Init(game.Context{
+				ID:      refs.ID,
+				Colours: colours,
+				Client:  client,
+			})
+			games[refs.ID] = g
+			r.GET("/game/"+refs.ID+"/ws", g.Run())
 		}
 	}
-	return client
-}
-
-func testSetup(
-	situations map[string]map[string][]string,
-	colours []string,
-	games map[string]game.Game,
-	r *gin.Engine) {
-	ctx := game.Context{
-		ID:                    "test",
-		MaxPlayerNumber:       2,
-		StartingTroopNumber:   10,
-		StartingCountryNumber: 40,
-		Situation:             situations["world"],
-		Colours:               colours,
-		TroopInterval:         time.Minute * 60,
-	}
-
-	g := &game.RealTimeGame{DefaultGame: new(game.DefaultGame)}
-	games["test"] = g
-	games["test"].Start(ctx, r)
-}
-
-func redirect(msg string, c *gin.Context) {
-	fmt.Fprint(c.Writer, `<script>
-					alert("`+msg+`");
-					window.location.replace(window.location.href.replace("/join", ""));
-					</script>`)
+	return client, games
 }
