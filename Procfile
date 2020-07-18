@@ -1,1 +1,1 @@
-web: yarn & yarn build & go build & conquer2
+web: conquer2
