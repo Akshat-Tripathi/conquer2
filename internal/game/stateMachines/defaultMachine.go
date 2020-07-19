@@ -128,6 +128,8 @@ func (d *DefaultMachine) Attack(src, dest, player string) (valid, won, conquered
 				}
 				return true, won, true, deltaSrc, deltaDest
 			}
+			deltaSrc -= srcCountry.Troops
+			srcCountry.Troops = 0
 		}
 		return true, false, false, deltaSrc, deltaDest
 	}

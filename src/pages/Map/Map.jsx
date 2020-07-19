@@ -197,7 +197,14 @@ class GameMap extends Component {
 				} else {
 					setallowMove(false);
 				}
-			}
+			} else {
+                if (countryStates[iso_a2].Player === user) {
+					setFromCountryISO(iso_a2);
+
+					setfromCountry(NAME);
+					setallowDeploy(true);
+				}
+            }
         };
         
         const reset = () => {
