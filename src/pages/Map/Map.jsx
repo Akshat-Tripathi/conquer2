@@ -24,8 +24,6 @@ var countryStates = {};
 var playerColours = {};
 // List of all players
 var players = [];
-// List of this player's countries
-var playerCountries = [];
 // Current player name
 var user = '';
 
@@ -53,23 +51,19 @@ class GameMap extends Component {
             }, 54 * 1000);
 			switch (action.Type) {
 				case 'updateTroops':
-					console.log(action);
 					user = action.Player;
 					troops += action.Troops;
 					break;
 				case 'updateCountry':
 					let ok = typeof countryStates[action.Country] === 'undefined';
 					if (ok || countryStates[action.Country].Player !== action.Player) {
-						if (action.Player === user) {
-							playerCountries.push(action.Country);
-						}
-						//If I have lost this country
-						if (!ok && countryStates[action.Country].Player === user) {
-							playerCountries.filter((country) => country !== action.Country);
-						}
-						countryStates[action.Country] = new countryState(action.Troops, action.Player);
+                        countryStates[action.Country] = new countryState(action.Troops, action.Player);
 					} else {
-						countryStates[action.Country].Troops += action.Troops;
+                        if (action.Player !== "") {
+                            countryStates[action.Country].Troops += action.Troops;
+                        } else {
+                            countryStates[action.Country].Troops = action.Troops;
+                        }
 					}
 					break;
 				case 'newPlayer':
@@ -155,7 +149,6 @@ class GameMap extends Component {
 							...state,
 							[line[0]]: line.slice(1)
 						}));
-						//countries[line[0]] = line.slice(1);
 					})
 				);
 		}
@@ -182,32 +175,37 @@ class GameMap extends Component {
 			var iso_a2 = convertISO(NAME, ISO_A2);
 
 			if (fromCountry === '') {
-				if (playerCountries.some((iso) => iso === iso_a2)) {
+				if (countryStates[iso_a2].Player === user) {
 					setFromCountryISO(iso_a2);
 
 					setfromCountry(NAME);
 					setallowDeploy(true);
 				}
 			} else if (NAME === fromCountry) {
-				setToCountryISO('');
-				setFromCountryISO('');
-				setfromCountry('');
-				settoCountry('');
-				settoCountryOwner('');
-				setallowDeploy(false);
-				setallowMove(false);
+                reset()
 			} else if (countries[fromCountryISO].some((iso) => iso === iso_a2)) {
 				setallowDeploy(false);
-				settoCountry(NAME);
-				settoCountryOwner(countryStates[iso_a2].Player);
+                settoCountry(NAME);
+                let c = countryStates[iso_a2];
+				settoCountryOwner(c === undefined ? "" : c.Player);
 				setToCountryISO(iso_a2);
-				if (playerCountries.some((iso) => iso === iso_a2)) {
+				if (countryStates[iso_a2].Player === user) {
 					setallowMove(true);
 				} else {
 					setallowMove(false);
 				}
 			}
-		};
+        };
+        
+        const reset = () => {
+            setToCountryISO('');
+            setFromCountryISO('');
+            setfromCountry('');
+            settoCountry('');
+            settoCountryOwner('');
+            setallowDeploy(false);
+            setallowMove(false);
+        }
 
 		//Handle functions for snackbar
 		const handleOpenHelp = () => {
@@ -265,9 +263,11 @@ class GameMap extends Component {
 			var iso_a2 = convertISO(NAME, ISO_A2);
 
 			try {
-				var col = playerColours[countryStates[iso_a2].Player];
-				if (typeof col == 'undefined') {
-					col = '#a69374';
+                var col = '#a69374';
+				if (countryStates[iso_a2] !== undefined) {
+                    if (countryStates[iso_a2].Player !== "") {
+                        col = playerColours[countryStates[iso_a2].Player];
+                    }
 				}
 				if (
 					fromCountryISO !== '' &&
@@ -307,7 +307,8 @@ class GameMap extends Component {
 									targetPlayer={targetPlayer}
 									socket={socket}
 									user={user}
-									players={players}
+                                    players={players}
+                                    reset={reset}
 								/>
 							)}
 
@@ -329,7 +330,8 @@ class GameMap extends Component {
 										fromCountryISO={fromCountryISO}
 										toCountryISO={toCountryISO}
 										socket={socket}
-										user={user}
+                                        user={user}
+                                        reset={reset}
 									/>
 								</Grid>
 							)}
@@ -346,7 +348,8 @@ class GameMap extends Component {
 									fromCountryISO={fromCountryISO}
 									socket={socket}
 									user={user}
-									troops={troops}
+                                    troops={troops}
+                                    reset={reset}
 								/>
 							)}
 

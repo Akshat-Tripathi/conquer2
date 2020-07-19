@@ -11,13 +11,15 @@ let connect = () => {
 	};
 
 	socket.onclose = (event) => {
-		console.log('Socket Closed Connection: ', event);
+        socket.close(1000)
+        if (event.code == 1008) {
+            alert(event.reason);
+            window.Location.href.replace("/game*", "/");
+        }
 	};
     
 	socket.onerror = (error) => {
         console.log('Socket Error: ', error);
-        alert('Invalid login');
-        window.location.replace(window.location.href.replace('/game', '/'));
 	};
 	return socket;
 	// socket.send
