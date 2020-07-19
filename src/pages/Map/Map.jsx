@@ -141,7 +141,10 @@ class GameMap extends Component {
 		function loadMap() {
 			fetch('/maps/world.txt')
 				.then((raw) => raw.text())
-				.then((raw) => raw.split('\r\n'))
+				.then((raw) => {
+                    let sep = raw.includes('\r') ? '\r\n' : '\n';
+                    return raw.split(sep);
+                })
 				.then((lines) => lines.map((s) => s.split(' ')))
 				.then((lines) =>
 					lines.forEach((line) => {
