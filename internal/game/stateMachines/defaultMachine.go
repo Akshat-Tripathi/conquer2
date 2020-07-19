@@ -128,8 +128,8 @@ func (d *DefaultMachine) Attack(src, dest, player string) (valid, won, conquered
 				}
 				return true, won, true, deltaSrc, deltaDest
 			}
-			return true, false, false, deltaSrc, deltaDest
 		}
+		return true, false, false, deltaSrc, deltaDest
 	}
 	return false, false, false, 0, 0
 }
