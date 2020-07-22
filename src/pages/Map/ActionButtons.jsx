@@ -224,7 +224,7 @@ const AssistForm = ({ numTroops, classes, handleNumTroops, showAssist, handleAss
 			</Grid>
 
 			<Grid item xs={12}>
-				<IconButton aria-label="return" color="secondary" onClick={handleAssist}>
+				<IconButton aria-label="return" color="secondary" onClick={() => {handleAssist(); reset();}}>
 					<ArrowBackIcon
 						style={{
 							fontSize: '30'
@@ -283,7 +283,7 @@ const MoveForm = ({ numTroops, classes, handleNumTroops, showMove, handleMove, f
 			</Grid>
 
 			<Grid item xs={12}>
-				<IconButton aria-label="return" color="secondary" onClick={handleMove}>
+				<IconButton aria-label="return" color="secondary" onClick={() => {handleMove(); reset();}}>
 					<ArrowBackIcon
 						style={{
 							fontSize: '30'
@@ -368,7 +368,7 @@ const OptionsDeploy = ({ classes, numTroops, handleNumTroops, fromCountry, handl
 					</Grid>
 
 					<Grid item xs={12}>
-						<IconButton aria-label="return" color="secondary" onClick={handleDeploy}>
+						<IconButton aria-label="return" color="secondary" onClick={() => {handleDeploy(); reset();}}>
 							<ArrowBackIcon
 								style={{
 									fontSize: '30'
