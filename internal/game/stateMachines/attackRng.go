@@ -4,7 +4,21 @@ import (
 	"math/rand"
 )
 
-func defaultRng(srcTroops, destTroops int) (int, int) {
+func defaultRng(srcTroops, destTroops, times int) (int, int) {
+	var tempSrc, tempDest, deltaSrc, deltaDest int
+	for times > 0 && deltaSrc+srcTroops > 0 && deltaDest+destTroops > 0 {
+		tempSrc, tempDest = defaultRngHelper(srcTroops, destTroops)
+		deltaSrc += tempSrc
+		deltaDest += tempDest
+		times--
+	}
+	if deltaSrc+srcTroops < 0 {
+		deltaSrc = -srcTroops
+	}
+	return deltaSrc, deltaDest
+}
+
+func defaultRngHelper(srcTroops, destTroops int) (int, int) {
 	if srcTroops > 3 {
 		srcTroops = 3
 	}

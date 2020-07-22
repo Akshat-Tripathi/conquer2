@@ -94,7 +94,7 @@ func (cg *CampaignGame) process(name string, action Action) {
 		}
 		oldPlayer := cg.machine.GetCountry(action.Dest).Player
 		valid, won, conquered, deltaSrc, deltaDest :=
-			cg.machine.Attack(action.Src, action.Dest, name)
+			cg.machine.Attack(action.Src, action.Dest, name, 1)
 		if !valid {
 			return
 		}

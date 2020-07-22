@@ -150,7 +150,7 @@ func (d *DefaultGame) process(name string, action Action) {
 			return
 		}
 		valid, won, conquered, deltaSrc, deltaDest :=
-			d.machine.Attack(action.Src, action.Dest, name)
+			d.machine.Attack(action.Src, action.Dest, name, action.Troops)
 		if !valid {
 			return
 		}

@@ -15,7 +15,7 @@ type StateMachine interface {
 
 	ToggleAttack()
 
-	Attack(src, dest, player string) (valid, won, conquered bool, nSrc, nDest int)
+	Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int)
 	Donate(src, dest string, troops int) bool
 	Assist(src, dest string, troops int, player string) bool
 	Move(src, dest string, troops int, player string) bool

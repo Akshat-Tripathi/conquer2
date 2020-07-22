@@ -75,7 +75,7 @@ func (d *DefaultMachine) withLockedPlayers(src, dest string, op func(src, dest *
 }
 
 //Attack attacks
-func (d *DefaultMachine) Attack(src, dest, player string) (valid, won, conquered bool, nSrc, nDest int) {
+func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
 	srcCountry, ok := d.countries[src]
 	if !ok {
 		return false, false, false, 0, 0
@@ -97,7 +97,7 @@ func (d *DefaultMachine) Attack(src, dest, player string) (valid, won, conquered
 	if d.attackValid(srcCountry, destCountry, player) {
 		deltaSrc, deltaDest := 0, 0
 		if destCountry.Troops != 0 {
-			deltaSrc, deltaDest = defaultRng(srcCountry.Troops, destCountry.Troops)
+			deltaSrc, deltaDest = defaultRng(srcCountry.Troops, destCountry.Troops, times)
 		}
 		srcCountry.Troops += deltaSrc
 		destCountry.Troops += deltaDest
@@ -105,31 +105,27 @@ func (d *DefaultMachine) Attack(src, dest, player string) (valid, won, conquered
 		if destCountry.Troops <= 0 {
 			deltaDest -= destCountry.Troops
 			destCountry.Troops = 0
-			if srcCountry.Troops > 0 {
-				//Conquered
-				destCountry.Troops++
-				srcCountry.Troops--
+			//Conquered
+			destCountry.Troops++
+			srcCountry.Troops--
 
-				source := d.players[srcCountry.Player]
-				source.Lock()
-				defer source.Unlock()
-				source.Countries++
-				if destCountry.Player != "" {
-					destination := d.players[destCountry.Player]
-					destination.Lock()
-					defer destination.Unlock()
-					destination.Countries--
-				}
-				destCountry.Player = player
-
-				won := false
-				if source.Countries == d.winCountries {
-					won = true
-				}
-				return true, won, true, deltaSrc, deltaDest
+			source := d.players[srcCountry.Player]
+			source.Lock()
+			defer source.Unlock()
+			source.Countries++
+			if destCountry.Player != "" {
+				destination := d.players[destCountry.Player]
+				destination.Lock()
+				defer destination.Unlock()
+				destination.Countries--
 			}
-			deltaSrc -= srcCountry.Troops
-			srcCountry.Troops = 0
+			destCountry.Player = player
+
+			won := false
+			if source.Countries == d.winCountries {
+				won = true
+			}
+			return true, won, true, deltaSrc, deltaDest
 		}
 		return true, false, false, deltaSrc, deltaDest
 	}
