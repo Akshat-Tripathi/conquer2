@@ -395,7 +395,7 @@ class action {
 
 function attack(fromCountryISO, toCountryISO, user, socket) {
     const atk = new action(
-        0,
+        1,
         'attack',
         fromCountryISO,
         toCountryISO,
