@@ -94,7 +94,7 @@ func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won
 	defer srcCountry.Unlock()
 	defer destCountry.Unlock()
 
-	if d.attackValid(srcCountry, destCountry, player) {
+	if d.attackValid(srcCountry, destCountry, player, times) {
 		deltaSrc, deltaDest := 0, 0
 		if destCountry.Troops != 0 {
 			deltaSrc, deltaDest = defaultRng(srcCountry.Troops, destCountry.Troops, times)
@@ -238,8 +238,11 @@ func (d *DefaultMachine) ToggleAttack() {
 	d.attackDisabled = !d.attackDisabled
 }
 
-func (d *DefaultMachine) attackValid(src, dest *CountryState, player string) bool {
-	if d.attackDisabled {
+func (d *DefaultMachine) attackValid(src, dest *CountryState, player string, times int) bool {
+	if d.attackDisabled && dest.Player != "" {
+		return false
+	}
+	if times <= 0 {
 		return false
 	}
 	//Must own src
