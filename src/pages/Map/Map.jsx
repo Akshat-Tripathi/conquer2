@@ -78,6 +78,7 @@ class GameMap extends Component {
 
     socket.onmessage = (msg) => {
       var action = JSON.parse(msg.data);
+      console.log(action);
       window.clearInterval(keepAlive);
       keepAlive = window.setInterval(() => {
         socket.send("{}");

@@ -55,16 +55,23 @@ function Alert(props) {
 }
 
 function ETA(interval) {
-  const [seconds, setSeconds] = React.useState(interval);
+  const [seconds, setSeconds] = React.useState(interval * 60);
 
   React.useEffect(() => {
     if (seconds >= 0) {
       setTimeout(() => setSeconds(seconds - 1), 1000);
     } else {
-      setSeconds(interval);
+      setSeconds(interval * 60);
     }
   });
-  return seconds;
+
+  var integerpart = Math.floor(seconds / 60);
+  var secondspart = seconds % 60;
+  if (secondspart < 10) {
+    return "0" + integerpart + ":" + "0" + (seconds % 60);
+  } else {
+    return "0" + integerpart + ":" + (seconds % 60);
+  }
 }
 
 const Title = ({
