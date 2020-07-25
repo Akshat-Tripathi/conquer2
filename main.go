@@ -124,6 +124,7 @@ func main() {
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("type", gameType, cookieMaxAge, "/game", "", false, false)
 		if gameType == "realtime" {
+			c.SetCookie("start", ctx.StartTime.UTC().String(), cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("interval", strconv.Itoa(minutes), cookieMaxAge, "/game", "", false, false)
 		}
 
@@ -155,6 +156,7 @@ func main() {
 		switch g.(type) {
 		case *game.DefaultGame:
 			c.SetCookie("type", "realtime", cookieMaxAge, "/game", "", false, false)
+			c.SetCookie("start", ctx.StartTime.UTC().String(), cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("interval", strconv.Itoa(ctx.Minutes), cookieMaxAge, "/game", "", false, false)
 		case *game.CampaignGame:
 			c.SetCookie("type", "campaign", cookieMaxAge, "/game", "", false, false)
