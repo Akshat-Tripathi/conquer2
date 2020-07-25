@@ -56,6 +56,18 @@ const Options = ({
                                         ATTACK
                                     </Button>
                                 </Grid>
+							<Grid item xs={12} sm={6}>
+								//TODO: Send num of troops
+								<Button
+									variant="contained"
+									size="small"
+									color="secondary"
+									className={classes.button}
+									onClick={() => { attack(fromCountryISO, toCountryISO, user, socket); reset() }}
+								>
+									AUTO ATTACK LIKE IT'S 'NAM
+                                    </Button>
+							</Grid>
                             ) : (null)}
                             <Grid item xs={12} sm={6}>
                                 <AssistForm
@@ -402,6 +414,18 @@ function attack(fromCountryISO, toCountryISO, user, socket) {
         user
     );
     socket.send(JSON.stringify(atk));
+}
+
+function megaAttack(fromCountryISO, toCountryISO, user, socket, troops) {
+	const atk = new action(
+		1,
+		'attack',
+		fromCountryISO,
+		toCountryISO,
+		user,
+		troops
+	);
+	socket.send(JSON.stringify(atk));
 }
 
 function donate(numTroops, targetPlayer, user, socket) {
