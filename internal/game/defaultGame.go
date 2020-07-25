@@ -255,3 +255,8 @@ func (d *DefaultGame) End() {
 	d.close <- struct{}{}
 	d.machine.Destroy()
 }
+
+//GetContext returns the context information
+func (d *DefaultGame) GetContext() Context {
+	return d.context
+}

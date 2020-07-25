@@ -13,6 +13,7 @@ type Game interface {
 	Run() func(ctx *gin.Context)
 	RoutePlayer(name, password string, ctx *gin.Context) (routed bool, reason string)
 	End()
+	GetContext() Context
 }
 
 //Context stores the fields neccessary to initialise a game

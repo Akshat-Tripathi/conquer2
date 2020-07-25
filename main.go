@@ -93,8 +93,10 @@ func main() {
 			Client:            client,
 		}
 
+		gameType := req.FormValue("type")
+
 		g := func() game.Game {
-			switch req.FormValue("type") {
+			switch gameType {
 			case "realtime":
 				g := &game.DefaultGame{}
 				g.Init(ctx)
@@ -120,6 +122,10 @@ func main() {
 		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
+		c.SetCookie("type", gameType, cookieMaxAge, "/game", "", false, false)
+		if gameType == "realtime" {
+			c.SetCookie("interval", strconv.Itoa(minutes), cookieMaxAge, "/game", "", false, false)
+		}
 
 		c.Redirect(http.StatusFound, "/game")
 	})
@@ -132,7 +138,8 @@ func main() {
 		password := req.FormValue("password")
 
 		id := req.FormValue("id")
-		_, validID := games[id]
+		g, validID := games[id]
+		ctx := g.GetContext()
 		if !validID {
 			fmt.Fprint(c.Writer, `<script>
 			alert("Invalid game ID");
@@ -143,6 +150,15 @@ func main() {
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("situation", ctx.Situation, cookieMaxAge, "/game", "", false, false)
+
+		switch g.(type) {
+		case *game.DefaultGame:
+			c.SetCookie("type", "realtime", cookieMaxAge, "/game", "", false, false)
+			c.SetCookie("interval", strconv.Itoa(ctx.Minutes), cookieMaxAge, "/game", "", false, false)
+		case *game.CampaignGame:
+			c.SetCookie("type", "campaign", cookieMaxAge, "/game", "", false, false)
+		}
 
 		c.Redirect(http.StatusFound, "/game")
 	})
