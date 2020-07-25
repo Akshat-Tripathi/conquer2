@@ -159,7 +159,9 @@ function OffsetsX(NAME) {
     case "United Kingdom":
       return 2;
     case "Canada":
-      return -10;
+      return -8;
+    case "United States of America":
+      return 4;
     default:
       return 0;
   }
@@ -174,9 +176,9 @@ function OffsetsY(NAME) {
     case "Antarctica":
       return 8;
     case "United States of America":
-      return -10;
+      return -6;
     case "Canada":
-      return -10;
+      return -6;
     default:
       return 0;
   }
