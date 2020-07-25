@@ -12,9 +12,9 @@ type CampaignGame struct {
 
 //Init initialises a persistentGame then sets the sendInitialState function
 func (cg *CampaignGame) Init(ctx Context) {
-	cg.machine.ToggleAttack()
 	cg.persistentGame = &persistentGame{}
 	cg.persistentGame.Init(ctx)
+	cg.machine.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
 	cg.handle = cg.process
 
