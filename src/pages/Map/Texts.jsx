@@ -65,12 +65,20 @@ function ETA(interval) {
     }
   });
 
+  var hourpart = Math.floor(seconds / 3600);
   var integerpart = Math.floor(seconds / 60);
   var secondspart = seconds % 60;
+  let hours = ""
+  if (hourpart != 0) {
+      hours = hourpart + ":"
+      if (hourpart < 10) {
+          hours = "0" + hours
+      }
+  }
   if (secondspart < 10) {
-    return "0" + integerpart + ":" + "0" + (seconds % 60);
+    return hours + "0" + integerpart + ":" + "0" + (seconds % 60);
   } else {
-    return "0" + integerpart + ":" + (seconds % 60);
+    return hours + "0" + integerpart + ":" + (seconds % 60);
   }
 }
 
@@ -81,6 +89,7 @@ const Title = ({
   user,
   troops,
   interval,
+  nextTroops,
 }) => {
   return (
     <div>
@@ -114,6 +123,9 @@ const Title = ({
         </Typography>
         <Typography variant="h6" align="center">
           <span style={{ color: "red" }}>ETA: {ETA(interval)}</span>
+        </Typography>
+        <Typography variant="h6" align="center">
+          <span style={{ color: "red" }}>Incoming troops: {nextTroops}</span>
         </Typography>
       </Grid>
       <br />

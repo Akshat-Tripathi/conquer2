@@ -29,6 +29,16 @@ var user = "";
 //Interval for troop drops
 var interval;
 
+function getUserTroops() {
+    let userCountries = 0;
+    for (var c in countryStates) {
+        if (countryStates[c].Player == user) {
+            userCountries++;
+        }
+    }
+    return 3 + Math.floor(userCountries / 3);
+};
+
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
 //POST: The hex colour, p% darker
 function darken(hex, p) {
@@ -350,6 +360,7 @@ class GameMap extends Component {
                 user={user}
                 troops={troops}
                 interval={interval}
+                nextTroops={getUserTroops()}
               />
               {/* Show Donation options when clicked on Donate Button */}
               {fromCountry === "" && (
