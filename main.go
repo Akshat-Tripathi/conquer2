@@ -25,12 +25,12 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = "3000"
+		port = "80"
 	}
 
 	colours := loadColours()
 
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	client, games := loadGames(colours, r)
@@ -89,6 +89,7 @@ func main() {
 			Situation:         situation,
 			StartingCountries: startingCountries,
 			StartingTroops:    startingTroops,
+			StartTime:         time.Now(),
 			Colours:           colours,
 			Client:            client,
 		}
@@ -124,7 +125,8 @@ func main() {
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("type", gameType, cookieMaxAge, "/game", "", false, false)
 		if gameType == "realtime" {
-			c.SetCookie("start", ctx.StartTime.UTC().String(), cookieMaxAge, "/game", "", false, false)
+			fmt.Println(ctx.StartTime, ctx.StartTime.Unix(), strconv.FormatInt(ctx.StartTime.Unix(), 10))
+			c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("interval", strconv.Itoa(minutes), cookieMaxAge, "/game", "", false, false)
 		}
 
@@ -156,7 +158,8 @@ func main() {
 		switch g.(type) {
 		case *game.DefaultGame:
 			c.SetCookie("type", "realtime", cookieMaxAge, "/game", "", false, false)
-			c.SetCookie("start", ctx.StartTime.UTC().String(), cookieMaxAge, "/game", "", false, false)
+			fmt.Println(ctx.StartTime, strconv.FormatInt(ctx.StartTime.Unix(), 10))
+			c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("interval", strconv.Itoa(ctx.Minutes), cookieMaxAge, "/game", "", false, false)
 		case *game.CampaignGame:
 			c.SetCookie("type", "campaign", cookieMaxAge, "/game", "", false, false)
