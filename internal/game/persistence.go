@@ -39,6 +39,7 @@ func (p *persistence) loadPlayers(machine st.StateMachine) {
 		return
 	}
 	players := snapshot.Data()["Players"].([]interface{})
+	playerCountries := make(map[string]int)
 	//Load players
 	for _, player := range players {
 		stateSnapshot := loadSnapshot("."+player.(string), p.docs)
@@ -49,10 +50,18 @@ func (p *persistence) loadPlayers(machine st.StateMachine) {
 				data["Password"].(string),
 				data["Colour"].(string),
 				int(data["Troops"].(int64)),
-				int(data["Countries"].(int64)),
+				0,
 			)
+			playerCountries[player.(string)] = int(data["Countries"].(int64))
 		}
 	}
+	machine.RangePlayers(func(name string, player *st.PlayerState) {
+		countries, ok := playerCountries[name]
+		if !ok {
+			return
+		}
+		player.Countries = countries
+	})
 }
 
 func (p *persistence) loadCountries(machine st.StateMachine) {
@@ -68,7 +77,6 @@ func (p *persistence) loadCountries(machine st.StateMachine) {
 	})
 }
 
-//TODO reduce the number of things stored
 func (p *persistence) storeContext(ctx Context) {
 	_, err := p.docs.Doc("ctx").Set(context.Background(), getPersistentContext(ctx))
 	if err != nil {
