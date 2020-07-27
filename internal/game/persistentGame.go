@@ -43,10 +43,10 @@ func (pg *persistentGame) Init(ctx Context) {
 }
 
 func (pg *persistentGame) Run() func(ctx *gin.Context) {
-	pg.storeContext(pg.context)
 	go func() {
 		<-pg.timer.C
 		log.Println("timer fired")
+		pg.storeContext(pg.context)
 		pg.store(pg.machine)
 	}()
 	return pg.DefaultGame.Run()
