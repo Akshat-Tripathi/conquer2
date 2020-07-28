@@ -55,7 +55,6 @@ const Options = ({
                     className={classes.button}
                     onClick={() => {
                       attack(fromCountryISO, toCountryISO, user, socket);
-                      reset();
                     }}
                   >
                     ATTACK
@@ -73,10 +72,8 @@ const Options = ({
                         fromCountryISO,
                         toCountryISO,
                         user,
-                        socket,
-                        numTroops
+                        socket
                       );
-                      reset();
                     }}
                   >
                     AUTO ATTACK LIKE IT'S 'NAM
@@ -511,15 +508,8 @@ function attack(fromCountryISO, toCountryISO, user, socket) {
   socket.send(JSON.stringify(atk));
 }
 
-function megaAttack(fromCountryISO, toCountryISO, user, socket, troops) {
-  const atk = new action(
-    1,
-    "attack",
-    fromCountryISO,
-    toCountryISO,
-    user,
-    troops
-  );
+function megaAttack(fromCountryISO, toCountryISO, user, socket) {
+  const atk = new action(10, "attack", fromCountryISO, toCountryISO, user);
   socket.send(JSON.stringify(atk));
 }
 
