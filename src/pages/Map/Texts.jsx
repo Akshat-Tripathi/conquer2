@@ -54,8 +54,19 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-function ETA(interval) {
-  const [seconds, setSeconds] = React.useState(interval * 60);
+//PRE: n >= 0 && n < 100
+function stringifyInt(n) {
+    let str = n;
+    if (n < 10) {
+        str = "0" + str;
+    }
+    return str;
+}
+
+function ETA(interval, start) {
+  let date = new Date();
+  let secondsFromStart = Math.floor(date.getTime() / 1000) - start;
+  const [seconds, setSeconds] = React.useState((interval * 60) - (secondsFromStart % (interval * 60)));
 
   React.useEffect(() => {
     if (seconds >= 0) {
@@ -65,21 +76,20 @@ function ETA(interval) {
     }
   });
 
-  var hourpart = Math.floor(seconds / 3600);
-  var integerpart = Math.floor(seconds / 60);
-  var secondspart = seconds % 60;
-  let hours = ""
-  if (hourpart != 0) {
-      hours = hourpart + ":"
-      if (hourpart < 10) {
-          hours = "0" + hours
+  var hourPart = Math.floor(seconds / 3600) % 24;
+  var minutePart = Math.floor(seconds / 60) % 60;
+  var secondsPart = seconds % 60;
+  
+  var str = stringifyInt(secondsPart);
+
+  if (minutePart != 0) {
+      str = stringifyInt(minutePart) + ":" + str;  
+      if (hourPart != 0) {
+        str = stringifyInt(hourPart) + ":" + str;
       }
   }
-  if (secondspart < 10) {
-    return hours + "0" + integerpart + ":" + "0" + (seconds % 60);
-  } else {
-    return hours + "0" + integerpart + ":" + (seconds % 60);
-  }
+
+  return str
 }
 
 const Title = ({
@@ -89,6 +99,7 @@ const Title = ({
   user,
   troops,
   interval,
+  startTime,
   nextTroops,
 }) => {
   return (
@@ -122,7 +133,7 @@ const Title = ({
           Base Troops: {troops}
         </Typography>
         <Typography variant="h6" align="center">
-          <span style={{ color: "red" }}>ETA: {ETA(interval)}</span>
+          <span style={{ color: "red" }}>ETA: {ETA(interval, startTime)}</span>
         </Typography>
         <Typography variant="h6" align="center">
           <span style={{ color: "red" }}>Incoming troops: {nextTroops}</span>

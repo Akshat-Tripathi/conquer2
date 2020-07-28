@@ -28,6 +28,7 @@ var players = [];
 var user = "";
 //Interval for troop drops
 var interval;
+var start;
 
 function getUserTroops() {
     let userCountries = 0;
@@ -46,6 +47,10 @@ function darken(hex, p) {
   const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - p));
   const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - p));
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function getStartTime() {
+	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
 }
 
 function getInterval() {
@@ -70,8 +75,7 @@ function getInterval() {
       }
     }
   } else {
-    //TODO: Fix this
-    return 60;
+    return 8 * 60; //8 hours
   }
 }
 
@@ -85,6 +89,7 @@ class GameMap extends Component {
 
     //Ascertain from cookies the base troop drop time intervals
     interval = getInterval();
+    start = getStartTime();
 
     socket.onmessage = (msg) => {
       var action = JSON.parse(msg.data);
@@ -359,6 +364,7 @@ class GameMap extends Component {
                 openHelp={openHelp}
                 user={user}
                 troops={troops}
+                startTime={start}
                 interval={interval}
                 nextTroops={getUserTroops()}
               />
