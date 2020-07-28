@@ -141,7 +141,6 @@ func main() {
 
 		id := req.FormValue("id")
 		g, validID := games[id]
-		ctx := g.GetContext()
 		if !validID {
 			fmt.Fprint(c.Writer, `<script>
 			alert("Invalid game ID");
@@ -149,6 +148,7 @@ func main() {
 			</script>`)
 			return
 		}
+		ctx := g.GetContext()
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
