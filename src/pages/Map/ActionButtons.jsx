@@ -55,6 +55,7 @@ const Options = ({
                     className={classes.button}
                     onClick={() => {
                       attack(fromCountryISO, toCountryISO, user, socket);
+                      reset();
                     }}
                   >
                     ATTACK
@@ -74,6 +75,7 @@ const Options = ({
                         user,
                         socket
                       );
+                      reset();
                     }}
                   >
                     AUTO ATTACK LIKE IT'S 'NAM
