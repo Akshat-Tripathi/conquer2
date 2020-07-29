@@ -136,7 +136,7 @@ const Title = ({
           <span style={{ color: "red" }}>{nextTroops} arriving in</span>
         </Typography>
         <Typography variant="h6" align="center">
-          <span style={{ color: "red" }}>{ETA(interval, startTime)} seconds</span>
+          <span style={{ color: "red" }}>{ETA(interval, startTime)}</span>
         </Typography>
       </Grid>
       <br />
