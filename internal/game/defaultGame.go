@@ -163,7 +163,7 @@ func (d *DefaultGame) process(name string, action Action) {
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
-				Troops:  -1 - deltaSrc,
+				Troops:  deltaSrc - 1,
 				Player:  name,
 				Country: action.Src,
 			})
