@@ -16,7 +16,7 @@ class Redirector extends React.Component {
   }
 
   render() {
-    return this.state.redirect ? <Redirect to="/game" /> : <Intro2 />;
+    return this.state.redirect ? <Redirect to="/" /> : <Intro2 />;
   }
 }
 
