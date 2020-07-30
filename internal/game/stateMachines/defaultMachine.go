@@ -235,6 +235,7 @@ func (d *DefaultMachine) GetCountry(country string) CountryState {
 	return *cState
 }
 
+//ToggleAttack - does what the name suggests
 func (d *DefaultMachine) ToggleAttack() {
 	d.attackDisabled = !d.attackDisabled
 }
