@@ -30,6 +30,7 @@ func (d *DefaultMachine) Init(countries []string) {
 		d.countries[country] = &CountryState{}
 	}
 	d.canAcceptPlayers = true
+	d.winCountries = 177
 }
 
 func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {

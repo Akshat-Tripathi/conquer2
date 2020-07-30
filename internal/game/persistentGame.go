@@ -60,5 +60,5 @@ func (pg *persistentGame) process(name string, action Action) {
 
 func (pg *persistentGame) End() {
 	pg.persistence.delete()
-	pg.DefaultGame.End()
+	pg.DefaultGame.end()
 }

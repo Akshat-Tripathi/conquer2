@@ -176,7 +176,7 @@ func (d *DefaultGame) process(name string, action Action) {
 					Type:   "won",
 					Player: name,
 				})
-				d.end()
+				time.AfterFunc(time.Second*5, d.end)
 			}
 		} else {
 			d.sendToAll(UpdateMessage{
