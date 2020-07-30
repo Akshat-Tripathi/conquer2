@@ -126,12 +126,12 @@ class GameMap extends Component {
             playerColours[action.Player] = action.Country;
             players.push(action.Player);
           }
-        case "won":
+        /*case "won":
             if (user == action.Player) {
                 window.location.replace("https://www.youtube.com/watch?v=tS_2hEmGnzA");
             } else {
                 window.location.replace("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-            }
+            }*/
       }
       this.forceUpdate();
     };
