@@ -10,6 +10,8 @@ type CampaignGame struct {
 	*persistentGame
 }
 
+var _ Game = (*CampaignGame)(nil)
+
 //Init initialises a persistentGame then sets the sendInitialState function
 func (cg *CampaignGame) Init(ctx Context) {
 	cg.persistentGame = &persistentGame{}

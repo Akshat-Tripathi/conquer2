@@ -11,9 +11,9 @@ import (
 type Game interface {
 	Init(Context)
 	Run() func(ctx *gin.Context)
-	RoutePlayer(name, password string, ctx *gin.Context) (routed bool, reason string)
-	End()
 	GetContext() Context
+	routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string)
+	end()
 }
 
 //Context stores the fields neccessary to initialise a game

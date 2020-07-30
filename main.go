@@ -89,7 +89,7 @@ func main() {
 			Situation:         situation,
 			StartingCountries: startingCountries,
 			StartingTroops:    startingTroops,
-			StartTime:         time.Now(),
+			StartTime:         time.Now().Add(time.Minute * 3),
 			Colours:           colours,
 			Client:            client,
 		}

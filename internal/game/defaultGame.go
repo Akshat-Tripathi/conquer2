@@ -3,6 +3,7 @@ package game
 import (
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	st "github.com/Akshat-Tripathi/conquer2/internal/game/stateMachines"
 	"github.com/gin-gonic/gin"
@@ -57,8 +58,8 @@ func (d *DefaultGame) Init(ctx Context) {
 	d.sendInitialState = d.sendInitialStateFunc
 }
 
-//RoutePlayer will either add a new player, connect an existing player or reject the player
-func (d *DefaultGame) RoutePlayer(name, password string, ctx *gin.Context) (routed bool, reason string) {
+//routePlayer will either add a new player, connect an existing player or reject the player
+func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string) {
 	if int(d.numPlayers) == d.context.MaxPlayers {
 		d.machine.StopAccepting()
 	}
@@ -74,7 +75,9 @@ func (d *DefaultGame) RoutePlayer(name, password string, ctx *gin.Context) (rout
 		//Send initial state
 		d.sendInitialState(name)
 
-		d.listen(name)
+		time.AfterFunc(d.context.StartTime.Sub(time.Now()), func() {
+			d.listen(name)
+		})
 		return true, ""
 	}
 	//case playerRejected
@@ -129,7 +132,7 @@ func (d *DefaultGame) Run() func(ctx *gin.Context) {
 			redirect(ctx.Writer, ctx.Request, "No password")
 			return
 		}
-		if added, reason := d.RoutePlayer(username, password, ctx); !added {
+		if added, reason := d.routePlayer(username, password, ctx); !added {
 			redirect(ctx.Writer, ctx.Request, reason)
 		}
 	}
@@ -173,7 +176,7 @@ func (d *DefaultGame) process(name string, action Action) {
 					Type:   "won",
 					Player: name,
 				})
-				d.End()
+				d.end()
 			}
 		} else {
 			d.sendToAll(UpdateMessage{
@@ -250,8 +253,8 @@ func (d *DefaultGame) process(name string, action Action) {
 	})
 }
 
-//End is used to destroy all structs associated with the game
-func (d *DefaultGame) End() {
+//end is used to destroy all structs associated with the game
+func (d *DefaultGame) end() {
 	d.close <- struct{}{}
 	d.machine.Destroy()
 }
