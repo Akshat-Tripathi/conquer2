@@ -33,10 +33,10 @@ func (p *persistence) loadContext(ctx *Context) {
 	}
 }
 
-func (p *persistence) loadPlayers(machine st.StateMachine) {
+func (p *persistence) loadPlayers(machine st.StateMachine) int {
 	snapshot := loadSnapshot("ctx", p.docs)
 	if snapshot == nil {
-		return
+		return 0
 	}
 	players := snapshot.Data()["Players"].([]interface{})
 	playerCountries := make(map[string]int)
@@ -62,6 +62,7 @@ func (p *persistence) loadPlayers(machine st.StateMachine) {
 		}
 		player.Countries = countries
 	})
+	return len(players)
 }
 
 func (p *persistence) loadCountries(machine st.StateMachine) {

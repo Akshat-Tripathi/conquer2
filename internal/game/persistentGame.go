@@ -37,7 +37,7 @@ func (pg *persistentGame) Init(ctx Context) {
 
 	pg.sockets.handle = pg.process
 	if !ctxAlreadyInit {
-		pg.loadPlayers(pg.machine)
+		pg.numPlayers = int32(pg.loadPlayers(pg.machine))
 		pg.loadCountries(pg.machine)
 	}
 }
