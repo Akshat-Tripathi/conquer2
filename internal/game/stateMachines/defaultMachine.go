@@ -220,7 +220,7 @@ func (d *DefaultMachine) AddPlayer(name, password, colour string, troops, countr
 			if country.Player == "" {
 				country.Player = name
 				countries--
-			} else {
+			} else if country.Troops == 0 {
 				func() {
 					owner := d.players[country.Player]
 					owner.Lock()
@@ -252,15 +252,19 @@ func (d *DefaultMachine) ToggleAttack() {
 }
 
 func (d *DefaultMachine) attackValid(src, dest *CountryState, player string, times int) bool {
-	if d.attackDisabled && dest.Player != "" && dest.Troops > 0 {
-		//Prevents you from wiping the other player out entirely
-		if func() bool {
-			other := d.players[player]
-			other.Lock()
-			defer other.Unlock()
+	if d.attackDisabled && dest.Player != "" {
+		if dest.Troops == 0 {
+			//Prevents you from wiping the other player out entirely
+			if func() bool {
+				other := d.players[player]
+				other.Lock()
+				defer other.Unlock()
 
-			return other.Countries == 1
-		}() {
+				return other.Countries == 1
+			}() {
+				return false
+			}
+		} else {
 			return false
 		}
 	}
