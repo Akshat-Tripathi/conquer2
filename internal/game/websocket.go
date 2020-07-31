@@ -3,6 +3,7 @@ package game
 import (
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -40,6 +41,7 @@ func (s *socket) read() {
 }
 
 type sockets struct {
+	sync.Mutex
 	players map[string]*socket
 	close   chan struct{}
 	handle  func(name string, action Action)
@@ -60,6 +62,7 @@ type UpdateMessage struct {
 	Type    string //Type of update: updateCountry or updateTroops or newPlayer or won
 	Player  string //Player that owns the country / dest player
 	Country string //Could be the colour iff the type is newPlayer
+	ID      int
 }
 
 func newSockets() *sockets {
@@ -123,6 +126,8 @@ func (s *sockets) sendToPlayer(name string, msg UpdateMessage) {
 }
 
 func (s *sockets) sendToAll(msg UpdateMessage) {
+	s.Lock()
+	defer s.Unlock()
 	for _, value := range s.players {
 		value.send(msg)
 	}
