@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -48,9 +49,12 @@ func (p *player) connect(ip, username string) bool {
 	dialer := websocket.Dialer{}
 	var err error
 	header := make(http.Header)
-	header.Set("Cookie", fmt.Sprintf("situation=world; id=test; username=%s; password=asdf;",
-		username))
+	header.Set("Cookie", fmt.Sprintf("situation=world; id=%s; username=%s; password=asdf;",
+		id, username))
 	p.conn, _, err = dialer.Dial(ip, header)
+	if err != nil {
+		log.Println(err)
+	}
 	return err == nil
 }
 
@@ -60,6 +64,7 @@ func (p *player) onMessage(stop *bool) {
 	for {
 		err := p.conn.ReadJSON(&msg)
 		if err != nil {
+			log.Println(err)
 			*stop = true
 			return
 		}
@@ -92,57 +97,78 @@ func (p *player) onMessage(stop *bool) {
 func (p *player) selectCountries() (string, string) {
 	fromCountry := p.countries[rand.Intn(len(p.countries))]
 	neighbours := countries["world"][fromCountry]
-	toCountry := neighbours[rand.Intn(len(neighbours))]
-	return fromCountry, toCountry
+	if len(neighbours) > 0 {
+		return fromCountry, neighbours[rand.Intn(len(neighbours))]
+	}
+	return fromCountry, fromCountry
 }
 
 func (p *player) selectPlayer() string {
 	var other string
-	for ok := true; ok; ok = other != p.name {
+	for ok := true; ok; ok = other == p.name {
 		other = p.all[rand.Intn(len(p.all))]
 	}
 	return other
 }
 
 func (p *player) attack(fromCountry, toCountry string) {
-	p.conn.WriteJSON(action{
-		Troops:     0,
+	act := action{
+		Troops:     10,
 		ActionType: "attack",
 		Src:        fromCountry,
 		Dest:       toCountry,
 		Player:     p.name,
-	})
+	}
+	fmt.Println(act)
+	err := p.conn.WriteJSON(act)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (p *player) donate() {
-	p.conn.WriteJSON(action{
+	act := action{
 		Troops:     rand.Intn(p.baseTroops + 1),
 		ActionType: "donate",
 		Src:        "",
 		Dest:       p.selectPlayer(),
 		Player:     p.name,
-	})
+	}
+	fmt.Println(act)
+	err := p.conn.WriteJSON(act)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (p *player) move(fromCountry, toCountry string) {
-	p.conn.WriteJSON(action{
+	act := action{
 		Troops:     rand.Intn(p.baseTroops + 1),
 		ActionType: "move",
 		Src:        fromCountry,
 		Dest:       toCountry,
 		Player:     p.name,
-	})
+	}
+	fmt.Println(act)
+	err := p.conn.WriteJSON(act)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (p *player) deploy(fromCountry string) {
 	act := action{
 		Troops:     rand.Intn(p.baseTroops + 1),
-		ActionType: "drop",
+		ActionType: "deploy",
 		Src:        "",
 		Dest:       fromCountry,
 		Player:     p.name,
 	}
-	p.conn.WriteJSON(act)
+	fmt.Println(act)
+	err := p.conn.WriteJSON(act)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 //Run - runs the player
@@ -159,17 +185,17 @@ func (p *player) run(ip, username string) {
 		if len(p.countries) > 0 && len(p.all) > 0 {
 			fromCountry, toCountry = p.selectCountries()
 			if p.countryStates[fromCountry].troops > 0 {
+				_, ok := p.countryStates[toCountry]
+				if !ok {
+					p.countryStates[toCountry] = &countryState{}
+				}
 				if p.countryStates[toCountry].player == p.name {
 					p.move(fromCountry, toCountry)
 				} else {
 					p.attack(fromCountry, toCountry)
 				}
 			} else {
-				if rand.Intn(2) == 0 {
-					p.deploy(fromCountry)
-				} else {
-					p.donate()
-				}
+				p.deploy(fromCountry)
 			}
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(3)) * 500)
 		}
@@ -177,13 +203,13 @@ func (p *player) run(ip, username string) {
 }
 
 //Join - joins a game and starts the player
-func (p *player) Join(name string) {
+func (p *player) join(name string) {
 	p.name = name
 
 	v := url.Values{}
 	v.Set("username", name)
 	v.Set("password", "asdf")
-	v.Set("id", "test")
+	v.Set("id", id)
 
 	_, err := http.PostForm("http://localhost/join", v)
 
@@ -192,5 +218,5 @@ func (p *player) Join(name string) {
 	}
 
 	time.Sleep(time.Second * 5)
-	p.run("ws://localhost/game/test/ws", name)
+	p.run("ws://localhost/game/"+id+"/ws", name)
 }

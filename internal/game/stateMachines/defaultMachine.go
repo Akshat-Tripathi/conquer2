@@ -34,6 +34,9 @@ func (d *DefaultMachine) Init(countries []string) {
 }
 
 func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {
+	if src == dest {
+		return false
+	}
 	source, ok := d.countries[src]
 	if !ok {
 		return false
@@ -55,6 +58,9 @@ func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest
 }
 
 func (d *DefaultMachine) withLockedPlayers(src, dest string, op func(src, dest *PlayerState) bool) bool {
+	if src == dest {
+		return false
+	}
 	source, ok := d.players[src]
 	if !ok {
 		return false
