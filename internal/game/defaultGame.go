@@ -163,12 +163,14 @@ func (d *DefaultGame) process(name string, action Action) {
 				Troops:  1,
 				Player:  name,
 				Country: action.Dest,
+				ID:      1,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc - 1,
 				Player:  name,
 				Country: action.Src,
+				ID:      2,
 			})
 
 			if won {
@@ -184,12 +186,14 @@ func (d *DefaultGame) process(name string, action Action) {
 				Troops:  deltaDest,
 				Player:  d.machine.GetCountry(action.Dest).Player,
 				Country: action.Dest,
+				ID:      3,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc,
 				Player:  name,
 				Country: action.Src,
+				ID:      4,
 			})
 		}
 		return
@@ -201,11 +205,13 @@ func (d *DefaultGame) process(name string, action Action) {
 			Type:   "updateTroops",
 			Troops: action.Troops,
 			Player: action.Dest,
+			ID:     5,
 		})
 		d.sendToPlayer(name, UpdateMessage{
 			Type:   "updateTroops",
 			Troops: -action.Troops,
 			Player: name,
+			ID:     6,
 		})
 	case "move":
 		if !d.areNeighbours(action.Src, action.Dest) {
@@ -227,12 +233,14 @@ func (d *DefaultGame) process(name string, action Action) {
 				Type:   "updateTroops",
 				Troops: -action.Troops,
 				Player: name,
+				ID:     7,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  action.Troops,
 				Player:  name,
 				Country: action.Dest,
+				ID:      8,
 			})
 		}
 		return
@@ -244,12 +252,14 @@ func (d *DefaultGame) process(name string, action Action) {
 		Troops:  -action.Troops,
 		Player:  name,
 		Country: action.Src,
+		ID:      9,
 	})
 	d.sendToAll(UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  action.Troops,
 		Player:  d.machine.GetCountry(action.Dest).Player,
 		Country: action.Dest,
+		ID:      10,
 	})
 }
 
