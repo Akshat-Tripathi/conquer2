@@ -81,7 +81,7 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 				cg.sendToPlayer(playerName, msg)
 			}
 		} else {
-			if cg.canSee(playerName, name) {
+			if cg.countViewPoints(playerName, name) != 0 {
 				cg.sendToPlayer(playerName, msg)
 			}
 		}
@@ -101,7 +101,7 @@ func (cg *CampaignGame) process(name string, action Action) {
 			return
 		}
 		if conquered {
-			if !cg.canSee(oldPlayer, action.Dest) {
+			if cg.countViewPoints(oldPlayer, action.Dest) == 0 {
 				cg.sendToPlayer(oldPlayer, UpdateMessage{
 					Type:    "updateCountry",
 					Troops:  0,
@@ -126,7 +126,7 @@ func (cg *CampaignGame) process(name string, action Action) {
 				if neighbour == action.Src {
 					continue
 				}
-				if cg.canSee(name, neighbour) && !cg.areNeighbours(action.Src, neighbour) {
+				if cg.countViewPoints(name, neighbour) == 1 {
 					country = cg.machine.GetCountry(neighbour)
 					cg.sendToPlayer(name, UpdateMessage{
 						Type:    "updateCountry",
@@ -135,7 +135,7 @@ func (cg *CampaignGame) process(name string, action Action) {
 						Player:  country.Player,
 					})
 				}
-				if !cg.canSee(oldPlayer, neighbour) {
+				if cg.countViewPoints(oldPlayer, neighbour) == 0 {
 					cg.sendToPlayer(oldPlayer, UpdateMessage{
 						Type:    "updateCountry",
 						Country: neighbour,
@@ -225,16 +225,17 @@ func (cg *CampaignGame) process(name string, action Action) {
 	})
 }
 
-func (cg *CampaignGame) canSee(player, country string) bool {
+func (cg *CampaignGame) countViewPoints(player, country string) int {
+	viewPoints := 0
 	if cg.machine.GetCountry(country).Player == player {
-		return true
+		viewPoints++
 	}
 	for _, neighbour := range cg.getNeighbours(country) {
 		if cg.machine.GetCountry(neighbour).Player == player {
-			return true
+			viewPoints++
 		}
 	}
-	return false
+	return viewPoints
 }
 
 func (cg *CampaignGame) sendToRelevantPlayers(country string, msg UpdateMessage) {
