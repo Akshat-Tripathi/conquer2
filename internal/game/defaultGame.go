@@ -196,7 +196,6 @@ func (d *DefaultGame) process(name string, action Action) {
 				ID:      4,
 			})
 		}
-		return
 	case "donate":
 		if !d.machine.Donate(name, action.Dest, action.Troops) {
 			return
@@ -220,6 +219,7 @@ func (d *DefaultGame) process(name string, action Action) {
 		if !d.machine.Move(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
+		d.sendMove(name, action)
 	case "assist":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
@@ -227,6 +227,7 @@ func (d *DefaultGame) process(name string, action Action) {
 		if !d.machine.Assist(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
+		d.sendMove(name, action)
 	case "deploy":
 		if d.machine.Deploy(action.Dest, action.Troops, name) {
 			d.sendToPlayer(name, UpdateMessage{
@@ -243,10 +244,10 @@ func (d *DefaultGame) process(name string, action Action) {
 				ID:      8,
 			})
 		}
-		return
-	default:
-		return
 	}
+}
+
+func (d *DefaultGame) sendMove(name string, action Action) {
 	d.sendToAll(UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  -action.Troops,
