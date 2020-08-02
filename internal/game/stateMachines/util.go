@@ -19,3 +19,8 @@ func sort(vals []int) []int {
 	}
 	return vals
 }
+
+type playerAllegiance struct {
+	leader    string
+	followers []*playerAllegiance
+}
