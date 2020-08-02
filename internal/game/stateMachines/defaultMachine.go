@@ -19,7 +19,13 @@ type DefaultMachine struct {
 	moveDisabled     bool
 	dropDisabled     bool
 	winCountries     int
+	validateAttack   func(src, dest *CountryState, player string, times int) bool
+	validateDonate   func(src, dest *PlayerState, troops int) bool
+	validateDeploy   func(src *PlayerState, dest *CountryState, player string, troops int) bool
+	validateMove     func(src *CountryState, player string, troops int) bool
 }
+
+var _ StateMachine = (*DefaultMachine)(nil)
 
 //Init initialises the machine
 func (d *DefaultMachine) Init(countries []string) {
@@ -31,6 +37,10 @@ func (d *DefaultMachine) Init(countries []string) {
 	}
 	d.canAcceptPlayers = true
 	d.winCountries = 177
+	d.validateAttack = d.attackValid
+	d.validateDeploy = d.deployValid
+	d.validateDonate = d.donateValid
+	d.validateMove = d.moveValid
 }
 
 func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {
@@ -101,7 +111,7 @@ func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won
 	defer srcCountry.Unlock()
 	defer destCountry.Unlock()
 
-	if d.attackValid(srcCountry, destCountry, player, times) {
+	if d.validateAttack(srcCountry, destCountry, player, times) {
 		deltaSrc, deltaDest := 0, 0
 		if destCountry.Troops != 0 {
 			deltaSrc, deltaDest = defaultRng(srcCountry.Troops, destCountry.Troops, times)
@@ -142,7 +152,7 @@ func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won
 //Donate validates a donation
 func (d *DefaultMachine) Donate(src, dest string, troops int) bool {
 	return d.withLockedPlayers(src, dest, func(src, dest *PlayerState) bool {
-		if !d.donateValid(src, dest, troops) {
+		if !d.validateDonate(src, dest, troops) {
 			return false
 		}
 		src.Troops -= troops
@@ -154,7 +164,7 @@ func (d *DefaultMachine) Donate(src, dest string, troops int) bool {
 //Assist allows a player to move troops into territory owned by another player
 func (d *DefaultMachine) Assist(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
-		if !d.moveValid(src, player, troops) || src.Player == dest.Player {
+		if !d.validateMove(src, player, troops) || src.Player == dest.Player {
 			return false
 		}
 		src.Troops -= troops
@@ -166,7 +176,7 @@ func (d *DefaultMachine) Assist(src, dest string, troops int, player string) boo
 //Move allows intra-empire movement
 func (d *DefaultMachine) Move(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
-		if !d.moveValid(src, player, troops) || src.Player != dest.Player {
+		if !d.validateMove(src, player, troops) || src.Player != dest.Player {
 			return false
 		}
 		src.Troops -= troops
@@ -189,7 +199,7 @@ func (d *DefaultMachine) Deploy(dest string, troops int, player string) bool {
 	defer source.Unlock()
 	destination.Lock()
 	defer destination.Unlock()
-	if !d.deployValid(source, destination, player, troops) {
+	if !d.validateDeploy(source, destination, player, troops) {
 		return false
 	}
 	source.Troops -= troops
@@ -215,9 +225,15 @@ func (d *DefaultMachine) AddPlayer(name, password, colour string, troops, countr
 		Countries: countries,
 		Password:  password,
 	}
-	startingCountries := countries
 	//Assign initial countries
+	d.assignCountries(countries, name)
+	return PlayerAdded
+}
+
+func (d *DefaultMachine) assignCountries(countries int, name string) string {
 	var countryName string
+	startingCountries := countries
+
 	for countries > 0 {
 		countryName = d.countryNames[rand.Intn(len(d.countryNames))]
 		func(country *CountryState) {
@@ -239,7 +255,7 @@ func (d *DefaultMachine) AddPlayer(name, password, colour string, troops, countr
 			}
 		}(d.countries[countryName])
 	}
-	return PlayerAdded
+	return countryName
 }
 
 //GetCountry returns an copy of country
@@ -315,10 +331,6 @@ func (d *DefaultMachine) moveValid(src *CountryState, player string, troops int)
 	if d.moveDisabled {
 		return false
 	}
-	//Must select neighbouring countries
-	/*if !d.areNeighbours(move.Src, move.Dest) {
-		return false
-	}*/
 	//troops must be > 0
 	if troops < 0 {
 		return false
