@@ -113,7 +113,7 @@ class GameMap extends Component {
             if (action.Player !== "") {
               countryStates[action.Country].Troops += action.Troops;
               if (countryStates[action.Country].Troops < 0) {
-                  alert("Looks like u have a negative value.The ID is: " + action.ID + "pls tell the developers this");
+                  console.log(action);
               }
             } else {
               countryStates[action.Country].Troops = action.Troops;
