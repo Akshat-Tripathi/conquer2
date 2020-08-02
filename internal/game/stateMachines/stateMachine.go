@@ -1,9 +1,25 @@
 package statemachines
 
-//TODO maybe split into smaller interfaces
+type validator interface {
+	attackValid(src, dest *CountryState, player string, times int) bool
+	donateValid(src, dest *PlayerState, troops int) bool
+	deployValid(src *PlayerState, dest *CountryState, player string, troops int) bool
+	moveValid(src *CountryState, player string, troops int) bool
+}
+
+type executor interface {
+	Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int)
+	Donate(src, dest string, troops int) bool
+	Assist(src, dest string, troops int, player string) bool
+	Move(src, dest string, troops int, player string) bool
+	Deploy(dest string, troops int, player string) bool
+}
 
 //StateMachine is an interface defining what all statemachines are capable of
 type StateMachine interface {
+	executor
+	validator
+
 	Init([]string)
 	Destroy()
 
@@ -14,12 +30,6 @@ type StateMachine interface {
 	StopAccepting()
 
 	ToggleAttack()
-
-	Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int)
-	Donate(src, dest string, troops int) bool
-	Assist(src, dest string, troops int, player string) bool
-	Move(src, dest string, troops int, player string) bool
-	Deploy(dest string, troops int, player string) bool
 
 	GetCountry(country string) CountryState
 
