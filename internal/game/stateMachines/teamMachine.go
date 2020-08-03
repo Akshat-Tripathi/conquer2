@@ -17,9 +17,10 @@ type TeamMachine struct {
 
 var _ StateMachine = (*TeamMachine)(nil)
 
-//Init initialises the DefaultMachine and overrides the validation functions
+//Init overrides the validation functions
+//PRE: the DefaultMachine is already provided
 func (t *TeamMachine) Init(countries []string) {
-	t.DefaultMachine.Init(countries)
+	//t.DefaultMachine.Init(countries)
 	t.capitals = make(map[string]string)
 	t.allegiances = make(map[string]*playerAllegiance)
 	t.validateAttack = t.attackValid
@@ -40,7 +41,7 @@ func (t *TeamMachine) AddPlayer(name, password, colour string, troops, countries
 		//assign a capital
 		t.capitalLock.Lock()
 		defer t.capitalLock.Unlock()
-		t.capitals[t.assignCountries(1, name)] = name
+		t.capitals[name] = t.assignCountries(1, name)
 		atomic.AddInt32(&t.nIndependent, 1)
 	}
 	return status
@@ -73,7 +74,7 @@ func (t *TeamMachine) attackValid(src, dest *CountryState, player string, times 
 		return false
 	}
 	//Can't attack self
-	if t.allegiances[src.Player].leader == t.allegiances[dest.Player].leader {
+	if dest.Player != "" && t.allegiances[src.Player].leader == t.allegiances[dest.Player].leader {
 		return false
 	}
 	//Must have at least 1 troop to attack
@@ -127,16 +128,19 @@ func (t *TeamMachine) deployValid(src *PlayerState, dest *CountryState, player s
 
 //Attack performs an attack then checks for any change of allegiance
 func (t *TeamMachine) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
+	oldPlayer := func() string {
+		destination := t.countries[dest]
+		destination.Lock()
+		defer destination.Unlock()
+		return destination.Player
+	}()
 	valid, won, conquered, nSrc, nDest = t.DefaultMachine.Attack(src, dest, player, times)
 	if conquered && t.isCapital(dest) {
 		//change allegiances
 		t.allegianceLock.Lock()
 		defer t.allegianceLock.Unlock()
-		destination := t.countries[dest]
-		destination.Lock()
-		defer destination.Unlock()
-		t.allegiances[destination.Player].leader = t.allegiances[player].leader
-		for _, follower := range t.allegiances[destination.Player].followers {
+		t.allegiances[oldPlayer].leader = t.allegiances[player].leader
+		for _, follower := range t.allegiances[oldPlayer].followers {
 			follower.leader = t.allegiances[player].leader
 		}
 		//if the last country conquered isn't a capital

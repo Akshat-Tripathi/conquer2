@@ -12,14 +12,17 @@ var _ Game = (*CapitalGame)(nil)
 //Init replaces the DefaultGame's state processor
 func (cg *CapitalGame) Init(ctx Context) {
 	cg.DefaultGame.Init(ctx)
-	cg.machine = &statemachines.TeamMachine{}
+	teamMachine := &statemachines.TeamMachine{}
+	teamMachine.DefaultMachine = *cg.machine.(*statemachines.DefaultMachine)
+	cg.machine = teamMachine
+	cg.machine.Init(nil)
 	cg.sendInitialState = cg.sendInitialStateFunc
 }
 
 func (cg *CapitalGame) sendInitialStateFunc(playerName string) {
 	cg.DefaultGame.sendInitialStateFunc(playerName)
 	cg.machine.(*statemachines.TeamMachine).RangeCapitals(func(player, capital string) {
-		cg.sendToPlayer(playerName, UpdateMessage{
+		cg.sendToAll(UpdateMessage{
 			Type:    "newCapital",
 			Player:  player,
 			Country: capital,
