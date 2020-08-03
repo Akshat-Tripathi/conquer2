@@ -1,0 +1,93 @@
+body {
+	background-color: transparent;
+}
+
+.backdrop {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-image: url("../../media/conquer2.jpeg");
+	min-width: 100%;
+	min-height: 100%;
+	-webkit-filter: blur(18px);
+	-o-filter: blur(18px);
+	filter: blur(18px);
+	z-index: -100;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-ms-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+.container {
+	text-align: center;
+}
+
+.container h2 h4 {
+	color: orange;
+	align-content: center;
+}
+
+.player-list {
+	text-align: center;
+	height: 80%;
+	width: 20%;
+	position: fixed;
+	background-color: black;
+	opacity: 0.6;
+	z-index: 1;
+	left: 0;
+	bottom: 0;
+	overflow: hidden;
+	padding-top: 20px;
+	border-radius: 0px 20px 0px 0px;
+}
+
+.players {
+	font-weight: bold;
+	text-shadow: white 0px 0px 10px;
+}
+
+.tips-and-tricks {
+	background-color: black;
+	opacity: 0.7;
+	padding: 2%;
+	border-radius: 10%;
+	overflow: hidden;
+	position: relative;
+	width: 400px;
+  	margin: 0 auto;
+	display:block;
+	width: 30%;
+}
+
+.left-tat {
+	color: orange;
+	width: 20%;
+	display: flex;
+	float: left;
+	justify-content: center;
+}
+
+.right-tat {
+	width: 80%;
+	color: orange;
+	display: flex;
+	float: right;
+	justify-content: center;
+}
+
+.br-box {
+	text-align: center;
+	background-color: black;
+	box-shadow: blue;
+	padding: 3%;
+	opacity: 0.7;
+	border-radius: 20px 0px 0px 0px;
+	overflow: hidden;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}

@@ -7,6 +7,7 @@ import GameMap from './pages/Map/Map.jsx';
 import Intro2 from './shashgonenuts/intro2.jsx';
 import ErrorPage from './pages/Extra/Error.jsx';
 import Redirector from './pages/Extra/Redirector.jsx';
+import WaitingRoom from './pages/Map/WaitingRoom';
 
 class App extends React.Component {
 	render() {
@@ -17,6 +18,7 @@ class App extends React.Component {
 						<div>
 							<Route exact path="/" component={Home} />
 							<Route path="/home" component={Home} />
+							<Route path="/lobby" component={WaitingRoom} />
 							<Route path="/underdev" component={UnderConstruction} />
 							<Route path="/game" component={GameMap} />
 							<Route path="/game_intro" component={Redirector} />
