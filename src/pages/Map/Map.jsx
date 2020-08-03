@@ -71,7 +71,7 @@ function getInterval() {
     }
   }
 
-  if (type === "realtime") {
+  if (type === "realtime" || type === "capital") {
     for (let i = 0; i < decodedCookie.length; i++) {
       const elem = decodedCookie[i].split("=");
       if (elem[0] === "interval") {
@@ -81,6 +81,13 @@ function getInterval() {
   } else {
     return 8 * 60; //8 hours
   }
+}
+
+function getOwner(player) {
+    while (player != allegiances[player]) {
+        player = allegiances[player];
+    }
+    return player;
 }
 
 class GameMap extends Component {
@@ -108,7 +115,11 @@ class GameMap extends Component {
           break;
         case "updateCountry":
           let ok = typeof countryStates[action.Country] === "undefined";
-          if (ok || countryStates[action.Country].Player !== action.Player) {
+          if (ok || getOwner(countryStates[action.Country].Player) !== getOwner(action.Player)) {
+            if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
+                //change allegiance  
+                allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
+              }
               countryStates[action.Country] = new countryState(
                   action.Troops,
                   action.Player
@@ -139,7 +150,9 @@ class GameMap extends Component {
           }
           break;
         case "newCapital":
+          console.log(action.Country);  
           capitals[action.Player] = action.Country;
+          break;
         case "won":
             alert(action.Player + " won");
             /*if (user == action.Player) {
@@ -253,7 +266,7 @@ class GameMap extends Component {
       var iso_a2 = convertISO(NAME, ISO_A2);
 
       if (fromCountry === "") {
-        if (countryStates[iso_a2].Player === user) {
+        if (getOwner(countryStates[iso_a2].Player) === getOwner(user)) {
           setFromCountryISO(iso_a2);
 
           setfromCountry(NAME);
@@ -267,13 +280,13 @@ class GameMap extends Component {
         let c = countryStates[iso_a2];
         settoCountryOwner(c === undefined ? "" : c.Player);
         setToCountryISO(iso_a2);
-        if (countryStates[iso_a2].Player === user) {
+        if (getOwner(countryStates[iso_a2].Player) === getOwner(user)) {
           setallowMove(true);
         } else {
           setallowMove(false);
         }
       } else {
-        if (countryStates[iso_a2].Player === user) {
+        if (getOwner(countryStates[iso_a2].Player) === getOwner(user)) {
           setFromCountryISO(iso_a2);
 
           setfromCountry(NAME);
