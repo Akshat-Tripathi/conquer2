@@ -75,9 +75,7 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 		//Send initial state
 		d.sendInitialState(name)
 
-		time.AfterFunc(d.context.StartTime.Sub(time.Now()), func() {
-			d.listen(name)
-		})
+		d.listen(name)
 		return true, ""
 	}
 	//case playerRejected
