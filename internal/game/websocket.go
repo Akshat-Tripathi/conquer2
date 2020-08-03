@@ -53,7 +53,6 @@ type Action struct {
 	ActionType string
 	Src        string
 	Dest       string
-	Player     string //TODO remove this
 }
 
 //UpdateMessage - sent to client

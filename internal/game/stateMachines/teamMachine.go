@@ -1,6 +1,9 @@
 package statemachines
 
-import "sync"
+import (
+	"sync"
+	"sync/atomic"
+)
 
 //TeamMachine allows players to team up, it is used for capital supremacy games
 type TeamMachine struct {
@@ -9,10 +12,12 @@ type TeamMachine struct {
 	capitals       map[string]string //Name : Capital
 	allegianceLock sync.RWMutex
 	allegiances    map[string]*playerAllegiance
+	nIndependent   int32
 }
 
 var _ StateMachine = (*TeamMachine)(nil)
 
+//Init initialises the DefaultMachine and overrides the validation functions
 func (t *TeamMachine) Init(countries []string) {
 	t.DefaultMachine.Init(countries)
 	t.capitals = make(map[string]string)
@@ -22,6 +27,7 @@ func (t *TeamMachine) Init(countries []string) {
 	t.validateMove = t.moveValid
 }
 
+//AddPlayer adds a player and creates a capital and allegiance for them
 func (t *TeamMachine) AddPlayer(name, password, colour string, troops, countries int) int8 {
 	status := t.DefaultMachine.AddPlayer(name, password, colour, troops, countries-1)
 	if status == PlayerAdded {
@@ -35,6 +41,7 @@ func (t *TeamMachine) AddPlayer(name, password, colour string, troops, countries
 		t.capitalLock.Lock()
 		defer t.capitalLock.Unlock()
 		t.capitals[t.assignCountries(1, name)] = name
+		atomic.AddInt32(&t.nIndependent, 1)
 	}
 	return status
 }
@@ -118,9 +125,10 @@ func (t *TeamMachine) deployValid(src *PlayerState, dest *CountryState, player s
 	return true
 }
 
+//Attack performs an attack then checks for any change of allegiance
 func (t *TeamMachine) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
 	valid, won, conquered, nSrc, nDest = t.DefaultMachine.Attack(src, dest, player, times)
-	if conquered {
+	if conquered && t.isCapital(dest) {
 		//change allegiances
 		t.allegianceLock.Lock()
 		defer t.allegianceLock.Unlock()
@@ -131,14 +139,29 @@ func (t *TeamMachine) Attack(src, dest, player string, times int) (valid, won, c
 		for _, follower := range t.allegiances[destination.Player].followers {
 			follower.leader = t.allegiances[player].leader
 		}
+		//if the last country conquered isn't a capital
+		// then the game should already be over as all capitals would have been taken
+		won = atomic.AddInt32(&t.nIndependent, -1) == 1
 	}
 	return valid, won, conquered, nSrc, nDest
 }
 
-func (t *TeamMachine) rangeCapitals(f func(player, capital string)) {
+//RangeCapitals does what the name suggests
+func (t *TeamMachine) RangeCapitals(f func(player, capital string)) {
 	t.capitalLock.RLock()
 	defer t.capitalLock.RUnlock()
 	for player, capital := range t.capitals {
 		f(player, capital)
 	}
+}
+
+func (t *TeamMachine) isCapital(dest string) bool {
+	t.capitalLock.RLock()
+	defer t.capitalLock.RUnlock()
+	for _, capital := range t.capitals {
+		if capital == dest {
+			return true
+		}
+	}
+	return false
 }

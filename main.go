@@ -35,6 +35,23 @@ func main() {
 
 	client, games := loadGames(colours, r)
 
+	ctx := game.Context{
+		ID:                "001f91",
+		MaxPlayers:        20,
+		Minutes:           1,
+		Situation:         "world",
+		StartingCountries: 1,
+		StartingTroops:    100,
+		StartTime:         time.Now().Add(time.Minute * 0),
+		Colours:           colours,
+		Client:            client,
+	}
+
+	g := &game.DefaultGame{}
+	g.Init(ctx)
+	games["001f91"] = g
+	r.GET("/game/001f91/ws", g.Run())
+
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
@@ -89,7 +106,7 @@ func main() {
 			Situation:         situation,
 			StartingCountries: startingCountries,
 			StartingTroops:    startingTroops,
-			StartTime:         time.Now().Add(time.Minute * 1),
+			StartTime:         time.Now().Add(time.Minute * 2),
 			Colours:           colours,
 			Client:            client,
 		}
