@@ -37,17 +37,17 @@ func main() {
 
 	ctx := game.Context{
 		ID:                "001f91",
-		MaxPlayers:        20,
+		MaxPlayers:        3,
 		Minutes:           1,
 		Situation:         "world",
-		StartingCountries: 1,
+		StartingCountries: 20,
 		StartingTroops:    100,
 		StartTime:         time.Now().Add(time.Minute * 0),
 		Colours:           colours,
 		Client:            client,
 	}
 
-	g := &game.DefaultGame{}
+	g := &game.CapitalGame{}
 	g.Init(ctx)
 	games["001f91"] = g
 	r.GET("/game/001f91/ws", g.Run())
@@ -123,6 +123,10 @@ func main() {
 				year, month, day := time.Now().Date()
 				ctx.StartTime = time.Date(year, month, day, 0, 0, 0, 0, time.Now().Location())
 				g := &game.CampaignGame{}
+				g.Init(ctx)
+				return g
+			case "capital":
+				g := &game.CapitalGame{}
 				g.Init(ctx)
 				return g
 			default:

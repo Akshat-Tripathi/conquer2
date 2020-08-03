@@ -208,6 +208,7 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 							>
 								<MenuItem value="realtime">Regular</MenuItem>
 								<MenuItem value="campaign">Campaign</MenuItem>
+                                <MenuItem value="capital">Capital Supremacy</MenuItem>
 							</Select>
 						</Grid>
 						<Grid item xs={12}>
