@@ -20,6 +20,10 @@ var socket = null;
 var troops = 0;
 // List of all countries
 var countryStates = {};
+// Map players to capitals
+var capitals = {};
+//Map players to their owners
+var allegiances = {};
 // List of all 'players: colours'
 var playerColours = {};
 // List of all players
@@ -105,17 +109,21 @@ class GameMap extends Component {
         case "updateCountry":
           let ok = typeof countryStates[action.Country] === "undefined";
           if (ok || countryStates[action.Country].Player !== action.Player) {
-            countryStates[action.Country] = new countryState(
-              action.Troops,
-              action.Player
-            );
-          } else {
+              countryStates[action.Country] = new countryState(
+                  action.Troops,
+                  action.Player
+                  );
+                } else {
             if (action.Player !== "") {
-              countryStates[action.Country].Troops += action.Troops;
+                countryStates[action.Country].Troops += action.Troops;
               if (countryStates[action.Country].Troops < 0) {
                   console.log(action);
-              }
+                }
             } else {
+              if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
+                //change allegiance  
+                allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
+              }
               countryStates[action.Country].Troops = action.Troops;
             }
           }
@@ -127,8 +135,11 @@ class GameMap extends Component {
             );
             playerColours[action.Player] = action.Country;
             players.push(action.Player);
+            allegiances[action.Player] = action.Player;
           }
           break;
+        case "newCapital":
+          capitals[action.Player] = action.Country;
         case "won":
             alert(action.Player + " won");
             /*if (user == action.Player) {
@@ -340,7 +351,7 @@ class GameMap extends Component {
         var col = "#a69374";
         if (countryStates[iso_a2] !== undefined) {
           if (countryStates[iso_a2].Player !== "") {
-            col = playerColours[countryStates[iso_a2].Player];
+            col = playerColours[getOwner(countryStates[iso_a2].Player)];
           }
         }
         if (
