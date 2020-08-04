@@ -68,7 +68,7 @@ body {
 	width: 20%;
 	display: flex;
 	float: left;
-	justify-content: center;
+	justify-content: left;
 }
 
 .right-tat {

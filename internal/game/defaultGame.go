@@ -75,9 +75,9 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 		//Send initial state
 		d.sendInitialState(name)
 
-		time.AfterFunc(d.context.StartTime.Sub(time.Now()), func() {
+		// time.AfterFunc(d.context.StartTime.Sub(time.Now()), func() {
 			d.listen(name)
-		})
+		// })
 		return true, ""
 	}
 	//case playerRejected
@@ -148,6 +148,15 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 
 func (d *DefaultGame) process(name string, action Action) {
 	switch action.ActionType {
+	
+	//Lobby room waiting until everyone is ready to play.
+	case "readyUp":
+		d.sendToAll(UpdateMessage{
+			Type: "playerIsReady",
+			Player: name,
+		})
+		return;
+
 	case "attack":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
@@ -160,7 +169,7 @@ func (d *DefaultGame) process(name string, action Action) {
 		if conquered {
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
-				Troops:  1,
+				Troops:  1, 
 				Player:  name,
 				Country: action.Dest,
 				ID:      1,

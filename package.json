@@ -11,8 +11,11 @@
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
 		"ReconnectingWebSocket": "git+https://github.com/joewalnes/reconnecting-websocket.git",
+		"express": "^4.17.1",
+		"express-generator": "^4.16.0",
 		"firebase-admin": "^8.13.0",
 		"formik": "^2.1.4",
+		"gsap": "^3.4.2",
 		"node-sass": "^4.14.1",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
@@ -24,7 +27,9 @@
 		"react-scripts": "3.4.1",
 		"react-simple-maps": "^2.0.0",
 		"react-spring": "^8.0.27",
-		"react-tooltip": "^4.2.6"
+		"react-tooltip": "^4.2.6",
+		"react-typist": "^2.0.5",
+		"ws": "^7.3.1"
 	},
 	"scripts": {
 		"start": "react-scripts start",

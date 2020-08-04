@@ -57,6 +57,10 @@ function getStartTime() {
 	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
 }
 
+function getYourUsername() {
+	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'username')[0][1];
+}
+
 function getInterval() {
 	console.log(document.cookie);
 	const decodedCookie = decodeURIComponent(document.cookie).replace(/ /g, '').split(';');
@@ -93,7 +97,10 @@ class GameMap extends Component {
 
 		//Ascertain from cookies the base troop drop time intervals
 		interval = getInterval();
+		//Ascertain from cookies the game server start time
 		start = getStartTime();
+		//Ascertain from cookies the current player's username
+		user = getYourUsername();
 
 		socket.onmessage = (msg) => {
 			var action = JSON.parse(msg.data);
@@ -115,7 +122,7 @@ class GameMap extends Component {
 							countryStates[action.Country].Troops += action.Troops;
 							if (countryStates[action.Country].Troops < 0) {
 								alert(
-									'Looks like u have a negative value.The ID is: ' +
+									'Looks like u have a negative value. The ID is: ' +
 										action.ID +
 										'pls tell the developers this'
 								);
@@ -125,13 +132,19 @@ class GameMap extends Component {
 						}
 					}
 					break;
+				case 'playerIsReady':
+					playerReady[action.Player] = true;
+					console.log(playerReady, 'received readyUp message for ', action.Player);
+					break;
 				case 'newPlayer':
-					if (!players.some((player) => player == action.Player)) {
+					if (!players.some((player) => player === action.Player)) {
 						console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
 						playerColours[action.Player] = action.Country;
 						players.push(action.Player);
+						playerReady[action.Player] = false;
 					}
 					break;
+
 				case 'won':
 					alert(action.Player + ' won');
 				/*if (user == action.Player) {
@@ -466,7 +479,11 @@ class GameMap extends Component {
 	}
 
 	render() {
-		return this.state.lobby ? <WaitingRoom playerColours={playerColours} /> : <this.SideBar />;
+		return this.state.lobby ? (
+			<WaitingRoom playerColours={playerColours} user={user} socket={socket} />
+		) : (
+			<this.SideBar />
+		);
 	}
 }
 
@@ -509,3 +526,4 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default GameMap;
+export { playerReady };
