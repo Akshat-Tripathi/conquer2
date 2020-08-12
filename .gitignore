@@ -7,3 +7,5 @@
 internal/game/*.json
 /discord/auth.token
 /src/api/environment.js
+
+/src/pages/NewHome

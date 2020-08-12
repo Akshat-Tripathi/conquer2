@@ -40,6 +40,7 @@ func (p *persistence) loadPlayers(machine st.StateMachine) int {
 	}
 	players := snapshot.Data()["Players"].([]interface{})
 	playerCountries := make(map[string]int)
+	
 	//Load players
 	for _, player := range players {
 		stateSnapshot := loadSnapshot("."+player.(string), p.docs)

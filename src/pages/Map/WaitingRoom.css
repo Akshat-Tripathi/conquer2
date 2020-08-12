@@ -7,7 +7,7 @@ body {
 	top: 0;
 	right: 0;
 	bottom: 0;
-	background-image: url("../../media/conquer2.jpeg");
+	background-image: url("../../media/conquer2.jpg");
 	min-width: 100%;
 	min-height: 100%;
 	-webkit-filter: blur(18px);
@@ -51,19 +51,23 @@ body {
 }
 
 .tips-and-tricks {
-	background-color: black;
 	opacity: 0.7;
-	padding: 2%;
-	border-radius: 10%;
-	overflow: hidden;
-	position: relative;
-	width: 400px;
-  	margin: 0 auto;
-	display:block;
-	width: 30%;
+	background: black;
+	position: absolute;
+	text-align: center;
+	left: 50%;
+	color: orange;
+	display: grid;
+	grid-template-columns: 10% 80%;
+	justify-content: center;
+	transform: translate(-50%, -50%);
+	width: 33.33%;
+	padding: 2em;
+	border-radius: 10px;
+	margin-top: 10vh;
 }
 
-.left-tat {
+/* .left-tat {
 	color: orange;
 	width: 20%;
 	display: flex;
@@ -77,7 +81,7 @@ body {
 	display: flex;
 	float: right;
 	justify-content: center;
-}
+} */
 
 .br-box {
 	text-align: center;

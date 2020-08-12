@@ -132,9 +132,16 @@ class GameMap extends Component {
 						}
 					}
 					break;
-				case 'playerIsReady':
+				case 'readyPlayer':
+					console.log('readyPlayer token received. Setting ready state to true');
 					playerReady[action.Player] = true;
-					console.log(playerReady, 'received readyUp message for ', action.Player);
+					console.log(playerReady);
+					if (
+						!Object.keys(playerReady).some((player) => !playerReady[player]) &&
+						Object.keys(playerReady).length > 2
+					) {
+						this.setState({ lobby: false });
+					}
 					break;
 				case 'newPlayer':
 					if (!players.some((player) => player === action.Player)) {
@@ -144,7 +151,6 @@ class GameMap extends Component {
 						playerReady[action.Player] = false;
 					}
 					break;
-
 				case 'won':
 					alert(action.Player + ' won');
 				/*if (user == action.Player) {
@@ -480,7 +486,7 @@ class GameMap extends Component {
 
 	render() {
 		return this.state.lobby ? (
-			<WaitingRoom playerColours={playerColours} user={user} socket={socket} />
+			<WaitingRoom playerColours={playerColours} user={user} socket={socket} playerReady={playerReady} />
 		) : (
 			<this.SideBar />
 		);

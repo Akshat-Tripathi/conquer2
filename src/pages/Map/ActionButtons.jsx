@@ -44,7 +44,7 @@ const Options = ({
 				</Grid>
 				{!allowMove ? (
 					<div>
-						{toCountryOwner != user ? (
+						{toCountryOwner !== user ? (
 							<Grid container>
 								<Grid item xs={12} sm={4}>
 									<Button
@@ -148,7 +148,7 @@ const DonateForm = ({
 							style={{ color: 'yellow', borderColor: 'white' }}
 						>
 							{players.map(function(p) {
-								if (p != user) {
+								if (p !== user) {
 									return <MenuItem value={p}>{p}</MenuItem>;
 								}
 							})}

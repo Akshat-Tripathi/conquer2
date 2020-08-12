@@ -366,7 +366,6 @@ func (d *DefaultMachine) ProcessTroops() map[string]int {
 			playerTroops[player] = delta
 		}(p)
 	}
-
 	return playerTroops
 }
 

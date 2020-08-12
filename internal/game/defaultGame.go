@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync/atomic"
 	"time"
-
+	"fmt"
 	st "github.com/Akshat-Tripathi/conquer2/internal/game/stateMachines"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron"
@@ -23,6 +23,14 @@ type DefaultGame struct {
 }
 
 var _ Game = (*DefaultGame)(nil)
+var readyPlayers = make(map[string]bool)
+
+// Hashmap for players ready to proceed from lobby
+func Add(name string, isReady bool) {
+   readyPlayers[name] = isReady
+}
+
+
 
 //Init initialises a default game from a context
 //PRE: ctx is valid
@@ -39,6 +47,7 @@ func (d *DefaultGame) Init(ctx Context) {
 			})
 		}
 	})
+
 	d.situation = situations[ctx.Situation]
 
 	countries := make([]string, len(d.situation.countryMap))
@@ -85,12 +94,14 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 }
 
 func (d *DefaultGame) sendInitialStateFunc(playerName string) {
+
 	d.machine.RangePlayers(func(name string, player *st.PlayerState) {
 		d.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  name,
 			Country: player.Colour,
 		})
+
 		if name == playerName {
 			d.sendToPlayer(name, UpdateMessage{
 				Troops: player.Troops,
@@ -116,6 +127,17 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 			d.sendToPlayer(playerName, msg)
 		}
 	})
+
+	//FIXME: Check if working
+		for p, _ := range readyPlayers {
+			fmt.Println(p)
+			d.sendToPlayer(playerName, UpdateMessage{
+				Type:   "readyPlayer",
+				Player: p,
+			})
+			fmt.Println("Updated player ", playerName)
+		}
+		fmt.Println("Sent initial players list", readyPlayers)
 }
 
 //Run returns the websocket handler and starts the cron job
@@ -148,15 +170,18 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 
 func (d *DefaultGame) process(name string, action Action) {
 	switch action.ActionType {
-	
-	//Lobby room waiting until everyone is ready to play.
-	case "readyUp":
+	case "imreadym9": 
+		readyPlayers[name] = true
+		fmt.Println(name, " IS READY TO PLAY!")
+		fmt.Println(readyPlayers)
 		d.sendToAll(UpdateMessage{
-			Type: "playerIsReady",
-			Player: name,
-		})
-		return;
-
+				Type:    "readyPlayer",
+				Troops: 1,
+				Player:  name,
+				Country: action.Dest,
+				ID:		1,
+			})
+		return
 	case "attack":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
@@ -181,7 +206,6 @@ func (d *DefaultGame) process(name string, action Action) {
 				Country: action.Src,
 				ID:      2,
 			})
-
 			if won {
 				d.sendToAll(UpdateMessage{
 					Type:   "won",

@@ -16,6 +16,7 @@ type PlayerState struct {
 	Troops    int
 	Countries int
 	Password  string
+	Ready	  bool
 }
 
 type state struct {
