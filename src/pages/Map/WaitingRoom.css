@@ -58,7 +58,7 @@ body {
 	left: 50%;
 	color: orange;
 	display: grid;
-	grid-template-columns: 10% 80%;
+	grid-template-columns: 10% 90%;
 	justify-content: center;
 	transform: translate(-50%, -50%);
 	width: 33.33%;

@@ -49,7 +49,7 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 			<body>
 				<div className="player-list">
 					<div className="players">
-						<h4 style={{ color: 'white' }}>Joining Players (Max 20)</h4>
+						<h4 style={{ color: 'white' }}>Joined Players </h4>
 
 						{Object.keys(playerColours).map(function(player) {
 							var isReady = playerReady[player];
@@ -60,6 +60,7 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 									<div style={{ verticalAlign: 'middle', marginBottom: '1%' }}>
 										<span style={{ color: colour, paddingInline: '1%' }}>
 											{player}
+											&ensp;
 											<ReadyIcon isReady={isReady} />
 										</span>
 									</div>
