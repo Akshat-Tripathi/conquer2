@@ -1,4 +1,4 @@
-package statemachines
+package stateprocessors
 
 import (
 	"math/rand"

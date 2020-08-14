@@ -1,11 +1,12 @@
 package game
 
 import (
+	"fmt"
 	"net/http"
 	"sync/atomic"
 	"time"
-	"fmt"
-	st "github.com/Akshat-Tripathi/conquer2/internal/game/stateMachines"
+
+	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron"
 )
@@ -14,7 +15,7 @@ import (
 type DefaultGame struct {
 	situation
 	*sockets
-	machine    st.StateMachine
+	processor  gs.StateProcessor
 	context    Context
 	numPlayers int32
 	cron       *cron.Cron
@@ -27,10 +28,8 @@ var readyPlayers = make(map[string]bool)
 
 // Hashmap for players ready to proceed from lobby
 func Add(name string, isReady bool) {
-   readyPlayers[name] = isReady
+	readyPlayers[name] = isReady
 }
-
-
 
 //Init initialises a default game from a context
 //PRE: ctx is valid
@@ -39,7 +38,7 @@ func (d *DefaultGame) Init(ctx Context) {
 	d.sockets = newSockets()
 	d.handle = d.process
 	d.cron = minuteCron(d.context.Minutes, func() {
-		for player, troops := range d.machine.ProcessTroops() {
+		for player, troops := range d.processor.ProcessTroops() {
 			d.sendToPlayer(player, UpdateMessage{
 				Troops: troops,
 				Player: player,
@@ -56,8 +55,8 @@ func (d *DefaultGame) Init(ctx Context) {
 		countries[i] = country
 		i++
 	}
-	d.machine = &st.DefaultMachine{}
-	d.machine.Init(countries)
+	d.processor = &gs.DefaultProcessor{}
+	d.processor.Init(countries)
 
 	maxCountries := len(countries) / ctx.MaxPlayers
 	if ctx.StartingCountries > maxCountries {
@@ -70,22 +69,22 @@ func (d *DefaultGame) Init(ctx Context) {
 //routePlayer will either add a new player, connect an existing player or reject the player
 func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string) {
 	if int(d.numPlayers) == d.context.MaxPlayers {
-		d.machine.StopAccepting()
+		d.processor.StopAccepting()
 	}
-	switch d.machine.AddPlayer(name, password, d.context.Colours[d.numPlayers],
+	switch d.processor.AddPlayer(name, password, d.context.Colours[d.numPlayers],
 		d.context.StartingTroops, d.context.StartingCountries) {
-	case st.GameFull:
+	case gs.GameFull:
 		return false, "Game full"
-	case st.PlayerAdded:
+	case gs.PlayerAdded:
 		atomic.AddInt32(&d.numPlayers, 1)
 		fallthrough
-	case st.PlayerAlreadyExists:
+	case gs.PlayerAlreadyExists:
 		d.newPlayer(ctx.Writer, ctx.Request, name)
 		//Send initial state
 		d.sendInitialState(name)
 
 		// time.AfterFunc(d.context.StartTime.Sub(time.Now()), func() {
-			d.listen(name)
+		d.listen(name)
 		// })
 		return true, ""
 	}
@@ -95,7 +94,7 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 
 func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 
-	d.machine.RangePlayers(func(name string, player *st.PlayerState) {
+	d.processor.RangePlayers(func(name string, player *gs.PlayerState) {
 		d.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  name,
@@ -110,7 +109,7 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 			})
 		}
 	})
-	d.machine.RangeCountries(func(name string, country *st.CountryState) {
+	d.processor.RangeCountries(func(name string, country *gs.CountryState) {
 		if country.Player == "" {
 			return
 		}
@@ -129,15 +128,15 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 	})
 
 	//FIXME: Check if working
-		for p, _ := range readyPlayers {
-			fmt.Println(p)
-			d.sendToPlayer(playerName, UpdateMessage{
-				Type:   "readyPlayer",
-				Player: p,
-			})
-			fmt.Println("Updated player ", playerName)
-		}
-		fmt.Println("Sent initial players list", readyPlayers)
+	for p := range readyPlayers {
+		fmt.Println(p)
+		d.sendToPlayer(playerName, UpdateMessage{
+			Type:   "readyPlayer",
+			Player: p,
+		})
+		fmt.Println("Updated player ", playerName)
+	}
+	fmt.Println("Sent initial players list", readyPlayers)
 }
 
 //Run returns the websocket handler and starts the cron job
@@ -170,31 +169,31 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 
 func (d *DefaultGame) process(name string, action Action) {
 	switch action.ActionType {
-	case "imreadym9": 
+	case "imreadym9":
 		readyPlayers[name] = true
 		fmt.Println(name, " IS READY TO PLAY!")
 		fmt.Println(readyPlayers)
 		d.sendToAll(UpdateMessage{
-				Type:    "readyPlayer",
-				Troops: 1,
-				Player:  name,
-				Country: action.Dest,
-				ID:		1,
-			})
+			Type:    "readyPlayer",
+			Troops:  1,
+			Player:  name,
+			Country: action.Dest,
+			ID:      1,
+		})
 		return
 	case "attack":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
 		}
 		valid, won, conquered, deltaSrc, deltaDest :=
-			d.machine.Attack(action.Src, action.Dest, name, action.Troops)
+			d.processor.Attack(action.Src, action.Dest, name, action.Troops)
 		if !valid {
 			return
 		}
 		if conquered {
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
-				Troops:  1, 
+				Troops:  1,
 				Player:  name,
 				Country: action.Dest,
 				ID:      1,
@@ -217,7 +216,7 @@ func (d *DefaultGame) process(name string, action Action) {
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaDest,
-				Player:  d.machine.GetCountry(action.Dest).Player,
+				Player:  d.processor.GetCountry(action.Dest).Player,
 				Country: action.Dest,
 				ID:      3,
 			})
@@ -231,7 +230,7 @@ func (d *DefaultGame) process(name string, action Action) {
 		}
 		return
 	case "donate":
-		if !d.machine.Donate(name, action.Dest, action.Troops) {
+		if !d.processor.Donate(name, action.Dest, action.Troops) {
 			return
 		}
 		d.sendToPlayer(action.Dest, UpdateMessage{
@@ -250,18 +249,18 @@ func (d *DefaultGame) process(name string, action Action) {
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
 		}
-		if !d.machine.Move(action.Src, action.Dest, action.Troops, name) {
+		if !d.processor.Move(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
 	case "assist":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return
 		}
-		if !d.machine.Assist(action.Src, action.Dest, action.Troops, name) {
+		if !d.processor.Assist(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
 	case "deploy":
-		if d.machine.Deploy(action.Dest, action.Troops, name) {
+		if d.processor.Deploy(action.Dest, action.Troops, name) {
 			d.sendToPlayer(name, UpdateMessage{
 				Type:   "updateTroops",
 				Troops: -action.Troops,
@@ -290,7 +289,7 @@ func (d *DefaultGame) process(name string, action Action) {
 	d.sendToAll(UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  action.Troops,
-		Player:  d.machine.GetCountry(action.Dest).Player,
+		Player:  d.processor.GetCountry(action.Dest).Player,
 		Country: action.Dest,
 		ID:      10,
 	})
@@ -299,7 +298,7 @@ func (d *DefaultGame) process(name string, action Action) {
 //end is used to destroy all structs associated with the game
 func (d *DefaultGame) end() {
 	d.close <- struct{}{}
-	d.machine.Destroy()
+	d.processor.Destroy()
 }
 
 //GetContext returns the context information

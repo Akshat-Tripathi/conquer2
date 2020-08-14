@@ -1,4 +1,4 @@
-package statemachines
+package stateprocessors
 
 import "sync"
 
@@ -16,7 +16,7 @@ type PlayerState struct {
 	Troops    int
 	Countries int
 	Password  string
-	Ready	  bool
+	Ready     bool
 }
 
 type state struct {

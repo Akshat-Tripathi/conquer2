@@ -37,8 +37,8 @@ func (pg *persistentGame) Init(ctx Context) {
 
 	pg.sockets.handle = pg.process
 	if !ctxAlreadyInit {
-		pg.numPlayers = int32(pg.loadPlayers(pg.machine))
-		pg.loadCountries(pg.machine)
+		pg.numPlayers = int32(pg.loadPlayers(pg.processor))
+		pg.loadCountries(pg.processor)
 	}
 }
 
@@ -47,7 +47,7 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 		<-pg.timer.C
 		log.Println("timer fired")
 		pg.storeContext(pg.context)
-		pg.store(pg.machine)
+		pg.store(pg.processor)
 	}()
 	return pg.DefaultGame.Run()
 }

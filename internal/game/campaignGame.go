@@ -1,7 +1,7 @@
 package game
 
 import (
-	st "github.com/Akshat-Tripathi/conquer2/internal/game/stateMachines"
+	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
 //CampaignGame is a subclass of DefaultGame which is a slower game lasting 2 weeks
@@ -16,12 +16,12 @@ var _ Game = (*CampaignGame)(nil)
 func (cg *CampaignGame) Init(ctx Context) {
 	cg.persistentGame = &persistentGame{}
 	cg.persistentGame.Init(ctx)
-	cg.machine.ToggleAttack()
+	cg.processor.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
 	cg.handle = cg.process
 
 	cg.cron = tripleCron(ctx.StartTime, func() {
-		for player, troops := range cg.machine.ProcessTroops() {
+		for player, troops := range cg.processor.ProcessTroops() {
 			cg.sendToPlayer(player, UpdateMessage{
 				Troops: troops,
 				Player: player,
@@ -29,11 +29,11 @@ func (cg *CampaignGame) Init(ctx Context) {
 			})
 		}
 	})
-	eraCron(cg.cron, ctx.StartTime, cg.machine.ToggleAttack,
+	eraCron(cg.cron, ctx.StartTime, cg.processor.ToggleAttack,
 		func() {
 			max := 0
 			playerName := ""
-			cg.machine.RangePlayers(func(name string, player *st.PlayerState) {
+			cg.processor.RangePlayers(func(name string, player *gs.PlayerState) {
 				if max < player.Countries {
 					playerName = name
 				}
@@ -48,7 +48,7 @@ func (cg *CampaignGame) Init(ctx Context) {
 }
 
 func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
-	cg.machine.RangePlayers(func(name string, player *st.PlayerState) {
+	cg.processor.RangePlayers(func(name string, player *gs.PlayerState) {
 		cg.sockets.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
 			Player:  name,
@@ -63,7 +63,7 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 		}
 	})
 
-	cg.machine.RangeCountries(func(name string, country *st.CountryState) {
+	cg.processor.RangeCountries(func(name string, country *gs.CountryState) {
 		if country.Player == "" {
 			return
 		}
@@ -94,9 +94,9 @@ func (cg *CampaignGame) process(name string, action Action) {
 		if !cg.areNeighbours(action.Src, action.Dest) {
 			return
 		}
-		oldPlayer := cg.machine.GetCountry(action.Dest).Player
+		oldPlayer := cg.processor.GetCountry(action.Dest).Player
 		valid, won, conquered, deltaSrc, deltaDest :=
-			cg.machine.Attack(action.Src, action.Dest, name, 1)
+			cg.processor.Attack(action.Src, action.Dest, name, 1)
 		if !valid {
 			return
 		}
@@ -121,13 +121,13 @@ func (cg *CampaignGame) process(name string, action Action) {
 				Country: action.Src,
 			})
 
-			var country st.CountryState
+			var country gs.CountryState
 			for _, neighbour := range cg.getNeighbours(action.Dest) {
 				if neighbour == action.Src {
 					continue
 				}
 				if cg.countViewPoints(name, neighbour) == 1 {
-					country = cg.machine.GetCountry(neighbour)
+					country = cg.processor.GetCountry(neighbour)
 					cg.sendToPlayer(name, UpdateMessage{
 						Type:    "updateCountry",
 						Country: neighbour,
@@ -166,7 +166,7 @@ func (cg *CampaignGame) process(name string, action Action) {
 		}
 		return
 	case "donate":
-		if !cg.machine.Donate(name, action.Dest, action.Troops) {
+		if !cg.processor.Donate(name, action.Dest, action.Troops) {
 			return
 		}
 		cg.sendToPlayer(action.Dest, UpdateMessage{
@@ -183,18 +183,18 @@ func (cg *CampaignGame) process(name string, action Action) {
 		if !cg.areNeighbours(action.Src, action.Dest) {
 			return
 		}
-		if !cg.machine.Move(action.Src, action.Dest, action.Troops, name) {
+		if !cg.processor.Move(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
 	case "assist":
 		if !cg.areNeighbours(action.Src, action.Dest) {
 			return
 		}
-		if !cg.machine.Assist(action.Src, action.Dest, action.Troops, name) {
+		if !cg.processor.Assist(action.Src, action.Dest, action.Troops, name) {
 			return
 		}
 	case "deploy":
-		if cg.machine.Deploy(action.Dest, action.Troops, name) {
+		if cg.processor.Deploy(action.Dest, action.Troops, name) {
 			cg.sendToPlayer(name, UpdateMessage{
 				Type:   "updateTroops",
 				Troops: -action.Troops,
@@ -220,18 +220,18 @@ func (cg *CampaignGame) process(name string, action Action) {
 	cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  action.Troops,
-		Player:  cg.machine.GetCountry(action.Dest).Player,
+		Player:  cg.processor.GetCountry(action.Dest).Player,
 		Country: action.Dest,
 	})
 }
 
 func (cg *CampaignGame) countViewPoints(player, country string) int {
 	viewPoints := 0
-	if cg.machine.GetCountry(country).Player == player {
+	if cg.processor.GetCountry(country).Player == player {
 		viewPoints++
 	}
 	for _, neighbour := range cg.getNeighbours(country) {
-		if cg.machine.GetCountry(neighbour).Player == player {
+		if cg.processor.GetCountry(neighbour).Player == player {
 			viewPoints++
 		}
 	}
@@ -240,9 +240,9 @@ func (cg *CampaignGame) countViewPoints(player, country string) int {
 
 func (cg *CampaignGame) sendToRelevantPlayers(country string, msg UpdateMessage) {
 	uniquePlayers := make(map[string]bool)
-	uniquePlayers[cg.machine.GetCountry(country).Player] = true
+	uniquePlayers[cg.processor.GetCountry(country).Player] = true
 	for _, neighbour := range cg.getNeighbours(country) {
-		uniquePlayers[cg.machine.GetCountry(neighbour).Player] = true
+		uniquePlayers[cg.processor.GetCountry(neighbour).Player] = true
 	}
 
 	for player := range uniquePlayers {

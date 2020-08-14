@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	st "github.com/Akshat-Tripathi/conquer2/internal/game/stateMachines"
+	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 	"golang.org/x/net/context"
 )
 
@@ -33,20 +33,20 @@ func (p *persistence) loadContext(ctx *Context) {
 	}
 }
 
-func (p *persistence) loadPlayers(machine st.StateMachine) int {
+func (p *persistence) loadPlayers(processor gs.StateProcessor) int {
 	snapshot := loadSnapshot("ctx", p.docs)
 	if snapshot == nil {
 		return 0
 	}
 	players := snapshot.Data()["Players"].([]interface{})
 	playerCountries := make(map[string]int)
-	
+
 	//Load players
 	for _, player := range players {
 		stateSnapshot := loadSnapshot("."+player.(string), p.docs)
 		if stateSnapshot != nil {
 			data := stateSnapshot.Data()
-			machine.AddPlayer(
+			processor.AddPlayer(
 				player.(string),
 				data["Password"].(string),
 				data["Colour"].(string),
@@ -56,7 +56,7 @@ func (p *persistence) loadPlayers(machine st.StateMachine) int {
 			playerCountries[player.(string)] = int(data["Countries"].(int64))
 		}
 	}
-	machine.RangePlayers(func(name string, player *st.PlayerState) {
+	processor.RangePlayers(func(name string, player *gs.PlayerState) {
 		countries, ok := playerCountries[name]
 		if !ok {
 			return
@@ -66,8 +66,8 @@ func (p *persistence) loadPlayers(machine st.StateMachine) int {
 	return len(players)
 }
 
-func (p *persistence) loadCountries(machine st.StateMachine) {
-	machine.RangeCountries(func(name string, state *st.CountryState) {
+func (p *persistence) loadCountries(processor gs.StateProcessor) {
+	processor.RangeCountries(func(name string, state *gs.CountryState) {
 		snapshot := loadSnapshot(name, p.docs)
 		if snapshot == nil {
 			return
@@ -86,8 +86,8 @@ func (p *persistence) storeContext(ctx Context) {
 	}
 }
 
-func (p *persistence) store(machine st.StateMachine) {
-	machine.RangeCountries(func(country string, state *st.CountryState) {
+func (p *persistence) store(processor gs.StateProcessor) {
+	processor.RangeCountries(func(country string, state *gs.CountryState) {
 		if state.Player != "" {
 			_, err := p.docs.Doc(country).Set(context.Background(), *state)
 			if err != nil {
@@ -97,7 +97,7 @@ func (p *persistence) store(machine st.StateMachine) {
 	})
 
 	players := make([]string, 0)
-	machine.RangePlayers(func(player string, state *st.PlayerState) {
+	processor.RangePlayers(func(player string, state *gs.PlayerState) {
 		_, err := p.docs.Doc("."+player).Set(context.Background(), *state)
 		if err != nil {
 			log.Println(err)

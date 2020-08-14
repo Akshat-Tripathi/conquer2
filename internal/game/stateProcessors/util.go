@@ -1,4 +1,4 @@
-package statemachines
+package stateprocessors
 
 func sort(vals []int) []int {
 	if len(vals) == 1 {

@@ -1,9 +1,9 @@
-package statemachines
+package stateprocessors
 
 //TODO maybe split into smaller interfaces
 
-//StateMachine is an interface defining what all statemachines are capable of
-type StateMachine interface {
+//StateProcessor is an interface defining what all stateprocessors are capable of
+type StateProcessor interface {
 	Init([]string)
 	Destroy()
 

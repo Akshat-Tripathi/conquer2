@@ -1,4 +1,4 @@
-package statemachines
+package stateprocessors
 
 import "math/rand"
 
@@ -10,8 +10,8 @@ const (
 	GameFull
 )
 
-//DefaultMachine a state machine
-type DefaultMachine struct {
+//DefaultProcessor a state processor
+type DefaultProcessor struct {
 	state
 	canAcceptPlayers bool
 	attackDisabled   bool
@@ -21,8 +21,8 @@ type DefaultMachine struct {
 	winCountries     int
 }
 
-//Init initialises the machine
-func (d *DefaultMachine) Init(countries []string) {
+//Init initialises the processor
+func (d *DefaultProcessor) Init(countries []string) {
 	d.countryNames = countries
 	d.countries = make(map[string]*CountryState)
 	d.players = make(map[string]*PlayerState)
@@ -33,7 +33,7 @@ func (d *DefaultMachine) Init(countries []string) {
 	d.winCountries = 177
 }
 
-func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {
+func (d *DefaultProcessor) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {
 	if src == dest {
 		return false
 	}
@@ -57,7 +57,7 @@ func (d *DefaultMachine) withLockedCountries(src, dest string, op func(src, dest
 	return op(source, destination)
 }
 
-func (d *DefaultMachine) withLockedPlayers(src, dest string, op func(src, dest *PlayerState) bool) bool {
+func (d *DefaultProcessor) withLockedPlayers(src, dest string, op func(src, dest *PlayerState) bool) bool {
 	if src == dest {
 		return false
 	}
@@ -82,7 +82,7 @@ func (d *DefaultMachine) withLockedPlayers(src, dest string, op func(src, dest *
 }
 
 //Attack attacks
-func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
+func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
 	srcCountry, ok := d.countries[src]
 	if !ok {
 		return false, false, false, 0, 0
@@ -140,7 +140,7 @@ func (d *DefaultMachine) Attack(src, dest, player string, times int) (valid, won
 }
 
 //Donate validates a donation
-func (d *DefaultMachine) Donate(src, dest string, troops int) bool {
+func (d *DefaultProcessor) Donate(src, dest string, troops int) bool {
 	return d.withLockedPlayers(src, dest, func(src, dest *PlayerState) bool {
 		if !d.donateValid(src, dest, troops) {
 			return false
@@ -152,7 +152,7 @@ func (d *DefaultMachine) Donate(src, dest string, troops int) bool {
 }
 
 //Assist allows a player to move troops into territory owned by another player
-func (d *DefaultMachine) Assist(src, dest string, troops int, player string) bool {
+func (d *DefaultProcessor) Assist(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
 		if !d.moveValid(src, player, troops) || src.Player == dest.Player {
 			return false
@@ -164,7 +164,7 @@ func (d *DefaultMachine) Assist(src, dest string, troops int, player string) boo
 }
 
 //Move allows intra-empire movement
-func (d *DefaultMachine) Move(src, dest string, troops int, player string) bool {
+func (d *DefaultProcessor) Move(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
 		if !d.moveValid(src, player, troops) || src.Player != dest.Player {
 			return false
@@ -176,7 +176,7 @@ func (d *DefaultMachine) Move(src, dest string, troops int, player string) bool 
 }
 
 //Deploy allows players to move troops from their bases to their countries
-func (d *DefaultMachine) Deploy(dest string, troops int, player string) bool {
+func (d *DefaultProcessor) Deploy(dest string, troops int, player string) bool {
 	source, ok := d.players[player]
 	if !ok {
 		return false
@@ -199,7 +199,7 @@ func (d *DefaultMachine) Deploy(dest string, troops int, player string) bool {
 
 //AddPlayer returns a status code
 //PRE: There will be countries available to assign
-func (d *DefaultMachine) AddPlayer(name, password, colour string, troops, countries int) int8 {
+func (d *DefaultProcessor) AddPlayer(name, password, colour string, troops, countries int) int8 {
 	if player, ok := d.players[name]; ok {
 		if player.Password == password {
 			return PlayerAlreadyExists
@@ -244,7 +244,7 @@ func (d *DefaultMachine) AddPlayer(name, password, colour string, troops, countr
 
 //GetCountry returns an copy of country
 //PRE: the country exists
-func (d *DefaultMachine) GetCountry(country string) CountryState {
+func (d *DefaultProcessor) GetCountry(country string) CountryState {
 	cState, ok := d.countries[country]
 	if !ok {
 		return CountryState{}
@@ -253,11 +253,11 @@ func (d *DefaultMachine) GetCountry(country string) CountryState {
 }
 
 //ToggleAttack - does what the name suggests
-func (d *DefaultMachine) ToggleAttack() {
+func (d *DefaultProcessor) ToggleAttack() {
 	d.attackDisabled = !d.attackDisabled
 }
 
-func (d *DefaultMachine) attackValid(src, dest *CountryState, player string, times int) bool {
+func (d *DefaultProcessor) attackValid(src, dest *CountryState, player string, times int) bool {
 	if d.attackDisabled && dest.Player != "" {
 		if dest.Troops == 0 {
 			//Prevents you from wiping the other player out entirely
@@ -292,7 +292,7 @@ func (d *DefaultMachine) attackValid(src, dest *CountryState, player string, tim
 	return true
 }
 
-func (d *DefaultMachine) donateValid(src, dest *PlayerState, troops int) bool {
+func (d *DefaultProcessor) donateValid(src, dest *PlayerState, troops int) bool {
 	if d.donateDisabled {
 		return false
 	}
@@ -311,7 +311,7 @@ func (d *DefaultMachine) donateValid(src, dest *PlayerState, troops int) bool {
 	return true
 }
 
-func (d *DefaultMachine) moveValid(src *CountryState, player string, troops int) bool {
+func (d *DefaultProcessor) moveValid(src *CountryState, player string, troops int) bool {
 	if d.moveDisabled {
 		return false
 	}
@@ -333,7 +333,7 @@ func (d *DefaultMachine) moveValid(src *CountryState, player string, troops int)
 	return true
 }
 
-func (d *DefaultMachine) deployValid(src *PlayerState, dest *CountryState, player string, troops int) bool {
+func (d *DefaultProcessor) deployValid(src *PlayerState, dest *CountryState, player string, troops int) bool {
 	if d.dropDisabled {
 		return false
 	}
@@ -353,7 +353,7 @@ func (d *DefaultMachine) deployValid(src *PlayerState, dest *CountryState, playe
 }
 
 //ProcessTroops returns the number of troops each player should receive
-func (d *DefaultMachine) ProcessTroops() map[string]int {
+func (d *DefaultProcessor) ProcessTroops() map[string]int {
 	playerTroops := make(map[string]int)
 	delta := 0
 	for player, p := range d.players {
@@ -370,6 +370,6 @@ func (d *DefaultMachine) ProcessTroops() map[string]int {
 }
 
 //StopAccepting should be used to indicate if a game is full
-func (d *DefaultMachine) StopAccepting() {
+func (d *DefaultProcessor) StopAccepting() {
 	d.canAcceptPlayers = false
 }
