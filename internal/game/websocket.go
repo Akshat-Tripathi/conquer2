@@ -42,9 +42,9 @@ func (s *socket) read() {
 
 type sockets struct {
 	sync.Mutex
+	*FSM
 	players map[string]*socket
 	close   chan struct{}
-	handle  func(name string, action Action)
 }
 
 //Action - sent by the client, it encodes all the information about an action. Player is set by the server
@@ -81,6 +81,7 @@ func (s *sockets) newPlayer(w http.ResponseWriter, r *http.Request, name string)
 	s.players[name] = &socket{
 		responses: make(chan UpdateMessage),
 		requests:  make(chan Action),
+		close:     make(chan struct{}),
 		conn:      conn,
 	}
 	return conn
@@ -110,9 +111,10 @@ func (s *sockets) listen(name string) {
 			err := socket.conn.WriteJSON(msg)
 			if err != nil {
 				log.Println(err)
+				return
 			}
 		case action := <-socket.requests:
-			s.handle(name, action)
+			s.currentFunc(name, action)
 		}
 	}
 }
