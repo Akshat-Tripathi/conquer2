@@ -1,5 +1,5 @@
 body {
-	background-color: #3b727c;
+	background-color: #3b727c !important; 
 	width: 100%;
 	height: 100%;
 	font-family: arial, verdana, sans-serif;

@@ -136,12 +136,9 @@ class GameMap extends Component {
 					console.log('readyPlayer token received. Setting ready state to true');
 					playerReady[action.Player] = true;
 					console.log(playerReady);
-					if (
-						!Object.keys(playerReady).some((player) => !playerReady[player]) &&
-						Object.keys(playerReady).length > 2
-					) {
-						this.setState({ lobby: false });
-					}
+                    break;
+                case 'start':
+                    this.setState({ lobby: false });
 					break;
 				case 'newPlayer':
 					if (!players.some((player) => player === action.Player)) {
