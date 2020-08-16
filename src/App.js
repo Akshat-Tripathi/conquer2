@@ -8,7 +8,7 @@ import Intro2 from './shashgonenuts/intro2.jsx';
 import ErrorPage from './pages/Extra/Error.jsx';
 import Redirector from './pages/Extra/Redirector.jsx';
 import WaitingRoom from './pages/Map/WaitingRoom';
-import NewHome from './pages/NewHome/NewHome';
+//import NewHome from './pages/NewHome/NewHome';
 // import Login from './pages/NewHome/Authentication';
 
 class App extends React.Component {
@@ -21,7 +21,7 @@ class App extends React.Component {
 							{/* Homepage */}
 							<Route exact path="/" component={Home} />
 							<Route path="/home" component={Home} />
-							<Route path="/newhome" component={NewHome} />
+							{/*<Route path="/newhome" component={NewHome} />*/}
 							{/* <Route path="/login" component={Login} /> */}
 
 							{/* Game */}
