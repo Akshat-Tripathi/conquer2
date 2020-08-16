@@ -35,18 +35,20 @@ func (d *DefaultGame) Init(ctx Context) {
 			Type: "start",
 		})
 		d.processor.StopAccepting()
+		d.lobby.full = true
+		d.cron = minuteCron(d.context.Minutes, func() {
+			for player, troops := range d.processor.ProcessTroops() {
+				d.sendToPlayer(player, UpdateMessage{
+					Troops: troops,
+					Player: player,
+					Type:   "updateTroops",
+				})
+			}
+		})
 	})
+	d.start()
 
 	d.lobby = newLobby()
-	d.cron = minuteCron(d.context.Minutes, func() {
-		for player, troops := range d.processor.ProcessTroops() {
-			d.sendToPlayer(player, UpdateMessage{
-				Troops: troops,
-				Player: player,
-				Type:   "updateTroops",
-			})
-		}
-	})
 
 	d.situation = situations[ctx.Situation]
 
@@ -94,7 +96,6 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 }
 
 func (d *DefaultGame) sendInitialStateFunc(playerName string) {
-
 	d.processor.RangePlayers(func(name string, player *gs.PlayerState) {
 		d.sendToAll(UpdateMessage{
 			Type:    "newPlayer",
@@ -134,6 +135,11 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 			Player: player,
 		})
 	})
+	if d.lobby.full {
+		d.sendToPlayer(playerName, UpdateMessage{
+			Type: "start",
+		})
+	}
 }
 
 //Run returns the websocket handler and starts the cron job

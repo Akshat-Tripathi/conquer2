@@ -5,6 +5,7 @@ import "sync"
 type lobby struct {
 	sync.RWMutex
 	readyPlayers map[string]bool
+	full         bool
 }
 
 func newLobby() *lobby {

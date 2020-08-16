@@ -25,19 +25,20 @@ func (cg *CampaignGame) Init(ctx Context) {
 			Type: "start",
 		})
 		cg.processor.StopAccepting()
+		cg.lobby.full = true
+		cg.cron = tripleCron(ctx.StartTime, func() {
+			for player, troops := range cg.processor.ProcessTroops() {
+				cg.sendToPlayer(player, UpdateMessage{
+					Troops: troops,
+					Player: player,
+					Type:   "updateTroops",
+				})
+			}
+		})
 	})
+	cg.start()
 
 	cg.lobby = newLobby()
-
-	cg.cron = tripleCron(ctx.StartTime, func() {
-		for player, troops := range cg.processor.ProcessTroops() {
-			cg.sendToPlayer(player, UpdateMessage{
-				Troops: troops,
-				Player: player,
-				Type:   "updateTroops",
-			})
-		}
-	})
 	eraCron(cg.cron, ctx.StartTime, cg.processor.ToggleAttack,
 		func() {
 			max := 0
@@ -95,6 +96,17 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 			}
 		}
 	})
+	cg.lobby.rangeLobby(func(player string) {
+		cg.sendToPlayer(playerName, UpdateMessage{
+			Type:   "readyPlayer",
+			Player: player,
+		})
+	})
+	if cg.lobby.full {
+		cg.sendToPlayer(playerName, UpdateMessage{
+			Type: "start",
+		})
+	}
 }
 
 func (cg *CampaignGame) countViewPoints(player, country string) int {

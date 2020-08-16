@@ -11,6 +11,10 @@ func (d *DefaultGame) lobbyProcess(name string, action Action) (done bool) {
 		return
 	}
 	d.lobby.add(name)
+	d.sendToAll(UpdateMessage{
+		Type:   "readyPlayer",
+		Player: name,
+	})
 	return d.context.MaxPlayers == d.lobby.length()
 }
 

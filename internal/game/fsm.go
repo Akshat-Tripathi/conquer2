@@ -13,18 +13,26 @@ type FSM struct {
 func newFSM(states ...State) *FSM {
 	fsm := &FSM{
 		states:      make(chan State, len(states)),
-		transitions: make(chan func(), len(states)),
+		transitions: make(chan func(), len(states)-1),
 	}
 	for _, state := range states {
 		fsm.states <- state
 	}
-	fsm.nextState()
 	return fsm
 }
 
 func (fsm *FSM) addTransitions(tranistions ...func()) {
 	for _, transition := range tranistions {
 		fsm.transitions <- transition
+	}
+}
+
+func (fsm *FSM) start() {
+	state := <-fsm.states
+	fsm.currentFunc = func(name string, action Action) {
+		if state(name, action) {
+			fsm.nextState()
+		}
 	}
 }
 

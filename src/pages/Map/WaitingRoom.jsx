@@ -24,9 +24,7 @@ function handleVote({ socket, user }) {
 	// const readyup = new readyPlayer(this.props.user, true);
 
 	var readyup = new action(0, 'imreadym9', '', '', user);
-	console.log(readyup, user);
 	socket.send(JSON.stringify(readyup));
-	console.log('Sent readyup data for', user);
 }
 
 const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
@@ -53,7 +51,6 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 
 						{Object.keys(playerColours).map(function(player) {
 							var isReady = playerReady[player];
-							console.log(isReady);
 							var colour = playerColours[player];
 							return (
 								<div className="player-name" key={player}>
