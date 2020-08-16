@@ -18,7 +18,16 @@ func (cg *CampaignGame) Init(ctx Context) {
 	cg.persistentGame.Init(ctx)
 	cg.processor.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
-	cg.handle = cg.process
+
+	cg.FSM = newFSM(cg.lobbyProcess, cg.process)
+	cg.addTransitions(func() {
+		cg.sendToAll(UpdateMessage{
+			Type: "start",
+		})
+		cg.processor.StopAccepting()
+	})
+
+	cg.lobby = newLobby()
 
 	cg.cron = tripleCron(ctx.StartTime, func() {
 		for player, troops := range cg.processor.ProcessTroops() {
@@ -85,143 +94,6 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 				cg.sendToPlayer(playerName, msg)
 			}
 		}
-	})
-}
-
-func (cg *CampaignGame) process(name string, action Action) {
-	switch action.ActionType {
-	case "attack":
-		if !cg.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		oldPlayer := cg.processor.GetCountry(action.Dest).Player
-		valid, won, conquered, deltaSrc, deltaDest :=
-			cg.processor.Attack(action.Src, action.Dest, name, 1)
-		if !valid {
-			return
-		}
-		if conquered {
-			if cg.countViewPoints(oldPlayer, action.Dest) == 0 {
-				cg.sendToPlayer(oldPlayer, UpdateMessage{
-					Type:    "updateCountry",
-					Troops:  0,
-					Country: action.Dest,
-				})
-			}
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  1,
-				Player:  name,
-				Country: action.Dest,
-			})
-			cg.sendToRelevantPlayers(action.Src, UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  -1 - deltaSrc,
-				Player:  name,
-				Country: action.Src,
-			})
-
-			var country gs.CountryState
-			for _, neighbour := range cg.getNeighbours(action.Dest) {
-				if neighbour == action.Src {
-					continue
-				}
-				if cg.countViewPoints(name, neighbour) == 1 {
-					country = cg.processor.GetCountry(neighbour)
-					cg.sendToPlayer(name, UpdateMessage{
-						Type:    "updateCountry",
-						Country: neighbour,
-						Troops:  country.Troops,
-						Player:  country.Player,
-					})
-				}
-				if cg.countViewPoints(oldPlayer, neighbour) == 0 {
-					cg.sendToPlayer(oldPlayer, UpdateMessage{
-						Type:    "updateCountry",
-						Country: neighbour,
-						Troops:  0,
-					})
-				}
-			}
-			if won {
-				cg.sendToAll(UpdateMessage{
-					Type:   "won",
-					Player: name,
-				})
-				cg.End()
-			}
-		} else {
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  deltaDest,
-				Player:  oldPlayer,
-				Country: action.Dest,
-			})
-			cg.sendToRelevantPlayers(action.Src, UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  deltaSrc,
-				Player:  name,
-				Country: action.Src,
-			})
-		}
-		return
-	case "donate":
-		if !cg.processor.Donate(name, action.Dest, action.Troops) {
-			return
-		}
-		cg.sendToPlayer(action.Dest, UpdateMessage{
-			Type:   "updateTroops",
-			Troops: action.Troops,
-			Player: action.Dest,
-		})
-		cg.sendToPlayer(name, UpdateMessage{
-			Type:   "updateTroops",
-			Troops: -action.Troops,
-			Player: name,
-		})
-	case "move":
-		if !cg.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		if !cg.processor.Move(action.Src, action.Dest, action.Troops, name) {
-			return
-		}
-	case "assist":
-		if !cg.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		if !cg.processor.Assist(action.Src, action.Dest, action.Troops, name) {
-			return
-		}
-	case "deploy":
-		if cg.processor.Deploy(action.Dest, action.Troops, name) {
-			cg.sendToPlayer(name, UpdateMessage{
-				Type:   "updateTroops",
-				Troops: -action.Troops,
-				Player: name,
-			})
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  action.Troops,
-				Player:  name,
-				Country: action.Dest,
-			})
-		}
-		return
-	default:
-		return
-	}
-	cg.sendToRelevantPlayers(action.Src, UpdateMessage{
-		Type:    "updateCountry",
-		Troops:  -action.Troops,
-		Player:  name,
-		Country: action.Src,
-	})
-	cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
-		Type:    "updateCountry",
-		Troops:  action.Troops,
-		Player:  cg.processor.GetCountry(action.Dest).Player,
-		Country: action.Dest,
 	})
 }
 

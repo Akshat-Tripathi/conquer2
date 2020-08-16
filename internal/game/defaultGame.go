@@ -1,10 +1,8 @@
 package game
 
 import (
-	"fmt"
 	"net/http"
 	"sync/atomic"
-	"time"
 
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 	"github.com/gin-gonic/gin"
@@ -19,24 +17,27 @@ type DefaultGame struct {
 	context    Context
 	numPlayers int32
 	cron       *cron.Cron
+	lobby      *lobby
 
 	sendInitialState func(string)
 }
 
 var _ Game = (*DefaultGame)(nil)
-var readyPlayers = make(map[string]bool)
-
-// Hashmap for players ready to proceed from lobby
-func Add(name string, isReady bool) {
-	readyPlayers[name] = isReady
-}
 
 //Init initialises a default game from a context
 //PRE: ctx is valid
 func (d *DefaultGame) Init(ctx Context) {
 	d.context = ctx
 	d.sockets = newSockets()
-	d.handle = d.process
+	d.FSM = newFSM(d.lobbyProcess, d.process)
+	d.addTransitions(func() {
+		d.sendToAll(UpdateMessage{
+			Type: "start",
+		})
+		d.processor.StopAccepting()
+	})
+
+	d.lobby = newLobby()
 	d.cron = minuteCron(d.context.Minutes, func() {
 		for player, troops := range d.processor.ProcessTroops() {
 			d.sendToPlayer(player, UpdateMessage{
@@ -127,16 +128,12 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 		}
 	})
 
-	//FIXME: Check if working
-	for p := range readyPlayers {
-		fmt.Println(p)
+	d.lobby.rangeLobby(func(player string) {
 		d.sendToPlayer(playerName, UpdateMessage{
 			Type:   "readyPlayer",
-			Player: p,
+			Player: player,
 		})
-		fmt.Println("Updated player ", playerName)
-	}
-	fmt.Println("Sent initial players list", readyPlayers)
+	})
 }
 
 //Run returns the websocket handler and starts the cron job
@@ -165,134 +162,6 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 		return
 	}
 	closeWithMessage(conn, msg)
-}
-
-func (d *DefaultGame) process(name string, action Action) {
-	switch action.ActionType {
-	case "imreadym9":
-		readyPlayers[name] = true
-		fmt.Println(name, " IS READY TO PLAY!")
-		fmt.Println(readyPlayers)
-		d.sendToAll(UpdateMessage{
-			Type:    "readyPlayer",
-			Troops:  1,
-			Player:  name,
-			Country: action.Dest,
-			ID:      1,
-		})
-		return
-	case "attack":
-		if !d.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		valid, won, conquered, deltaSrc, deltaDest :=
-			d.processor.Attack(action.Src, action.Dest, name, action.Troops)
-		if !valid {
-			return
-		}
-		if conquered {
-			d.sendToAll(UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  1,
-				Player:  name,
-				Country: action.Dest,
-				ID:      1,
-			})
-			d.sendToAll(UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  deltaSrc - 1,
-				Player:  name,
-				Country: action.Src,
-				ID:      2,
-			})
-			if won {
-				d.sendToAll(UpdateMessage{
-					Type:   "won",
-					Player: name,
-				})
-				time.AfterFunc(time.Second*5, d.end)
-			}
-		} else {
-			d.sendToAll(UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  deltaDest,
-				Player:  d.processor.GetCountry(action.Dest).Player,
-				Country: action.Dest,
-				ID:      3,
-			})
-			d.sendToAll(UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  deltaSrc,
-				Player:  name,
-				Country: action.Src,
-				ID:      4,
-			})
-		}
-		return
-	case "donate":
-		if !d.processor.Donate(name, action.Dest, action.Troops) {
-			return
-		}
-		d.sendToPlayer(action.Dest, UpdateMessage{
-			Type:   "updateTroops",
-			Troops: action.Troops,
-			Player: action.Dest,
-			ID:     5,
-		})
-		d.sendToPlayer(name, UpdateMessage{
-			Type:   "updateTroops",
-			Troops: -action.Troops,
-			Player: name,
-			ID:     6,
-		})
-	case "move":
-		if !d.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		if !d.processor.Move(action.Src, action.Dest, action.Troops, name) {
-			return
-		}
-	case "assist":
-		if !d.areNeighbours(action.Src, action.Dest) {
-			return
-		}
-		if !d.processor.Assist(action.Src, action.Dest, action.Troops, name) {
-			return
-		}
-	case "deploy":
-		if d.processor.Deploy(action.Dest, action.Troops, name) {
-			d.sendToPlayer(name, UpdateMessage{
-				Type:   "updateTroops",
-				Troops: -action.Troops,
-				Player: name,
-				ID:     7,
-			})
-			d.sendToAll(UpdateMessage{
-				Type:    "updateCountry",
-				Troops:  action.Troops,
-				Player:  name,
-				Country: action.Dest,
-				ID:      8,
-			})
-		}
-		return
-	default:
-		return
-	}
-	d.sendToAll(UpdateMessage{
-		Type:    "updateCountry",
-		Troops:  -action.Troops,
-		Player:  name,
-		Country: action.Src,
-		ID:      9,
-	})
-	d.sendToAll(UpdateMessage{
-		Type:    "updateCountry",
-		Troops:  action.Troops,
-		Player:  d.processor.GetCountry(action.Dest).Player,
-		Country: action.Dest,
-		ID:      10,
-	})
 }
 
 //end is used to destroy all structs associated with the game
