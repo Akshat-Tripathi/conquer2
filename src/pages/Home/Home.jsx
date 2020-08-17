@@ -35,7 +35,6 @@ function Footer() {
 				container
 				xs={12}
 				style={{
-					color: 'white',
 					position: 'fixed',
 					left: 0,
 					bottom: 0,

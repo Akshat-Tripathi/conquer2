@@ -106,8 +106,7 @@ func main() {
 			Situation:         situation,
 			StartingCountries: startingCountries,
 			StartingTroops:    startingTroops,
-			StartTime:         time.Now().Add(time.Minute * 2),
-			Colours:           colours,
+			Colours:           shuffle(colours),
 			Client:            client,
 		}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"time"
 )
 
 func loadColours() []string {
@@ -26,4 +27,13 @@ func loadColours() []string {
 
 func genID() string {
 	return fmt.Sprintf("%06x", rand.Intn(10000))
+}
+
+func shuffle(strs []string) []string {
+	rand.Seed(time.Now().UnixNano())
+	shuffled := make([]string, len(strs))
+	for i, j := range rand.Perm(len(strs)) {
+		shuffled[i] = strs[j]
+	}
+	return shuffled
 }

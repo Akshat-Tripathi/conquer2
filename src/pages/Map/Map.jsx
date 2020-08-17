@@ -1,18 +1,19 @@
-import React, { Component, useState } from "react";
-import { connect, loaddetails } from "../../websockets/index.js";
-import { Paper, makeStyles, Grid } from "@material-ui/core";
-import { fade } from "@material-ui/core/styles/colorManipulator";
-import VectorMap from "./VectorMap";
-import "./Map.css";
-import { Options, OptionsDeploy, DonateForm } from "./ActionButtons";
-import { SpyDetails, PlayerBox, Title } from "./Texts";
-import { useHotkeys } from "react-hotkeys-hook";
+import React, { Component, useState } from 'react';
+import { connect, loaddetails } from '../../websockets/index.js';
+import { Paper, makeStyles, Grid } from '@material-ui/core';
+import { fade } from '@material-ui/core/styles/colorManipulator';
+import VectorMap from './VectorMap';
+import './Map.css';
+import { Options, OptionsDeploy, DonateForm } from './ActionButtons';
+import { SpyDetails, PlayerBox, Title } from './Texts';
+import { useHotkeys } from 'react-hotkeys-hook';
+import WaitingRoom from './WaitingRoom';
 
 class countryState {
-  constructor(Troops, Player) {
-    this.Troops = Troops;
-    this.Player = Player;
-  }
+	constructor(Troops, Player) {
+		this.Troops = Troops;
+		this.Player = Player;
+	}
 }
 
 var socket = null;
@@ -29,32 +30,38 @@ var playerColours = {};
 // List of all players
 var players = [];
 // Current player name
-var user = "";
-//Interval for troop drops
+var user = '';
+// Interval for troop drops
 var interval;
-var start;
+// Checking if everyone's ready
+var playerReady = {};
 
 function getUserTroops() {
-    let userCountries = 0;
-    for (var c in countryStates) {
-        if (countryStates[c].Player == user) {
-            userCountries++;
-        }
-    }
-    return 3 + Math.floor(userCountries / 3);
-};
+	let userCountries = 0;
+	for (var c in countryStates) {
+		if (countryStates[c].Player == user) {
+			userCountries++;
+		}
+	}
+	return 3 + Math.floor(userCountries / 3);
+}
 
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
 //POST: The hex colour, p% darker
 function darken(hex, p) {
-  const r = Math.round(parseInt(hex.slice(1, 3), 16) * (1 - p));
-  const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - p));
-  const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - p));
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+	const r = Math.round(parseInt(hex.slice(1, 3), 16) * (1 - p));
+	const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - p));
+	const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - p));
+	return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-function getStartTime() {
-	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
+//TODO: reduce redundancy
+function getYourUsername() {
+	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'username')[0][1];
+}
+
+function getStart() {
+    return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
 }
 
 function getInterval() {
@@ -91,71 +98,91 @@ function getOwner(player) {
 }
 
 class GameMap extends Component {
-  constructor() {
-    super();
-    socket = connect();
-    var keepAlive = (keepAlive = window.setInterval(() => {
-      socket.send("{}");
-    }, 54 * 1000));
+	constructor() {
+		super();
+        this.state = { lobby: true, base: getStart() };
 
-    //Ascertain from cookies the base troop drop time intervals
-    interval = getInterval();
-    start = getStartTime();
+        let updateTime = () => {
+            let date = new Date();
+            this.state.base = Math.floor(date.getTime() / 1000);
+        }
 
-    socket.onmessage = (msg) => {
-      var action = JSON.parse(msg.data);
-      window.clearInterval(keepAlive);
-      keepAlive = window.setInterval(() => {
-        socket.send("{}");
-      }, 54 * 1000);
-      switch (action.Type) {
-        case "updateTroops":
-          user = action.Player;
-          troops += action.Troops;
-          break;
-        case "updateCountry":
-          let ok = typeof countryStates[action.Country] === "undefined";
-          if (ok || getOwner(countryStates[action.Country].Player) !== getOwner(action.Player)) {
-            if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
-                //change allegiance  
-                allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
-              }
-              countryStates[action.Country] = new countryState(
-                  action.Troops,
-                  action.Player
-                  );
-                } else {
-            if (action.Player !== "") {
-                countryStates[action.Country].Troops += action.Troops;
-              if (countryStates[action.Country].Troops < 0) {
-                  console.log(action);
-                }
-            } else {
-              if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
-                //change allegiance  
-                allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
-              }
-              countryStates[action.Country].Troops = action.Troops;
-            }
-          }
-          break;
-        case "newPlayer":
-          if (!players.some((player) => player == action.Player)) {
-            console.log(
-              action.Player + " has entered the chat bois as: " + action.Country
-            );
-            playerColours[action.Player] = action.Country;
-            players.push(action.Player);
-            allegiances[action.Player] = action.Player;
-          }
-          break;
-        case "newCapital":
-          console.log(action.Country);  
-          capitals[action.Player] = action.Country;
-          break;
-        case "won":
-            alert(action.Player + " won");
-            /*if (user == action.Player) {
+        this.SideBar = this.SideBar.bind(this);
+
+		socket = connect();
+		var keepAlive = (keepAlive = window.setInterval(() => {
+			socket.send('{}');
+		}, 54 * 1000));
+
+		//Ascertain from cookies the base troop drop time intervals
+		interval = getInterval();
+		//Ascertain from cookies the current player's username
+        user = getYourUsername();
+
+		socket.onmessage = (msg) => {
+			var action = JSON.parse(msg.data);
+			window.clearInterval(keepAlive);
+			keepAlive = window.setInterval(() => {
+				socket.send('{}');
+			}, 54 * 1000);
+			switch (action.Type) {
+				case 'updateTroops':
+					user = action.Player;
+                    troops += action.Troops;
+                    if (action.ID == 1) {
+                        updateTime();
+                    }
+					break;
+				case 'updateCountry':
+                    let ok = typeof countryStates[action.Country] === 'undefined';
+                    if (ok || getOwner(countryStates[action.Country].Player) !== getOwner(action.Player)) {
+                        if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
+                            //change allegiance  
+                            allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
+                          }
+                          countryStates[action.Country] = new countryState(
+                              action.Troops,
+                              action.Player
+                          );
+                        } else {
+                            if (action.Player !== "") {
+                                countryStates[action.Country].Troops += action.Troops;
+                            if (countryStates[action.Country].Troops < 0) {
+                                console.log(action);
+                                }
+                            } else {
+                            if (Object.keys(capitals).some(key => capitals[key] == action.Country)) {
+                                //change allegiance  
+                                allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
+                            }
+                            countryStates[action.Country].Troops = action.Troops;
+                            }
+                      }
+                      break;
+				case 'readyPlayer':
+					console.log('readyPlayer token received. Setting ready state to true');
+					playerReady[action.Player] = true;
+                    console.log(playerReady);
+                    break;
+                case 'start':
+                    this.setState({ lobby: false });
+					break;
+				case 'newPlayer':
+					if (!players.some((player) => player === action.Player)) {
+						console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
+						playerColours[action.Player] = action.Country;
+						players.push(action.Player);
+						playerReady[action.Player] = false;
+					}
+                    break;
+                case "newCapital":
+                    console.log(action.Country);  
+                    capitals[action.Player] = action.Country;
+                    allegiances[action.Player] = countryStates[action.Country].Player
+                    break;
+				case 'won':
+					alert(action.Player + ' won');
+                    /*if (user == action.Player) {
                 window.location.replace("https://www.youtube.com/watch?v=tS_2hEmGnzA");
             } else {
                 window.location.replace("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
@@ -398,7 +425,7 @@ class GameMap extends Component {
                 openHelp={openHelp}
                 user={user}
                 troops={troops}
-                startTime={start}
+                startTime={this.state.base}
                 interval={interval}
                 nextTroops={getUserTroops()}
               />
@@ -492,46 +519,51 @@ class GameMap extends Component {
   }
 
   render() {
-    return <this.SideBar />;
-  }
+    return this.state.lobby ? (
+        <WaitingRoom playerColours={playerColours} user={user} socket={socket} playerReady={playerReady} />
+    ) : (
+        <this.SideBar />
+    );
+}
 }
 
 const useStyles = makeStyles((theme) => ({
-  sidebar: {
-    marginLeft: "70%",
-    marginTop: "10%",
-    background: fade("#000000", 0.8),
-    color: "white",
-    padding: theme.spacing(2),
-    position: "fixed",
-    width: "30%",
-    height: "80%",
-    borderRadius: "5%",
-    boxShadow: "0px 10px 50px #555",
-  },
-  players: {
-    background: fade("#000000", 0.8),
-    color: "white",
-    padding: theme.spacing(2),
-    position: "fixed",
-    boxShadow: "0px 10px 50px #555",
-  },
-  buttons: {
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-  button: {
-    marginTop: theme.spacing(3),
-    marginLeft: theme.spacing(1),
-  },
-  input: {
-    minWidth: 120,
-    marginRight: theme.spacing(2),
-  },
-  select: {
-    borderWidth: "1px",
-    borderColor: "yellow",
-  },
+	sidebar: {
+		marginLeft: '70%',
+		marginTop: '10%',
+		background: fade('#000000', 0.8),
+		color: 'white',
+		padding: theme.spacing(2),
+		position: 'fixed',
+		width: '30%',
+		height: '80%',
+		borderRadius: '5%',
+		boxShadow: '0px 10px 50px #555'
+	},
+	players: {
+		background: fade('#000000', 0.8),
+		color: 'white',
+		padding: theme.spacing(2),
+		position: 'fixed',
+		boxShadow: '0px 10px 50px #555'
+	},
+	buttons: {
+		display: 'flex',
+		justifyContent: 'flex-end'
+	},
+	button: {
+		marginTop: theme.spacing(3),
+		marginLeft: theme.spacing(1)
+	},
+	input: {
+		minWidth: 120,
+		marginRight: theme.spacing(2)
+	},
+	select: {
+		borderWidth: '1px',
+		borderColor: 'yellow'
+	}
 }));
 
 export default GameMap;
+export { playerReady };
