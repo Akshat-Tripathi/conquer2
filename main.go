@@ -55,6 +55,7 @@ func main() {
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/play", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
 
 	r.LoadHTMLGlob("./**/*.html")
@@ -187,6 +188,10 @@ func main() {
 	})
 
 	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	r.GET("/play", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
