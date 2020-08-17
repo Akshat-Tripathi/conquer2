@@ -6,6 +6,20 @@ import (
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
+const (
+	timerSync = iota + 1
+	conquestDest
+	conquestSrc
+	attackDest
+	attackSrc
+	donationDest
+	donationSrc
+	deployDest
+	deploySrc
+	moveDest
+	moveSrc
+)
+
 func (d *DefaultGame) lobbyProcess(name string, action Action) (done bool) {
 	if action.ActionType != "imreadym9" {
 		return
@@ -35,14 +49,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 				Troops:  1,
 				Player:  name,
 				Country: action.Dest,
-				ID:      1,
+				ID:      conquestDest,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc - 1,
 				Player:  name,
 				Country: action.Src,
-				ID:      2,
+				ID:      conquestSrc,
 			})
 			if won {
 				d.sendToAll(UpdateMessage{
@@ -58,14 +72,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 				Troops:  deltaDest,
 				Player:  d.processor.GetCountry(action.Dest).Player,
 				Country: action.Dest,
-				ID:      3,
+				ID:      attackDest,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc,
 				Player:  name,
 				Country: action.Src,
-				ID:      4,
+				ID:      attackSrc,
 			})
 		}
 		return false
@@ -77,13 +91,13 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 			Type:   "updateTroops",
 			Troops: action.Troops,
 			Player: action.Dest,
-			ID:     5,
+			ID:     donationDest,
 		})
 		d.sendToPlayer(name, UpdateMessage{
 			Type:   "updateTroops",
 			Troops: -action.Troops,
 			Player: name,
-			ID:     6,
+			ID:     donationSrc,
 		})
 	case "move":
 		if !d.areNeighbours(action.Src, action.Dest) {
@@ -105,14 +119,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 				Type:   "updateTroops",
 				Troops: -action.Troops,
 				Player: name,
-				ID:     7,
+				ID:     deploySrc,
 			})
 			d.sendToAll(UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  action.Troops,
 				Player:  name,
 				Country: action.Dest,
-				ID:      8,
+				ID:      deployDest,
 			})
 		}
 		return false
@@ -121,17 +135,17 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 	}
 	d.sendToAll(UpdateMessage{
 		Type:    "updateCountry",
-		Troops:  -action.Troops,
-		Player:  name,
-		Country: action.Src,
-		ID:      9,
-	})
-	d.sendToAll(UpdateMessage{
-		Type:    "updateCountry",
 		Troops:  action.Troops,
 		Player:  d.processor.GetCountry(action.Dest).Player,
 		Country: action.Dest,
-		ID:      10,
+		ID:      moveDest,
+	})
+	d.sendToAll(UpdateMessage{
+		Type:    "updateCountry",
+		Troops:  -action.Troops,
+		Player:  name,
+		Country: action.Src,
+		ID:      moveSrc,
 	})
 	return false
 }

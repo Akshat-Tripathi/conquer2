@@ -32,6 +32,7 @@ func (cg *CampaignGame) Init(ctx Context) {
 					Troops: troops,
 					Player: player,
 					Type:   "updateTroops",
+					ID:     timerSync,
 				})
 			}
 		})

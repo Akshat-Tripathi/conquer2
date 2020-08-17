@@ -29,8 +29,6 @@ var players = [];
 var user = '';
 // Interval for troop drops
 var interval;
-// Time of game start
-var start;
 // Checking if everyone's ready
 var playerReady = {};
 
@@ -51,10 +49,6 @@ function darken(hex, p) {
 	const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - p));
 	const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - p));
 	return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
-function getStartTime() {
-	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
 }
 
 function getYourUsername() {
@@ -85,10 +79,21 @@ function getInterval() {
 	}
 }
 
+function getStart() {
+    return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
+}
+
 class GameMap extends Component {
 	constructor() {
 		super();
-		this.state = { lobby: true };
+        this.state = { lobby: true, base: getStart() };
+
+        let updateTime = () => {
+            let date = new Date();
+            this.state.base = Math.floor(date.getTime() / 1000);
+        }
+
+        this.SideBar = this.SideBar.bind(this);
 
 		socket = connect();
 		var keepAlive = (keepAlive = window.setInterval(() => {
@@ -97,8 +102,6 @@ class GameMap extends Component {
 
 		//Ascertain from cookies the base troop drop time intervals
 		interval = getInterval();
-		//Ascertain from cookies the game server start time
-		start = getStartTime();
 		//Ascertain from cookies the current player's username
 		user = getYourUsername();
 
@@ -111,7 +114,10 @@ class GameMap extends Component {
 			switch (action.Type) {
 				case 'updateTroops':
 					user = action.Player;
-					troops += action.Troops;
+                    troops += action.Troops;
+                    if (action.ID == 1) {
+                        updateTime();
+                    }
 					break;
 				case 'updateCountry':
 					let ok = typeof countryStates[action.Country] === 'undefined';
@@ -219,7 +225,10 @@ class GameMap extends Component {
 		const [ countriesLoaded, setcountriesLoaded ] = useState(false);
 
 		// Map of ALL countries and their borders
-		const [ countries, changeCountries ] = useState({});
+        const [ countries, changeCountries ] = useState({});
+        
+        //Base time for text
+        const [ base, setBase ] = useState(0);
 
 		function loadMap() {
 			fetch('/maps/world.txt')
@@ -241,7 +250,7 @@ class GameMap extends Component {
 
 		if (!countriesLoaded) {
 			loadMap();
-			setcountriesLoaded(true);
+            setcountriesLoaded(true);
 		}
 
 		const convertISO = (NAME, ISO_A2) => {
@@ -387,7 +396,7 @@ class GameMap extends Component {
 								openHelp={openHelp}
 								user={user}
 								troops={troops}
-								startTime={start}
+								startTime={this.state.base}
 								interval={interval}
 								nextTroops={getUserTroops()}
 							/>

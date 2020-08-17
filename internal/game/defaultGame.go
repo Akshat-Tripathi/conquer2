@@ -3,6 +3,7 @@ package game
 import (
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 	"github.com/gin-gonic/gin"
@@ -42,9 +43,12 @@ func (d *DefaultGame) Init(ctx Context) {
 					Troops: troops,
 					Player: player,
 					Type:   "updateTroops",
+					ID:     timerSync,
 				})
 			}
 		})
+		d.context.StartTime = time.Now()
+		d.cron.Start()
 	})
 	d.start()
 
@@ -142,9 +146,9 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 	}
 }
 
-//Run returns the websocket handler and starts the cron job
+//Run returns the websocket handler
 func (d *DefaultGame) Run() func(ctx *gin.Context) {
-	d.cron.Start()
+	//Kept this signature in case anything else needs to be done
 	return func(ctx *gin.Context) {
 		username, err := ctx.Cookie("username")
 		if err != nil {
