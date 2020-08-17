@@ -59,11 +59,11 @@ function stringifyInt(n) {
 function ETA(interval, start) {
 	const [ seconds, setSeconds ] = React.useState(0);
 
-    let resetClock = () => {
-        let date = new Date();
-        let secondsFromStart = Math.floor(date.getTime() / 1000) - start;
-        setSeconds(interval * 60 - secondsFromStart % (interval * 60));
-    };
+	let resetClock = () => {
+		let date = new Date();
+		let secondsFromStart = Math.floor(date.getTime() / 1000) - start;
+		setSeconds(interval * 60 - secondsFromStart % (interval * 60));
+	};
 
 	React.useEffect(() => {
 		if (seconds >= 0) {
@@ -85,7 +85,6 @@ function ETA(interval, start) {
 			str = stringifyInt(hourPart) + ':' + str;
 		}
 	}
-
 	return str;
 }
 

@@ -147,18 +147,6 @@ const AssistancesSlider = () => {
 	));
 };
 
-function Loading() {
-	const [ seconds, setSeconds ] = React.useState(Math.random(10));
-
-	React.useEffect(() => {
-		if (seconds > 0) {
-			setTimeout(() => setSeconds(seconds - 1), 1000);
-		} else {
-			setSeconds('BOOOOM!');
-		}
-	});
-}
-
 const Assistances = [
 	"Press Q to remove dashboards while you're playing to see the map more clearly!",
 	'Make sure to check what countries are bordering your countries when moving troops',

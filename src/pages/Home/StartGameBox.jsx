@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: '15%',
 		marginTop: '10%',
 		marginBottom: '20%',
-		background: fade('#000000', 0.8),
 		color: 'white',
 		padding: theme.spacing(3)
 	},
@@ -208,7 +207,7 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 							>
 								<MenuItem value="realtime">Regular</MenuItem>
 								<MenuItem value="campaign">Campaign</MenuItem>
-                                <MenuItem value="capital">Capital Supremacy</MenuItem>
+								<MenuItem value="capital">Capital Supremacy</MenuItem>
 							</Select>
 						</Grid>
 						<Grid item xs={12}>

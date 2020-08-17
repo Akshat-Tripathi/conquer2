@@ -1,15 +1,33 @@
 import React, { Component, useState, useEffect, useRef } from 'react';
+import { Redirect } from 'react-router-dom';
 import './NewHome.css';
-import Ticker from 'react-ticker';
-import PageVisibility from 'react-page-visibility';
-import { LoginButton, LogoutButton, Profile } from './Authentication';
 import { PollBox, MemeRating, Testimonials, RSSFeedGameSpot, Podcast } from './Plugs';
 
 import videoSource from '../../media/fireball.mp4';
 import AllDevices from '../../media/AllDevices.png';
 import NextUpdateBanner from '../../media/NextUpdate.jpg';
 import Meme from '../../media/DominoMemes/meme1.jpeg';
-import MapImage from '../../media/conquer2.jpg';
+
+import { Button, Grid } from '@material-ui/core';
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
+
+export var signedIn = false;
+
+const LoginGBButton = () => {
+	return (
+		<Grid item xs={12} sm={6}>
+			<Button
+				aria-label="newgame"
+				color="primary"
+				size="medium"
+				// onClick={<Redirect to="/play" />}
+				endIcon={<DoubleArrowIcon />}
+			>
+				PLAY NOW
+			</Button>
+		</Grid>
+	);
+};
 
 export default class NewHome extends Component {
 	constructor() {
@@ -25,17 +43,9 @@ export default class NewHome extends Component {
 		document.body.appendChild(script);
 	}
 
-	// handleMouseEnterMeme() {
-	// 	this.setState(() => ({ isHovering: true }));
-	// }
-
-	// handleMouseLeaveMeme() {
-	// 	this.setState(() => ({ isHovering: false }));
-	// }
-
 	render() {
 		return (
-			<div>
+			<div id="new-home">
 				<header className="header">
 					<div className="container-header">
 						<div className="logo" />
@@ -61,10 +71,17 @@ export default class NewHome extends Component {
 								<div className="overlay-title">
 									<h2>CONQUER 2.0</h2>
 									<h3>Beta Version 2 Out Now</h3>
+									{/* {!signedIn ? <LoginButton /> : <LogoutButton />} */}
+									<Button
+										variant="outlined"
+										color="secondary"
+										href="/play"
+										endIcon={<DoubleArrowIcon />}
+									>
+										PLAY NOW
+									</Button>
 								</div>
-								<div className="play-now">
-									<h6>Gamebox here??</h6>
-								</div>
+								<div className="play-now">{/* <h6>Gamebox here??</h6> */}</div>
 							</div>
 						</div>
 					</div>
