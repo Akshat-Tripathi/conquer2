@@ -138,7 +138,7 @@ const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12} direction={'column'}>
 					{Object.keys(playerColours).map(function(player) {
-						var colour = playerColours[allrgiances[player]];
+						var colour = playerColours[allegiances[player]];
 						return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid
