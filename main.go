@@ -57,6 +57,7 @@ func main() {
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/play", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
+	r.Use(static.Serve("/play", static.LocalFile("./build", true)))
 
 	r.LoadHTMLGlob("./**/*.html")
 
