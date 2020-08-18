@@ -127,7 +127,7 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 	);
 };
 
-const PlayerBox = ({ classes, playerColours, hidden }) => {
+const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 	return !hidden ? (
 		<div>
 			<Paper className={classes.players}>
@@ -138,15 +138,14 @@ const PlayerBox = ({ classes, playerColours, hidden }) => {
 				<Typography variant="subtitle1">PLAYERS:</Typography>
 				<Grid container spacing={12} direction={'column'}>
 					{Object.keys(playerColours).map(function(player) {
-						var colour = playerColours[player];
+						var colour = playerColours[allrgiances[player]];
 						return (
 							<div key={player} style={{ padding: '5%' }}>
 								<Grid
 									container
 									spacing={12}
 									direction="row"
-									style={{ display: 'flex', alignItems: 'center' }}
-								>
+									style={{ display: 'flex', alignItems: 'center' }}>
 									<Grid item xs={9}>
 										<Typography variant="p">
 											<span style={{ color: colour }}>{player}</span>

@@ -167,11 +167,11 @@ class GameMap extends Component {
 						console.log(action.Player + ' has entered the chat bois as: ' + action.Country);
 						playerColours[action.Player] = action.Country;
 						players.push(action.Player);
-						playerReady[action.Player] = false;
+                        playerReady[action.Player] = false;
+                        allegiances[action.Player] = action.Player;
 					}
 					break;
 				case 'newCapital':
-					console.log(action.Country);
 					capitals[action.Player] = action.Country;
 					allegiances[action.Player] = countryStates[action.Country].Player;
 					break;
@@ -404,7 +404,7 @@ class GameMap extends Component {
 
 		return (
 			<div>
-				{players.length !== 0 && <PlayerBox classes={classes} playerColours={playerColours} hidden={hidden} />}
+				{players.length !== 0 && <PlayerBox classes={classes} playerColours={playerColours} hidden={hidden} allegiances={allegiances}/>}
 				{!hidden ? (
 					<Paper className={classes.sidebar}>
 						<Grid container style={{ alignText: 'center' }}>
