@@ -17,6 +17,9 @@ func newLobby() *lobby {
 func (l *lobby) add(player string) {
 	l.Lock()
 	defer l.Unlock()
+	if l.full {
+		return
+	}
 	l.readyPlayers[player] = true
 }
 

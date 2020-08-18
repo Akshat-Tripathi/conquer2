@@ -9,16 +9,21 @@
 
 from os import system
 
-def comment():
+def comment(set):
+    old = ''
+    new = '#'
+    if not set:
+        old, new = new, old
     with open(".gitignore", 'r') as file:
         raw = file.read()
-        raw = raw.replace("internal/game/*.json", "#internal/game/*.json")
+        raw = raw.replace(old + "internal/game/*.json", new + "internal/game/*.json")
     with open(".gitignore", 'w') as file:
         file.write(raw)
 
-comment()
+comment(True)
 system("git add .")
 system("git commit -m \"heroku release\"")
 system("git push heroku master --force")
 system("git reset --soft HEAD~1")
-system("git rm -r internal/game/*.json --cached")
+system("git rm -r --cached internal/game/*.json")
+comment(False)

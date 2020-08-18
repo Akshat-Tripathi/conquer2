@@ -29,7 +29,7 @@ func (d *DefaultGame) lobbyProcess(name string, action Action) (done bool) {
 		Type:   "readyPlayer",
 		Player: name,
 	})
-	return d.context.MaxPlayers == d.lobby.length()
+	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
 }
 
 func (d *DefaultGame) process(name string, action Action) (done bool) {

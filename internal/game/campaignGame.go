@@ -36,26 +36,26 @@ func (cg *CampaignGame) Init(ctx Context) {
 				})
 			}
 		})
+		eraCron(cg.cron, ctx.StartTime, cg.processor.ToggleAttack,
+			func() {
+				max := 0
+				playerName := ""
+				cg.processor.RangePlayers(func(name string, player *gs.PlayerState) {
+					if max < player.Countries {
+						playerName = name
+					}
+				})
+				cg.sendToAll(UpdateMessage{
+					Type:   "won",
+					Player: playerName,
+				})
+				cg.End()
+			},
+		)
 	})
 	cg.start()
 
 	cg.lobby = newLobby()
-	eraCron(cg.cron, ctx.StartTime, cg.processor.ToggleAttack,
-		func() {
-			max := 0
-			playerName := ""
-			cg.processor.RangePlayers(func(name string, player *gs.PlayerState) {
-				if max < player.Countries {
-					playerName = name
-				}
-			})
-			cg.sendToAll(UpdateMessage{
-				Type:   "won",
-				Player: playerName,
-			})
-			cg.End()
-		},
-	)
 }
 
 func (cg *CampaignGame) sendInitialStateFunc(playerName string) {

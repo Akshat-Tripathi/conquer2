@@ -55,13 +55,8 @@ function darken(hex, p) {
 	return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-//TODO: reduce redundancy
-function getYourUsername() {
-	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'username')[0][1];
-}
-
-function getStart() {
-	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'start')[0][1];
+function parseCookie(txt) {
+    return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == txt)[0][1]
 }
 
 function getInterval() {
@@ -90,7 +85,10 @@ function getInterval() {
 
 function getOwner(player) {
 	while (player != allegiances[player]) {
-		player = allegiances[player];
+        player = allegiances[player];
+        if (player === undefined || player === "") {
+            alert("glitch")
+        }
 	}
 	return player;
 }
@@ -98,12 +96,23 @@ function getOwner(player) {
 class GameMap extends Component {
 	constructor() {
 		super();
-		this.state = { lobby: true, base: getStart() };
+		this.state = { lobby: true, base: parseCookie('start'), isUnrelated: null };
 
 		let updateTime = () => {
 			let date = new Date();
 			this.state.base = Math.floor(date.getTime() / 1000);
 		};
+
+        if (parseCookie('type') === 'capital') {
+            this.state.isUnrelated = (iso) => {
+                return !Object.values(capitals).includes(iso);
+            }
+        } else {
+            this.state.isUnrelated = (iso) => {
+                let v = countryStates[iso];
+                return typeof v === 'undefined' || v.Player !== user; //shouldn't need getOwner as it's definitely not a capital game
+            }
+        }
 
 		this.SideBar = this.SideBar.bind(this);
 
@@ -115,7 +124,7 @@ class GameMap extends Component {
 		//Ascertain from cookies the base troop drop time intervals
 		interval = getInterval();
 		//Ascertain from cookies the current player's username
-		user = getYourUsername();
+		user = parseCookie('username');
 
 		socket.onmessage = (msg) => {
 			var action = JSON.parse(msg.data);
@@ -204,12 +213,20 @@ class GameMap extends Component {
 		const classes = useStyles();
 		//TODO: Fetch #troops, attack, move options, fix data vals
 
-		const [ hidden, setHidden ] = useState(false);
+        const [ hidden, setHidden ] = useState(false);
+        const [ hideUnrelated, setHideUnrelated ] = useState(false);
+
 		useHotkeys('q', () =>
 			setHidden((bool) => {
 				return !bool;
 			})
-		);
+        );
+        
+        useHotkeys('c', () => 
+            setHideUnrelated((bool) => {
+                return !bool;
+            })
+        );
 
 		// Spy Detail Information
 		const [ name, setname ] = useState('');
@@ -283,7 +300,7 @@ class GameMap extends Component {
 		const [ toCountryISO, setToCountryISO ] = useState('');
 
 		const handleClick = (geo) => {
-			const { NAME, ISO_A2 } = geo.properties;
+            const { NAME, ISO_A2 } = geo.properties;
 
 			var iso_a2 = convertISO(NAME, ISO_A2);
 
@@ -378,9 +395,13 @@ class GameMap extends Component {
 
 		const handleColorFill = (geo) => {
 			while (!countriesLoaded) {}
-			const { NAME, ISO_A2 } = geo.properties;
+            const { NAME, ISO_A2 } = geo.properties;
 
-			var iso_a2 = convertISO(NAME, ISO_A2);
+            var iso_a2 = convertISO(NAME, ISO_A2);
+            
+            if (hideUnrelated && this.state.isUnrelated(iso_a2)) {
+                return 'none';
+            }
 
 			try {
 				var col = '#a69374';
@@ -502,7 +523,9 @@ class GameMap extends Component {
 					handleColorFill={handleColorFill}
 					handleClick={handleClick}
 					countryStates={countryStates}
-					convertISO={convertISO}
+                    convertISO={convertISO}
+                    hideUnrelated={hideUnrelated}
+                    isUnrelated={this.state.isUnrelated}
 				/>
 			</div>
 		);

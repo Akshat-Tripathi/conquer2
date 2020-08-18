@@ -178,6 +178,8 @@ func main() {
 		c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
 
 		switch g.(type) {
+		case *game.CapitalGame:
+			c.SetCookie("type", "capital", cookieMaxAge, "/game", "", false, false)
 		case *game.DefaultGame:
 			c.SetCookie("type", "realtime", cookieMaxAge, "/game", "", false, false)
 			c.SetCookie("interval", strconv.Itoa(ctx.Minutes), cookieMaxAge, "/game", "", false, false)

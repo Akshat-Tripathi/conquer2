@@ -34,7 +34,9 @@ const MapChart = ({
 	handleColorFill,
 	handleClick,
 	countryStates,
-	convertISO
+    convertISO,
+    hideUnrelated,
+    isUnrelated,
 }) => {
 	return (
 		<div>
@@ -91,7 +93,7 @@ const MapChart = ({
 								const { NAME, ISO_A2 } = geo.properties;
 								var iso_a2 = convertISO(NAME, ISO_A2);
 								const centroid = geoCentroid(geo);
-								return notThisCountry(geo) ? (
+								return !(hideUnrelated && isUnrelated(iso_a2)) ? (
 									<Marker
 										coordinates={[ centroid[0] + OffsetsX(NAME), centroid[1] + OffsetsY(NAME) ]}
 									>
@@ -171,7 +173,9 @@ const VectorMap = ({
 	handleColorFill,
 	handleClick,
 	countryStates,
-	convertISO
+    convertISO,
+    hideUnrelated,
+    isUnrelated
 }) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
@@ -190,7 +194,9 @@ const VectorMap = ({
 				handleColorFill={handleColorFill}
 				handleClick={handleClick}
 				countryStates={countryStates}
-				convertISO={convertISO}
+                convertISO={convertISO}
+                hideUnrelated={hideUnrelated}
+                isUnrelated={isUnrelated}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>
