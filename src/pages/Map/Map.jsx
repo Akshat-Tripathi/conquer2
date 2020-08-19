@@ -185,7 +185,7 @@ class GameMap extends Component {
 					allegiances[action.Player] = countryStates[action.Country].Player;
 					break;
 				case 'won':
-					alert(action.Player + ' won');
+					alert(getOwner(action.Player) + ' won');
 				/*if (user == action.Player) {
                 window.location.replace("https://www.youtube.com/watch?v=tS_2hEmGnzA");
             } else {
