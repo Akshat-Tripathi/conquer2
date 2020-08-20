@@ -41,7 +41,12 @@ func (t *TeamProcessor) AddPlayer(name, password, colour string, troops, countri
 		//assign a capital
 		t.capitalLock.Lock()
 		defer t.capitalLock.Unlock()
-		t.capitals[name] = t.assignCountries(1, name)
+		capital := t.assignCountries(1, name)
+		t.capitals[name] = capital
+		c := t.countries[capital]
+		c.Lock()
+		defer c.Unlock()
+		c.Troops = 20
 		atomic.AddInt32(&t.nIndependent, 1)
 	}
 	return status
