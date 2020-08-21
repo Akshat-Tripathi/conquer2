@@ -1,16 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import './App.css';
-import Home from './pages/Home/Home.jsx';
+import OldHome from './pages/Home/Home.jsx';
 import { UnderConstruction } from './pages/Extra/UnderConstruction';
 import GameMap from './pages/Map/Map.jsx';
 import Intro2 from './shashgonenuts/intro2.jsx';
 import ErrorPage from './pages/Extra/Error.jsx';
 import Redirector from './pages/Extra/Redirector.jsx';
 import WaitingRoom from './pages/Map/WaitingRoom';
-import NewHome from './pages/NewHome/NewHome';
-// import Login from './pages/NewHome/Authentication';
-import StartGameBox from './pages/NewHome/StartGameBox';
+import Home from './pages/Website/Pages/Home';
 
 class App extends React.Component {
 	render() {
@@ -20,11 +18,10 @@ class App extends React.Component {
 					<Switch>
 						<div>
 							{/* Homepage */}
-							<Route exact path="/" component={NewHome} />
-							<Route path="/home" component={Home} />
-							<Route path="/newhome" component={NewHome} />
+							<Route exact path="/" component={Home} />
+							<Route path="/home" component={OldHome} />
 							{/* <Route path="/login" component={Login} /> */}
-							<Route path="/play" component={StartGameBox} />
+							{/* <Route path="/play" component={StartGameBox} /> */}
 
 							{/* Game */}
 							<Route path="/map" component={GameMap} />

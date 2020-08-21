@@ -1,0 +1,136 @@
+.footer-container {
+	background-color: #242424;
+	padding: 4rem 0 2rem 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.footer-subscription {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+
+	margin-bottom: 24px;
+	padding: 24px;
+	color: #fff;
+}
+
+.footer-subscription {
+	display: grid;
+	grid-template-areas: 'form discord';
+	grid-gap: 5rem;
+	padding: 2rem;
+}
+
+/* TODO: Add media query to resize */
+
+.form {
+	grid-area: form;
+	text-align: left;
+}
+
+.discord-widget {
+	grid-area: discord;
+}
+
+.footer-subscription > p {
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.footer-subscription-heading {
+	margin-bottom: 24px;
+	font-size: 24px;
+}
+
+.footer-subscription-text {
+	margin-bottom: 24px;
+	font-size: 20px;
+}
+
+.footer-input {
+	padding: 8px 20px;
+	border-radius: 20px;
+	margin-right: 10px;
+	outline: none;
+	border: none;
+	font-size: 18px;
+	margin-bottom: 16px;
+	border: 1px solid #fff;
+}
+
+.footer-email-form h2 {
+	margin-bottom: 2rem;
+}
+
+.footer-input::placeholder {
+	color: #b1b1b1;
+}
+
+/* Social Icons */
+.social-icon-link {
+	color: #fff;
+	font-size: 24px;
+}
+
+.social-media {
+	max-width: 1000px;
+	width: 100%;
+}
+
+.social-media-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 90%;
+	max-width: 1000px;
+	margin: 40px auto 0 auto;
+}
+
+.social-icons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 240px;
+}
+
+.social-icons > icon:hover {
+	color: #ff4520;
+}
+
+.social-logo {
+	color: #fff;
+	justify-self: start;
+	margin-left: 20px;
+	cursor: pointer;
+	text-decoration: none;
+	font-size: 2rem;
+	display: flex;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.website-rights {
+	color: #fff;
+	margin-bottom: 16px;
+}
+
+@media screen and (max-width: 820px) {
+	.footer-input {
+		width: 100%;
+	}
+
+	.btn {
+		width: 100%;
+	}
+
+	.social-media-wrap {
+		flex-direction: column;
+	}
+}
+
+@media screen and (max-width: 768px) {
+}

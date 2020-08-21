@@ -1,0 +1,32 @@
+.self-ads {
+	background-color: #fff;
+	color: #242424;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+.self-ads-grid {
+	display: grid;
+	/* grid-template-areas: 'alld alld alld compb'; */
+	grid-template-columns: 3fr 1fr;
+	min-height: 700px;
+	grid-gap: 2rem;
+}
+
+.compatible-devices {
+	/* grid-area: compb; */
+	background: url(../../media/CompatibleBrowsers.jpg);
+	background-size: cover;
+	background-position: center;
+	border-radius: 20px;
+	box-shadow: 10px 10px 10px 1px #242424;
+}
+
+.all-browsers {
+	/* grid-area: alld; */
+	background: url(../../media/AllDevices.png);
+	background-size: cover;
+	background-position: right;
+	border-radius: 20px;
+	box-shadow: 10px 10px 10px 1px #242424;
+}
