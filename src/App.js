@@ -9,6 +9,9 @@ import ErrorPage from './pages/Extra/Error.jsx';
 import Redirector from './pages/Extra/Redirector.jsx';
 import WaitingRoom from './pages/Map/WaitingRoom';
 import Home from './pages/Website/Pages/Home';
+import StartGameBox from './pages/Home/StartGameBox';
+import Forums from './pages/Website/Pages/Forums';
+import DominoMemes from './pages/Website/Pages/DominoMemes';
 
 class App extends React.Component {
 	render() {
@@ -17,11 +20,12 @@ class App extends React.Component {
 				<Router>
 					<Switch>
 						<div>
-							{/* Homepage */}
+							{/* Website */}
 							<Route exact path="/" component={Home} />
 							<Route path="/home" component={OldHome} />
-							{/* <Route path="/login" component={Login} /> */}
-							{/* <Route path="/play" component={StartGameBox} /> */}
+							<Route path="/memes" component={DominoMemes} />
+							<Route path="/forums" component={Forums} />
+							<Route path="/play" component={StartGameBox} />
 
 							{/* Game */}
 							<Route path="/map" component={GameMap} />

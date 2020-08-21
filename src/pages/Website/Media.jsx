@@ -16,7 +16,9 @@ function Media() {
 			<div className="media-grid">
 				<div className="tl">
 					<header>
-						<p>DOMINO MEMES</p>
+						<p>
+							<a href="/memes">DOMINO MEMES</a>
+						</p>
 					</header>
 				</div>
 				<div className="mt">

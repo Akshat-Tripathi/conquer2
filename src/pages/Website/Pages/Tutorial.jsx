@@ -1,5 +1,8 @@
 import React from 'react';
+import Header from '../Header';
 
-export default function Services() {
-	return <h1 className="services">SERVICES</h1>;
+function Tutorial() {
+	return <h1 className="services">Tutorials</h1>;
 }
+
+export default Tutorial;
