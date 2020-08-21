@@ -88,7 +88,7 @@ p#start {
   }
 }
 
-h1 {
+.intro2 h1 {
   position: absolute;
   width: 2.6em;
   left: 50%;
@@ -110,7 +110,7 @@ h1 {
   animation: logo 5s ease-out 2.5s;
 }
 
-h1 sub {
+.intro2 h1 sub {
   display: block;
   font-size: 0.3em;
   letter-spacing: 0;

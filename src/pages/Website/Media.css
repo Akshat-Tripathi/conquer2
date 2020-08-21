@@ -1,0 +1,204 @@
+* {
+	box-sizing: border-box;
+}
+
+a {
+	text-emphasis: none;
+	text-decoration: none;
+	color: inherit;
+	animation: all 0.5s ease-out;
+}
+
+iframe {
+	display: block;
+}
+
+a:hover {
+	color: #ff4520;
+	animation: all 0.5s ease-in-out;
+}
+
+.media {
+	background-color: #242424;
+	color: #fff;
+	margin: 0 auto;
+}
+
+.media-title {
+	padding: 2rem;
+	font-size: 1.5rem;
+	text-align: center;
+	padding: 2rem;
+}
+
+.media-grid {
+	display: grid;
+	grid-template-areas: 'mt mt r' 'mt mt r' 'tl mb bl';
+	grid-template-columns: minmax(200px, auto) 550px minmax(200px, auto);
+	grid-template-rows: repeat(3, minmax(300px, auto));
+	width: 100%;
+}
+
+.tl {
+	grid-area: tl;
+	/* background: url(../../media/DominoMemes/meme1.jpeg); */
+	background: url(../../media/DominoMemes/meme4.jpeg);
+	background-size: cover;
+	background-position: center;
+	border-bottom: 2px solid #ff4520;
+	position: relative;
+	overflow: hidden;
+}
+
+.mt {
+	grid-area: mt;
+	background: url(../../media/conquer2.jpg);
+	background-size: cover;
+	background-attachment: fixed;
+	position: relative;
+	overflow: hidden;
+}
+
+.mt > header {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 20px 10px;
+	background: inherit;
+	background-attachment: fixed;
+}
+
+.mt > header::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: inherit;
+	background-attachment: fixed;
+	-webkit-filter: blur(12px);
+	filter: blur(12px);
+	transform: scale(2) translateY(10px);
+}
+
+.mt > header > h1 {
+	margin: 0;
+	color: white;
+	position: relative;
+	z-index: 1;
+}
+
+.r {
+	grid-area: r;
+	text-align: center;
+}
+
+.r > ul {
+	display: grid;
+	grid-template-rows: repeat(auto-fit, minmax(50px, auto-fit));
+	grid-gap: 2rem;
+	margin-bottom: 1rem;
+}
+
+.r > p {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.r > hr {
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+
+.r > ul > li {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	text-align: center;
+	object-fit: cover;
+}
+
+.r > ul > li > h2 {
+	text-align: left;
+}
+
+.bl {
+	grid-area: bl;
+	background: url(../../media/conquer2.jpg);
+	background-size: cover;
+	border-bottom: 2px solid #ff4520;
+	position: relative;
+	overflow: hidden;
+}
+
+.mb {
+	grid-area: mb;
+	/* background: url(../../media/conquer2.jpg); */
+	/* background-size: cover; */
+	border-bottom: 2px solid #ff4520;
+	overflow: hidden;
+	/* position: relative;
+	overflow: hidden; */
+}
+
+.mb > iframe {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+
+
+.bl > header,
+.tl > header,
+.mb > header {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 20px 10px;
+	background: inherit;
+	background-attachment: fixed;
+	overflow: hidden;
+}
+
+.bl > header::before,
+.tl > header::before,
+.mb > header::before {
+	content: "";
+	position: absolute;
+	top: -10px;
+	left: 0;
+	width: 200%;
+	height: 200%;
+	background: inherit;
+	background-attachment: fixed;
+	-webkit-filter: blur(4px);
+	filter: blur(4px);
+}
+
+.bl > header::after,
+.tl > header::after,
+.mb > header::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.25);
+}
+
+.bl > header > p,
+.tl > header > p,
+.mb > header > p,
+.bl > header > h1,
+.tl > header > h1,
+.mb > header > h1
+ {
+	margin: 0;
+	color: white;
+	position: relative;
+	z-index: 1;
+}
