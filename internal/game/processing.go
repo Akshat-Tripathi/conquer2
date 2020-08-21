@@ -99,6 +99,7 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 			Player: name,
 			ID:     donationSrc,
 		})
+		return false
 	case "move":
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return false
