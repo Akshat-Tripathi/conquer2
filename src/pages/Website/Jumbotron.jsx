@@ -11,7 +11,7 @@ function Jumbotron() {
 			<h1 style={{ textShadow: '4px 4px #ff4520' }}>CONQUER 2.0</h1>
 			<p style={{ textShadow: '0 0 10px #fff' }}>Version Beta 2 Out Now</p>
 			<div className="hero-btns">
-				<Button className="btns" buttonStyle="btn--outline" buttonSize="btn--large">
+				<Button className="btns" buttonStyle="btn--outline" buttonSize="btn--large" link="/play">
 					INITIATE CONQUEST
 				</Button>
 				<Button className="btns" buttonStyle="btn--primary" buttonSize="btn--large" link="/game_intro">

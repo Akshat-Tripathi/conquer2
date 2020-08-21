@@ -12,6 +12,7 @@ import Home from './pages/Website/Pages/Home';
 import StartGameBox from './pages/Home/StartGameBox';
 import Forums from './pages/Website/Pages/Forums';
 import DominoMemes from './pages/Website/Pages/DominoMemes';
+import Play from './pages/Website/Pages/Play';
 
 class App extends React.Component {
 	render() {
@@ -25,7 +26,7 @@ class App extends React.Component {
 							<Route path="/home" component={OldHome} />
 							<Route path="/memes" component={DominoMemes} />
 							<Route path="/forums" component={Forums} />
-							<Route path="/play" component={StartGameBox} />
+							<Route path="/play" component={Play} />
 
 							{/* Game */}
 							<Route path="/map" component={GameMap} />

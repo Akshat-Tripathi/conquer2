@@ -24,15 +24,9 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import './StartGameBox.css';
 
-//TODO: Add username var here and set accordingly.
-var username = '';
-
 const useStyles = makeStyles((theme) => ({
 	paper: {
-		marginLeft: '60%',
-		marginRight: '15%',
-		marginTop: '10%',
-		marginBottom: '20%',
+		backgroundColor: '#242424',
 		color: 'white',
 		padding: theme.spacing(3)
 	},
@@ -140,7 +134,7 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 	);
 };
 
-const JoinGame = ({ setModeToZero, setusername }) => {
+const JoinGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
 			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
@@ -148,14 +142,7 @@ const JoinGame = ({ setModeToZero, setusername }) => {
 				<form action="/join" method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
-							<TextField
-								type="text"
-								id="ign"
-								placeholder="Username"
-								name="username"
-								required
-								onChange={setusername}
-							/>
+							<TextField type="text" id="ign" placeholder="Username" name="username" required />
 						</Grid>
 						<Grid item xs={12}>
 							<TextField type="password" placeholder="Password" name="password" required />
@@ -183,7 +170,7 @@ const JoinGame = ({ setModeToZero, setusername }) => {
 	);
 };
 
-const CreateGame = ({ setModeToZero, setusername }) => {
+const CreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
 			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
@@ -285,4 +272,3 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 };
 
 export default StartGameBox;
-export { username };

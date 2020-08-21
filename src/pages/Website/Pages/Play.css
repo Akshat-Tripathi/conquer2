@@ -1,0 +1,24 @@
+.play-wrapper {
+   display: grid;
+   grid-template-columns: 20% 60% 20%;
+   grid-template-areas: '. title .' '. box .';
+   grid-template-rows: minmax(200px, auto);
+   justify-items: center;
+   min-height: 100vh;
+    background: #242424;
+    color: #fff;
+}
+
+.play-wrapper > header {
+    grid-area: title;
+    margin-top: 5vh;
+    text-align: center;
+    padding: 10px;
+}
+
+.gamebox {
+    grid-area: box;
+}
+
+
+

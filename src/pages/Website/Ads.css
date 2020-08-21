@@ -7,14 +7,25 @@
 
 .self-ads-grid {
 	display: grid;
-	/* grid-template-areas: 'alld alld alld compb'; */
-	grid-template-columns: 3fr 1fr;
+	grid-template-areas: 'alld alld alld compb';
+	/* grid-template-columns: 2fr 1fr; */
 	min-height: 700px;
 	grid-gap: 2rem;
 }
 
+
+/* Whats happening here ... ?? */
+@media screen and (max-width: 1300px) {
+	.self-ads-grid {
+		grid-template-areas: 'alld compb';
+	}
+	.all-browsers {
+		background: transparent;
+	}
+}
+
 .compatible-devices {
-	/* grid-area: compb; */
+	grid-area: compb;
 	background: url(../../media/CompatibleBrowsers.jpg);
 	background-size: cover;
 	background-position: center;
@@ -23,7 +34,7 @@
 }
 
 .all-browsers {
-	/* grid-area: alld; */
+	grid-area: alld;
 	background: url(../../media/AllDevices.png);
 	background-size: cover;
 	background-position: right;

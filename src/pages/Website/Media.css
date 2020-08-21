@@ -39,6 +39,17 @@ a:hover {
 	width: 100%;
 }
 
+@media screen and (max-width: 960px) {
+	.media-grid {
+		grid-template-areas: 'mt' 'r' 'tl' 'mb' 'bl';
+		grid-template-columns: 100%;
+		grid-template-rows: repeat(5, minmax(300px, auto));
+	}
+	.media-grid > iframe {
+		height: 100%;
+	}
+}
+
 .tl {
 	grid-area: tl;
 	/* background: url(../../media/DominoMemes/meme1.jpeg); */

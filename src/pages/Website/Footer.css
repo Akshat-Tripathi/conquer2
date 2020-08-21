@@ -26,6 +26,20 @@
 	padding: 2rem;
 }
 
+@media screen and (max-width: 650px) {
+	.footer-subscription {
+		grid-template-areas: 'form' 'discord';
+		
+	}
+	.form {
+		text-align: center;
+	}
+	.discord-widget{ 
+		justify-self: center;
+		align-self: center;
+	}
+}
+
 /* TODO: Add media query to resize */
 
 .form {
