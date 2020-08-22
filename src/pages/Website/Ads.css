@@ -1,4 +1,75 @@
-.self-ads {
+
+:root {
+	--brand: #ff4520;
+	--white: #fff;
+	--dark: #242424;
+}
+
+.ads {
+	background: var(--white);
+	color: var(--dark);
+}
+
+.ads-title {
+	text-align: center;
+	padding: 2rem;
+}
+
+.ads-title > h1 {
+	font-size: 60px;
+}
+
+.ads-wrapper {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(200px, auto));
+	padding: 2rem;
+	text-align: center;
+	padding-bottom: 3rem;
+}
+
+@media screen and (max-width: 840px) {
+	.ads-wrapper {
+		padding-left: 1rem;
+		padding-right: 1rem;
+		grid-template-columns: 100%;
+		grid-template-rows: repeat(4, minmax(150px, auto));
+	}
+}
+
+.icon {
+	color: var(--dark);
+	font-size: 50px;
+	padding-bottom: 2rem;
+	animation: all 0.5s ease-in;
+}
+
+.icon:hover {
+	color: var(--brand);
+	transform: scale(1.1);
+	animation-name: spin;
+  	animation-duration: 1500ms; /* How long lasts 1 turn */
+  	animation-iteration-count: infinite;
+  	animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
+
+
+
+
+
+
+
+
+
+/* .self-ads {
 	background-color: #fff;
 	color: #242424;
 	margin: 0 auto;
@@ -8,23 +79,23 @@
 .self-ads-grid {
 	display: grid;
 	grid-template-areas: 'alld alld alld compb';
-	/* grid-template-columns: 2fr 1fr; */
+	/* grid-template-columns: 2fr 1fr;
 	min-height: 700px;
 	grid-gap: 2rem;
-}
+} */
 
 
 /* Whats happening here ... ?? */
-@media screen and (max-width: 1300px) {
+/* @media screen and (max-width: 1300px) {
 	.self-ads-grid {
 		grid-template-areas: 'alld compb';
 	}
 	.all-browsers {
 		background: transparent;
 	}
-}
+} */
 
-.compatible-devices {
+/* .compatible-devices {
 	grid-area: compb;
 	background: url(../../media/CompatibleBrowsers.jpg);
 	background-size: cover;
@@ -40,4 +111,4 @@
 	background-position: right;
 	border-radius: 20px;
 	box-shadow: 10px 10px 10px 1px #242424;
-}
+} */
