@@ -57,11 +57,12 @@ func NewSockets() *Sockets {
 	}
 }
 
-func (s *Sockets) NewPlayer(w http.ResponseWriter, r *http.Request, name string) *websocket.Conn {
+//NewPlayer connects a player to a websocket
+func (s *Sockets) NewPlayer(w http.ResponseWriter, r *http.Request, name string) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
-		return nil
+		return
 	}
 	s.players[name] = &socket{
 		responses: make(chan common.UpdateMessage),
@@ -69,9 +70,9 @@ func (s *Sockets) NewPlayer(w http.ResponseWriter, r *http.Request, name string)
 		close:     make(chan struct{}),
 		conn:      conn,
 	}
-	return conn
 }
 
+//Listen manages the connection of 1 player
 //PRE: name is in players
 func (s *Sockets) Listen(name string) {
 	socket, ok := s.players[name]
