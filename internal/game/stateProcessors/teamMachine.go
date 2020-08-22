@@ -98,7 +98,7 @@ func (t *TeamProcessor) moveValid(src *CountryState, player string, troops int) 
 		return false
 	}
 	//Must have troops
-	if src.Troops < troops {
+	if src.Troops < troops && src.Troops > 0 {
 		return false
 	}
 	t.allegianceLock.RLock()

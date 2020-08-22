@@ -334,7 +334,7 @@ func (d *DefaultProcessor) moveValid(src *CountryState, player string, troops in
 		return false
 	}
 	//Must have troops
-	if src.Troops < troops {
+	if src.Troops < troops && src.Troops > 0 {
 		return false
 	}
 	if src.Player != player {
@@ -371,7 +371,7 @@ func (d *DefaultProcessor) ProcessTroops() map[string]int {
 			p.Lock()
 			defer p.Unlock()
 
-			delta = 3 + p.Countries/3
+			delta = 3 + p.Countries/6
 			p.Troops += delta
 			playerTroops[player] = delta
 		}(p)
