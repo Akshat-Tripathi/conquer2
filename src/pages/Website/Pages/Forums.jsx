@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from '../Header';
+import { Redirect, Link } from 'react-router-dom';
 
 function Forums() {
 	return (
@@ -12,4 +13,5 @@ function Forums() {
 	);
 }
 
+// style="border:1px solid #000;"
 export default Forums;
