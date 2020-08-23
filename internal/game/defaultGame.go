@@ -135,15 +135,16 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 		}
 	})
 
-	d.lobby.rangeLobby(func(player string) {
-		d.SendToPlayer(playerName, common.UpdateMessage{
-			Type:   "readyPlayer",
-			Player: player,
-		})
-	})
 	if d.lobby.full {
 		d.SendToPlayer(playerName, common.UpdateMessage{
 			Type: "start",
+		})
+	} else {
+		d.lobby.rangeLobby(func(player string) {
+			d.SendToPlayer(playerName, common.UpdateMessage{
+				Type:   "readyPlayer",
+				Player: player,
+			})
 		})
 	}
 }
