@@ -5,6 +5,9 @@ import (
 	"sync/atomic"
 )
 
+//capitalTroops is the number of troops each capital starts with
+const capitalTroops = 20
+
 //TeamProcessor allows players to team up, it is used for capital supremacy games
 type TeamProcessor struct {
 	DefaultProcessor
@@ -43,10 +46,12 @@ func (t *TeamProcessor) AddPlayer(name, password, colour string, troops, countri
 		defer t.capitalLock.Unlock()
 		capital := t.assignCountries(1, name)
 		t.capitals[name] = capital
+
 		c := t.countries[capital]
 		c.Lock()
 		defer c.Unlock()
-		c.Troops = 20
+		c.Troops = capitalTroops
+
 		atomic.AddInt32(&t.nIndependent, 1)
 	}
 	return status

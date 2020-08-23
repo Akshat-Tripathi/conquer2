@@ -181,8 +181,20 @@ class GameMap extends Component {
 					}
 					break;
 				case 'newCapital':
-					capitals[action.Player] = action.Country;
-					allegiances[action.Player] = countryStates[action.Country].Player;
+                    capitals[action.Player] = action.Country;
+                    let state = countryStates[action.Country];
+                    /*
+                    The following code was written to fix the bug where player n doesn't receive info about the capitals
+                    of players n+1 onwards.
+                    This only happens at the start when the new players are added, and disappears on reload, so it is safe
+                    to assume that action.Player would be the actual owner of the capital, and the number of troops would be accurate
+                    */
+                    if (state === undefined) {
+                        countryStates[action.Country] = new countryState(action.Troops, action.Player);
+                        allegiances[action.Player] = action.Player;
+                    } else {
+                        allegiances[action.Player] = state.Player;
+                    }
 					break;
 				case 'won':
 					alert(getOwner(action.Player) + ' won');
