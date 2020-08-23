@@ -141,14 +141,16 @@ class GameMap extends Component {
 					}
 					break;
 				case 'updateCountry':
-					let ok = typeof countryStates[action.Country] === 'undefined';
+                    let ok = typeof countryStates[action.Country] === 'undefined';
+                    //If the country isn't currently tracked, or it's changing ownership
 					if (ok || getOwner(countryStates[action.Country].Player) !== getOwner(action.Player)) {
+                        //change allegiance
 						if (Object.keys(capitals).some((key) => capitals[key] == action.Country)) {
-							//change allegiance
 							allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
 						}
 						countryStates[action.Country] = new countryState(action.Troops, action.Player);
 					} else {
+                        //This should only be false in a campaign, when a country needs to be zeroed
 						if (action.Player !== '') {
 							countryStates[action.Country].Troops += action.Troops;
 							if (countryStates[action.Country].Troops < 0) {
@@ -159,7 +161,7 @@ class GameMap extends Component {
 								//change allegiance
 								allegiances[countryStates[action.Country].Player] = getOwner(action.Player);
 							}
-							countryStates[action.Country].Troops = action.Troops;
+                            countryStates[action.Country].Troops = action.Troops;
 						}
 					}
 					break;

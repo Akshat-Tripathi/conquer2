@@ -65,7 +65,7 @@ func (s *Sockets) NewPlayer(w http.ResponseWriter, r *http.Request, name string)
 		return
 	}
 	s.players[name] = &socket{
-		responses: make(chan common.UpdateMessage),
+		responses: make(chan common.UpdateMessage, 10),
 		requests:  make(chan common.Action),
 		close:     make(chan struct{}),
 		conn:      conn,

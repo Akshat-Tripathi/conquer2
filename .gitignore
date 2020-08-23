@@ -8,3 +8,5 @@ internal/game/*.json
 /discord/auth.token
 /src/api/environment.js
 package-lock.json
+*.exe
+conquer2.exe
