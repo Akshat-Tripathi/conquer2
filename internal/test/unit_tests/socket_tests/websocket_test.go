@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -15,7 +16,7 @@ import (
 )
 
 func init() {
-	//log.SetOutput(ioutil.Discard)
+	log.SetOutput(ioutil.Discard)
 	go ListenAndServe()
 }
 
@@ -46,7 +47,7 @@ func ListenAndServe() {
 	log.Fatalln(http.ListenAndServe(":8080", nil))
 }
 
-func newPlayer(onMessage func(msg common.UpdateMessage)) *websocket.Conn {
+func newPlayer(onMessage func(msg common.UpdateMessage, i ...int), i int) *websocket.Conn {
 	dialer := websocket.Dialer{}
 	conn, _, err := dialer.Dial("ws://localhost:8080", nil)
 	if err != nil {
@@ -61,60 +62,64 @@ func newPlayer(onMessage func(msg common.UpdateMessage)) *websocket.Conn {
 				conn.Close()
 				return
 			}
-			onMessage(msg)
+			onMessage(msg, i)
 		}
 	}()
 	return conn
 }
 
-/*
 func TestWebsocketSendToPlayer(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
-	conn := newPlayer(func(msg common.UpdateMessage) {
+	conn := newPlayer(func(msg common.UpdateMessage, _ ...int) {
 		assert.Equal(t, 2, msg.Troops)
 		assert.Equal(t, "1", msg.Player)
 		wg.Done()
-	})
+	}, 0)
+	defer conn.Close()
 	conn.WriteJSON(common.Action{
 		Troops: 1,
 	})
 	wg.Wait()
-	conn.Close()
 }
 
 func TestWebsocketSendToAll(t *testing.T) {
 	var wg sync.WaitGroup
-	n := 20
+	n := 30
 	conns := make([]*websocket.Conn, n)
 	for i := 0; i < n; i++ {
 		wg.Add(1)
-		conns[i] = newPlayer(func(msg common.UpdateMessage) {
+		conns[i] = newPlayer(func(msg common.UpdateMessage, i ...int) {
 			if msg.Troops == 2*n-2 {
+				log.Println(msg.Troops, 2*n-2, i)
 				wg.Done()
 			}
-		})
+		}, i)
 	}
 	for i := 0; i < n; i++ {
-		conns[i].WriteJSON(common.Action{
+		go conns[i].WriteJSON(common.Action{
 			ActionType: "1",
 			Troops:     i,
 		})
 		defer conns[i].Close()
 	}
+	log.Println("All sent")
 	wg.Wait()
+	log.Println("done")
 }
-*/
+
+//This is commented out because I don't think that message order should matter for most messages
+//If further investigation reveals that this is the cause of the negative troops bug, then uncomment this
+/*
 func TestWebsocketMessageOrder(t *testing.T) {
 	var wg sync.WaitGroup
 	n := 20
-	max := 100
+	max := 1000
 
-	orderChecker := func() func(common.UpdateMessage) {
+	orderChecker := func() func(common.UpdateMessage, ...int) {
 		n := int32(-1)
-		return func(msg common.UpdateMessage) {
+		return func(msg common.UpdateMessage, _ ...int) {
 			assert.Equal(t, int32(msg.Troops), atomic.AddInt32(&n, 1)*2)
-			log.Println(n)
 			if n == int32(max) {
 				wg.Done()
 			}
@@ -123,10 +128,10 @@ func TestWebsocketMessageOrder(t *testing.T) {
 	conns := make([]*websocket.Conn, n)
 	for i := 0; i < n; i++ {
 		wg.Add(1)
-		conns[i] = newPlayer(orderChecker())
+		conns[i] = newPlayer(orderChecker(), i)
 		defer conns[i].Close()
 	}
-	sender := newPlayer(func(msg common.UpdateMessage) {})
+	sender := newPlayer(func(msg common.UpdateMessage, _ ...int) {}, -1)
 	for i := 0; i <= max; i++ {
 		sender.WriteJSON(common.Action{
 			ActionType: "1",
@@ -135,3 +140,4 @@ func TestWebsocketMessageOrder(t *testing.T) {
 	}
 	wg.Wait()
 }
+*/
