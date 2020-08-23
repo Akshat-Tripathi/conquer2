@@ -9,4 +9,3 @@ internal/game/*.json
 /src/api/environment.js
 package-lock.json
 *.exe
-conquer2.exe
