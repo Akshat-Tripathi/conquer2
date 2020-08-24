@@ -334,7 +334,7 @@ func (d *DefaultProcessor) moveValid(src *CountryState, player string, troops in
 		return false
 	}
 	//Must have troops
-	if src.Troops < troops && src.Troops > 0 {
+	if src.Troops <= troops {
 		return false
 	}
 	if src.Player != player {
