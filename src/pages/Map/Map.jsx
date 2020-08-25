@@ -43,7 +43,7 @@ function getUserTroops() {
 			userCountries++;
 		}
 	}
-	return 3 + Math.floor(userCountries / 3);
+	return 3 + Math.floor(userCountries / 6);
 }
 
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)

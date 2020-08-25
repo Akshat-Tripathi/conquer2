@@ -113,10 +113,10 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 			<br />
 			<Grid item xs={12}>
 				<Typography variant="h6" align="center">
-					Base Troops: {troops}
+					Stonks: {troops}
 				</Typography>
 				<Typography variant="h6" align="center">
-					<span style={{ color: 'red' }}>{nextTroops} troops arriving in</span>
+					<span style={{ color: 'red' }}>{nextTroops} stonks arriving in</span>
 				</Typography>
 				<Typography variant="h6" align="center">
 					<span style={{ color: 'red' }}>{ETA(interval, startTime)}</span>
