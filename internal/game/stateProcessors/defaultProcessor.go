@@ -299,8 +299,8 @@ func (d *DefaultProcessor) attackValid(src, dest *CountryState, player string, t
 	if src.Player == dest.Player {
 		return false
 	}
-	//Must have at least 1 troop to attack
-	if src.Troops < 1 {
+	//Must have at least 2 troops to attack
+	if src.Troops < 2 {
 		return false
 	}
 	return true
