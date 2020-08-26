@@ -38,7 +38,10 @@ func (s *socket) read() {
 		s.close <- struct{}{}
 		return
 	}
-	s.requests <- action
+	//Filter out the "keepAlive" messages
+	if action.ActionType != "" {
+		s.requests <- action
+	}
 }
 
 //Sockets is a struct used to manage communication with users
