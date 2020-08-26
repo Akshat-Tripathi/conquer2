@@ -21,14 +21,6 @@ func (cg *CampaignGame) Init(ctx Context) {
 	cg.processor.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
 
-	cg.lobby = newLobby()
-	//If Init is being called on an existing game
-	if cg.numPlayers > 0 {
-		cg.FSM = sockets.NewFSM(cg.process)
-		cg.lobby.full = true
-		return
-	}
-	//If Init is being called on a new game
 	cg.FSM = sockets.NewFSM(cg.lobbyProcess, cg.process)
 	cg.AddTransitions(func() {
 		cg.SendToAll(common.UpdateMessage{
@@ -64,6 +56,12 @@ func (cg *CampaignGame) Init(ctx Context) {
 		)
 	})
 	cg.Start()
+	cg.lobby = newLobby()
+
+	//If Init is being called on an existing game
+	if cg.numPlayers > 0 {
+		cg.NextState()
+	}
 }
 
 func (cg *CampaignGame) sendInitialStateFunc(playerName string) {

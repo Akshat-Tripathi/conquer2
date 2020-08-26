@@ -38,12 +38,13 @@ func (fsm *FSM) Start() {
 	state := <-fsm.states
 	fsm.currentFunc = func(name string, action common.Action) {
 		if state(name, action) {
-			fsm.nextState()
+			fsm.NextState()
 		}
 	}
 }
 
-func (fsm *FSM) nextState() {
+//NextState is used to go to the next state in the FSM
+func (fsm *FSM) NextState() {
 	select {
 	case state, ok := <-fsm.states:
 		if !ok {
@@ -51,7 +52,7 @@ func (fsm *FSM) nextState() {
 		}
 		fsm.currentFunc = func(name string, action common.Action) {
 			if state(name, action) {
-				fsm.nextState()
+				fsm.NextState()
 			}
 		}
 		transition, ok := <-fsm.transitions
