@@ -117,11 +117,14 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 		srcCountry.Troops += deltaSrc
 		destCountry.Troops += deltaDest
 
-		if destCountry.Troops <= 0 {
+		if destCountry.Troops < 0 {
 			deltaDest -= destCountry.Troops
 			destCountry.Troops = 0
+		}
+
+		if destCountry.Troops == 0 && srcCountry.Troops > 0 {
 			//Conquered
-			destCountry.Troops++
+			destCountry.Troops = 1
 			srcCountry.Troops--
 
 			source := d.players[srcCountry.Player]
