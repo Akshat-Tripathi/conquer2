@@ -23,7 +23,7 @@ def comment(set):
 comment(True)
 system("git add .")
 system("git commit -m \"heroku release\"")
-system("git push heroku master")
+system("git push heroku master --force")
 system("git reset --soft HEAD~1")
 system("git rm -r --cached internal/game/*.json")
 comment(False)
