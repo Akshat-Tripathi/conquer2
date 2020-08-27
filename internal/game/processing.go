@@ -3,6 +3,7 @@ package game
 import (
 	"time"
 
+	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
@@ -20,19 +21,19 @@ const (
 	moveSrc
 )
 
-func (d *DefaultGame) lobbyProcess(name string, action Action) (done bool) {
+func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool) {
 	if action.ActionType != "imreadym9" {
 		return
 	}
 	d.lobby.add(name)
-	d.sendToAll(UpdateMessage{
+	d.SendToAll(common.UpdateMessage{
 		Type:   "readyPlayer",
 		Player: name,
 	})
 	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
 }
 
-func (d *DefaultGame) process(name string, action Action) (done bool) {
+func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 	switch action.ActionType {
 	case "attack":
 		if !d.areNeighbours(action.Src, action.Dest) {
@@ -44,14 +45,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 			return false
 		}
 		if conquered {
-			d.sendToAll(UpdateMessage{
+			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  1,
 				Player:  name,
 				Country: action.Dest,
 				ID:      conquestDest,
 			})
-			d.sendToAll(UpdateMessage{
+			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc - 1,
 				Player:  name,
@@ -59,7 +60,7 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 				ID:      conquestSrc,
 			})
 			if won {
-				d.sendToAll(UpdateMessage{
+				d.SendToAll(common.UpdateMessage{
 					Type:   "won",
 					Player: name,
 				})
@@ -67,14 +68,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 				return true
 			}
 		} else {
-			d.sendToAll(UpdateMessage{
+			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaDest,
 				Player:  d.processor.GetCountry(action.Dest).Player,
 				Country: action.Dest,
 				ID:      attackDest,
 			})
-			d.sendToAll(UpdateMessage{
+			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc,
 				Player:  name,
@@ -87,13 +88,13 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 		if !d.processor.Donate(name, action.Dest, action.Troops) {
 			return false
 		}
-		d.sendToPlayer(action.Dest, UpdateMessage{
+		d.SendToPlayer(action.Dest, common.UpdateMessage{
 			Type:   "updateTroops",
 			Troops: action.Troops,
 			Player: action.Dest,
 			ID:     donationDest,
 		})
-		d.sendToPlayer(name, UpdateMessage{
+		d.SendToPlayer(name, common.UpdateMessage{
 			Type:   "updateTroops",
 			Troops: -action.Troops,
 			Player: name,
@@ -116,13 +117,13 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 		}
 	case "deploy":
 		if d.processor.Deploy(action.Dest, action.Troops, name) {
-			d.sendToPlayer(name, UpdateMessage{
+			d.SendToPlayer(name, common.UpdateMessage{
 				Type:   "updateTroops",
 				Troops: -action.Troops,
 				Player: name,
 				ID:     deploySrc,
 			})
-			d.sendToAll(UpdateMessage{
+			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  action.Troops,
 				Player:  name,
@@ -144,14 +145,14 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 	default:
 		return false
 	}
-	d.sendToAll(UpdateMessage{
+	d.SendToAll(common.UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  action.Troops,
 		Player:  d.processor.GetCountry(action.Dest).Player,
 		Country: action.Dest,
 		ID:      moveDest,
 	})
-	d.sendToAll(UpdateMessage{
+	d.SendToAll(common.UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  -action.Troops,
 		Player:  name,
@@ -161,7 +162,8 @@ func (d *DefaultGame) process(name string, action Action) (done bool) {
 	return false
 }
 
-func (cg *CampaignGame) process(name string, action Action) bool {
+func (cg *CampaignGame) process(name string, action common.Action) bool {
+	cg.persistentGame.timer.Reset(herokuTimeOut)
 	switch action.ActionType {
 	case "attack":
 		if !cg.areNeighbours(action.Src, action.Dest) {
@@ -175,19 +177,19 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 		}
 		if conquered {
 			if cg.countViewPoints(oldPlayer, action.Dest) == 0 {
-				cg.sendToPlayer(oldPlayer, UpdateMessage{
+				cg.SendToPlayer(oldPlayer, common.UpdateMessage{
 					Type:    "updateCountry",
 					Troops:  0,
 					Country: action.Dest,
 				})
 			}
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
+			cg.sendToRelevantPlayers(action.Dest, common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  1,
 				Player:  name,
 				Country: action.Dest,
 			})
-			cg.sendToRelevantPlayers(action.Src, UpdateMessage{
+			cg.sendToRelevantPlayers(action.Src, common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  -1 - deltaSrc,
 				Player:  name,
@@ -201,7 +203,7 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 				}
 				if cg.countViewPoints(name, neighbour) == 1 {
 					country = cg.processor.GetCountry(neighbour)
-					cg.sendToPlayer(name, UpdateMessage{
+					cg.SendToPlayer(name, common.UpdateMessage{
 						Type:    "updateCountry",
 						Country: neighbour,
 						Troops:  country.Troops,
@@ -209,7 +211,7 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 					})
 				}
 				if cg.countViewPoints(oldPlayer, neighbour) == 0 {
-					cg.sendToPlayer(oldPlayer, UpdateMessage{
+					cg.SendToPlayer(oldPlayer, common.UpdateMessage{
 						Type:    "updateCountry",
 						Country: neighbour,
 						Troops:  0,
@@ -217,7 +219,7 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 				}
 			}
 			if won {
-				cg.sendToAll(UpdateMessage{
+				cg.SendToAll(common.UpdateMessage{
 					Type:   "won",
 					Player: name,
 				})
@@ -225,13 +227,13 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 				return true
 			}
 		} else {
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
+			cg.sendToRelevantPlayers(action.Dest, common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaDest,
 				Player:  oldPlayer,
 				Country: action.Dest,
 			})
-			cg.sendToRelevantPlayers(action.Src, UpdateMessage{
+			cg.sendToRelevantPlayers(action.Src, common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  deltaSrc,
 				Player:  name,
@@ -243,12 +245,12 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 		if !cg.processor.Donate(name, action.Dest, action.Troops) {
 			return false
 		}
-		cg.sendToPlayer(action.Dest, UpdateMessage{
+		cg.SendToPlayer(action.Dest, common.UpdateMessage{
 			Type:   "updateTroops",
 			Troops: action.Troops,
 			Player: action.Dest,
 		})
-		cg.sendToPlayer(name, UpdateMessage{
+		cg.SendToPlayer(name, common.UpdateMessage{
 			Type:   "updateTroops",
 			Troops: -action.Troops,
 			Player: name,
@@ -269,12 +271,12 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 		}
 	case "deploy":
 		if cg.processor.Deploy(action.Dest, action.Troops, name) {
-			cg.sendToPlayer(name, UpdateMessage{
+			cg.SendToPlayer(name, common.UpdateMessage{
 				Type:   "updateTroops",
 				Troops: -action.Troops,
 				Player: name,
 			})
-			cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
+			cg.sendToRelevantPlayers(action.Dest, common.UpdateMessage{
 				Type:    "updateCountry",
 				Troops:  action.Troops,
 				Player:  name,
@@ -285,13 +287,13 @@ func (cg *CampaignGame) process(name string, action Action) bool {
 	default:
 		return false
 	}
-	cg.sendToRelevantPlayers(action.Src, UpdateMessage{
+	cg.sendToRelevantPlayers(action.Src, common.UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  -action.Troops,
 		Player:  name,
 		Country: action.Src,
 	})
-	cg.sendToRelevantPlayers(action.Dest, UpdateMessage{
+	cg.sendToRelevantPlayers(action.Dest, common.UpdateMessage{
 		Type:    "updateCountry",
 		Troops:  action.Troops,
 		Player:  cg.processor.GetCountry(action.Dest).Player,

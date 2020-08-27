@@ -56,7 +56,7 @@ function getUserTroops() {
 			userCountries++;
 		}
 	}
-	return 3 + Math.floor(userCountries / 3);
+	return 3 + Math.floor(userCountries / 6);
 }
 
 function parseCookie(txt) {
@@ -164,6 +164,7 @@ class GameMap extends Component {
 						}
 						GameContext.countryStates[action.Country] = new countryState(action.Troops, action.Player);
 					} else {
+						//This should only be false in a campaign, when a country needs to be zeroed
 						if (action.Player !== '') {
 							GameContext.countryStates[action.Country].Troops += action.Troops;
 							if (GameContext.countryStates[action.Country].Troops < 0) {

@@ -1,6 +1,8 @@
 package game
 
 import (
+	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
+	"github.com/Akshat-Tripathi/conquer2/internal/game/sockets"
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
@@ -19,16 +21,16 @@ func (cg *CampaignGame) Init(ctx Context) {
 	cg.processor.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
 
-	cg.FSM = newFSM(cg.lobbyProcess, cg.process)
-	cg.addTransitions(func() {
-		cg.sendToAll(UpdateMessage{
+	cg.FSM = sockets.NewFSM(cg.lobbyProcess, cg.process)
+	cg.AddTransitions(func() {
+		cg.SendToAll(common.UpdateMessage{
 			Type: "start",
 		})
 		cg.processor.StopAccepting()
 		cg.lobby.full = true
 		cg.cron = tripleCron(ctx.StartTime, func() {
 			for player, troops := range cg.processor.ProcessTroops() {
-				cg.sendToPlayer(player, UpdateMessage{
+				cg.SendToPlayer(player, common.UpdateMessage{
 					Troops: troops,
 					Player: player,
 					Type:   "updateTroops",
@@ -45,7 +47,7 @@ func (cg *CampaignGame) Init(ctx Context) {
 						playerName = name
 					}
 				})
-				cg.sendToAll(UpdateMessage{
+				cg.SendToAll(common.UpdateMessage{
 					Type:   "won",
 					Player: playerName,
 				})
@@ -53,20 +55,24 @@ func (cg *CampaignGame) Init(ctx Context) {
 			},
 		)
 	})
-	cg.start()
-
+	cg.Start()
 	cg.lobby = newLobby()
+
+	//If Init is being called on an existing game
+	if cg.numPlayers > 0 {
+		cg.NextState()
+	}
 }
 
 func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 	cg.processor.RangePlayers(func(name string, player *gs.PlayerState) {
-		cg.sockets.sendToAll(UpdateMessage{
+		cg.SendToAll(common.UpdateMessage{
 			Type:    "newPlayer",
 			Player:  name,
 			Country: player.Colour,
 		})
 		if name == playerName {
-			cg.sendToPlayer(name, UpdateMessage{
+			cg.SendToPlayer(name, common.UpdateMessage{
 				Troops: player.Troops,
 				Type:   "updateTroops",
 				Player: name,
@@ -78,8 +84,8 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 		if country.Player == "" {
 			return
 		}
-		var msg UpdateMessage
-		msg = UpdateMessage{
+		var msg common.UpdateMessage
+		msg = common.UpdateMessage{
 			Troops:  country.Troops,
 			Type:    "updateCountry",
 			Player:  country.Player,
@@ -89,23 +95,24 @@ func (cg *CampaignGame) sendInitialStateFunc(playerName string) {
 			if country.Troops == 0 {
 				cg.sendToRelevantPlayers(name, msg)
 			} else {
-				cg.sendToPlayer(playerName, msg)
+				cg.SendToPlayer(playerName, msg)
 			}
 		} else {
 			if cg.countViewPoints(playerName, name) != 0 {
-				cg.sendToPlayer(playerName, msg)
+				cg.SendToPlayer(playerName, msg)
 			}
 		}
 	})
-	cg.lobby.rangeLobby(func(player string) {
-		cg.sendToPlayer(playerName, UpdateMessage{
-			Type:   "readyPlayer",
-			Player: player,
-		})
-	})
 	if cg.lobby.full {
-		cg.sendToPlayer(playerName, UpdateMessage{
+		cg.SendToPlayer(playerName, common.UpdateMessage{
 			Type: "start",
+		})
+	} else {
+		cg.lobby.rangeLobby(func(player string) {
+			cg.SendToPlayer(playerName, common.UpdateMessage{
+				Type:   "readyPlayer",
+				Player: player,
+			})
 		})
 	}
 }
@@ -123,7 +130,7 @@ func (cg *CampaignGame) countViewPoints(player, country string) int {
 	return viewPoints
 }
 
-func (cg *CampaignGame) sendToRelevantPlayers(country string, msg UpdateMessage) {
+func (cg *CampaignGame) sendToRelevantPlayers(country string, msg common.UpdateMessage) {
 	uniquePlayers := make(map[string]bool)
 	uniquePlayers[cg.processor.GetCountry(country).Player] = true
 	for _, neighbour := range cg.getNeighbours(country) {
@@ -131,6 +138,6 @@ func (cg *CampaignGame) sendToRelevantPlayers(country string, msg UpdateMessage)
 	}
 
 	for player := range uniquePlayers {
-		cg.sendToPlayer(player, msg)
+		cg.SendToPlayer(player, msg)
 	}
 }

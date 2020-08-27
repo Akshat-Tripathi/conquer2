@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,7 +53,7 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 	return pg.DefaultGame.Run()
 }
 
-func (pg *persistentGame) process(name string, action Action) {
+func (pg *persistentGame) process(name string, action common.Action) {
 	log.Println("timer reset")
 	pg.timer.Reset(herokuTimeOut)
 	pg.DefaultGame.process(name, action)

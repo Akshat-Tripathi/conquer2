@@ -376,11 +376,11 @@ const OptionsDeploy = ({
 		<Grid item xs={12} sm={6}>
 			<Typography variant="h5">
 				<span>
-					Deploy from{' '}
-					<strong>
+					Buy troops in
+					{/*<strong>
 						<span style={{ color: 'green' }}>Base</span>
 					</strong>{' '}
-					to{' '}
+					to*/}{' '}
 					<strong>
 						<span style={{ color: 'orange' }}>{fromCountry}</span>
 					</strong>
@@ -396,7 +396,7 @@ const OptionsDeploy = ({
 						className={classes.button}
 						onClick={handleDeploy}
 					>
-						DEPLOY
+						BUY
 					</Button>
 				</Grid>
 			) : (
@@ -412,14 +412,14 @@ const OptionsDeploy = ({
 									required
 									variant="outlined"
 									placeholder={5}
-									label="Number of Troops to Deploy"
+									label="Number of Troops to Buy"
 									value={numTroops > 0 ? numTroops : null}
 									onChange={handleNumTroops}
 									className={classes.input}
 									style={{ color: 'yellow', borderColor: 'white' }}
 								/>
 								<FormHelperText style={{ color: 'white' }}>
-									Select Number of Base Troops to Deploy
+									Select Number of Troops to Buy
 								</FormHelperText>
 							</FormControl>
 						</Grid>
@@ -431,7 +431,7 @@ const OptionsDeploy = ({
 								className={classes.button}
 								onClick={handleClick}
 							>
-								DEPLOY
+								BUY
 							</Button>
 						</Grid>
 					</Grid>

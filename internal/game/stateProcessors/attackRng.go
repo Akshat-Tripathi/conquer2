@@ -4,18 +4,20 @@ import (
 	"math/rand"
 )
 
+//POST: deltaSrc won't exceed the number of troops in the src country
 func defaultRng(srcTroops, destTroops, times int) (int, int) {
-	var tempSrc, tempDest, deltaSrc, deltaDest int
-	for times > 0 && deltaSrc+srcTroops > 0 && deltaDest+destTroops > 0 {
-		tempSrc, tempDest = defaultRngHelper(srcTroops, destTroops)
-		deltaSrc += tempSrc
-		deltaDest += tempDest
+	var deltaSrc, deltaDest int
+	tempSrc, tempDest := srcTroops, destTroops
+	for times > 0 && tempSrc > 0 && tempDest > 0 {
+		deltaSrc, deltaDest = defaultRngHelper(tempSrc, tempDest)
+		tempSrc += deltaSrc
+		tempDest += deltaDest
 		times--
 	}
-	if deltaSrc+srcTroops < 0 {
-		deltaSrc = -srcTroops
+	if tempSrc < 0 {
+		tempSrc = 0
 	}
-	return deltaSrc, deltaDest
+	return tempSrc - srcTroops, tempDest - destTroops
 }
 
 func defaultRngHelper(srcTroops, destTroops int) (int, int) {

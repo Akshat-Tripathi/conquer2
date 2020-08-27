@@ -5,15 +5,20 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
+	"github.com/Akshat-Tripathi/conquer2/internal/game/sockets"
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/robfig/cron"
 )
+
+var upgrader websocket.Upgrader
 
 //DefaultGame is a realtime game, comparable to the RealTimeGame struct of v2
 type DefaultGame struct {
 	situation
-	*sockets
+	*sockets.Sockets
 	processor  gs.StateProcessor
 	context    Context
 	numPlayers int32
@@ -29,17 +34,17 @@ var _ Game = (*DefaultGame)(nil)
 //PRE: ctx is valid
 func (d *DefaultGame) Init(ctx Context) {
 	d.context = ctx
-	d.sockets = newSockets()
-	d.FSM = newFSM(d.lobbyProcess, d.process)
-	d.addTransitions(func() {
-		d.sendToAll(UpdateMessage{
+	d.Sockets = sockets.NewSockets()
+	d.FSM = sockets.NewFSM(d.lobbyProcess, d.process)
+	d.AddTransitions(func() {
+		d.SendToAll(common.UpdateMessage{
 			Type: "start",
 		})
 		d.processor.StopAccepting()
 		d.lobby.full = true
 		d.cron = minuteCron(d.context.Minutes, func() {
 			for player, troops := range d.processor.ProcessTroops() {
-				d.sendToPlayer(player, UpdateMessage{
+				d.SendToPlayer(player, common.UpdateMessage{
 					Troops: troops,
 					Player: player,
 					Type:   "updateTroops",
@@ -50,7 +55,7 @@ func (d *DefaultGame) Init(ctx Context) {
 		d.context.StartTime = time.Now()
 		d.cron.Start()
 	})
-	d.start()
+	d.Start()
 
 	d.lobby = newLobby()
 
@@ -86,10 +91,10 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 		atomic.AddInt32(&d.numPlayers, 1)
 		fallthrough
 	case gs.PlayerAlreadyExists:
-		d.newPlayer(ctx.Writer, ctx.Request, name)
+		d.NewPlayer(ctx.Writer, ctx.Request, name)
 		//Send initial state
 		d.sendInitialState(name)
-		d.listen(name)
+		d.Listen(name)
 		return true, ""
 	}
 	//case playerRejected
@@ -98,14 +103,14 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 
 func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 	d.processor.RangePlayers(func(name string, player *gs.PlayerState) {
-		d.sendToAll(UpdateMessage{
+		d.SendToAll(common.UpdateMessage{
 			Type:    "newPlayer",
 			Player:  name,
 			Country: player.Colour,
 		})
 
 		if name == playerName {
-			d.sendToPlayer(name, UpdateMessage{
+			d.SendToPlayer(name, common.UpdateMessage{
 				Troops: player.Troops,
 				Type:   "updateTroops",
 				Player: name,
@@ -116,29 +121,30 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 		if country.Player == "" {
 			return
 		}
-		var msg UpdateMessage
-		msg = UpdateMessage{
+		var msg common.UpdateMessage
+		msg = common.UpdateMessage{
 			Troops:  country.Troops,
 			Type:    "updateCountry",
 			Player:  country.Player,
 			Country: name,
 		}
 		if country.Player == playerName && country.Troops == 0 {
-			d.sendToAll(msg)
+			d.SendToAll(msg)
 		} else {
-			d.sendToPlayer(playerName, msg)
+			d.SendToPlayer(playerName, msg)
 		}
 	})
 
-	d.lobby.rangeLobby(func(player string) {
-		d.sendToPlayer(playerName, UpdateMessage{
-			Type:   "readyPlayer",
-			Player: player,
-		})
-	})
 	if d.lobby.full {
-		d.sendToPlayer(playerName, UpdateMessage{
+		d.SendToPlayer(playerName, common.UpdateMessage{
 			Type: "start",
+		})
+	} else {
+		d.lobby.rangeLobby(func(player string) {
+			d.SendToPlayer(playerName, common.UpdateMessage{
+				Type:   "readyPlayer",
+				Player: player,
+			})
 		})
 	}
 }
@@ -168,12 +174,12 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 	if err != nil {
 		return
 	}
-	closeWithMessage(conn, msg)
+	sockets.CloseWithMessage(conn, msg)
 }
 
 //end is used to destroy all structs associated with the game
 func (d *DefaultGame) end() {
-	d.close <- struct{}{}
+	d.Close()
 	d.processor.Destroy()
 }
 
