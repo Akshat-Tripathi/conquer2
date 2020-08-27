@@ -56,6 +56,7 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 				cg.End()
 			},
 		)
+		cg.cron.Start()
 	})
 	cg.Start()
 	cg.lobby = newLobby()
