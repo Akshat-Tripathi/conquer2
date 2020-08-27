@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation, Graticule } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
 import ReactTooltip from 'react-tooltip';
-import { gamemap } from './Map';
+import { GameContext } from './Map';
 
 // const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 
@@ -206,8 +206,8 @@ const VectorMap = ({
 	);
 };
 
-const handleGameMap = ({ gamemap }) => {
-	// switch (gamemap) {
+const handleGameMap = () => {
+	// switch (GameContext.gamemap) {
 	// 	case 'world':
 	// 		return 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 	// }

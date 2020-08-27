@@ -10,6 +10,7 @@ import Redirector from './pages/Extra/Redirector.jsx';
 import WaitingRoom from './pages/Map/WaitingRoom';
 import Home from './pages/Website/Pages/Home';
 import StartGameBox from './pages/Home/StartGameBox';
+import VectorMap from './pages/Map/VectorMap';
 import Forums from './pages/Website/Pages/Forums';
 import DominoMemes from './pages/Website/Pages/DominoMemes';
 import Play from './pages/Website/Pages/Play';
@@ -39,7 +40,7 @@ class App extends React.Component {
 							<Route path="/underdev" component={UnderConstruction} />
 
 							{/* ALPHA TESTING PURPOSES ONLY. PROHIBIT PUBLIC ACCESS*/}
-							<Route path="/alpha" component={Intro2} />
+							{/* <Route path="/vectormap" component={VectorMap} /> */}
 						</div>
 					</Switch>
 				</Router>

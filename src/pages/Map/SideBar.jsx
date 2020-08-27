@@ -5,7 +5,7 @@ import { Options, OptionsDeploy, DonateForm } from './ActionButtons';
 import VectorMap from './VectorMap';
 import { Paper, Grid } from '@material-ui/core';
 import useStyles from './SideBarStyles';
-import { GameContext, getUserTroops, getOwner } from './Map';
+import { GameContext, getUserTroops, getOwner, parseCookie } from './Map';
 
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
 //POST: The hex colour, p% darker
@@ -16,7 +16,7 @@ function darken(hex, p) {
 	return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-function SideBar() {
+function SideBar({ isUnrelated, base }) {
 	//CSS
 	const classes = useStyles();
 	const [ hidden, setHidden ] = useState(false);
@@ -206,7 +206,7 @@ function SideBar() {
 
 		var iso_a2 = convertISO(NAME, ISO_A2);
 
-		if (hideUnrelated && this.state.isUnrelated(iso_a2)) {
+		if (hideUnrelated && isUnrelated(iso_a2)) {
 			return 'none';
 		}
 
@@ -249,7 +249,7 @@ function SideBar() {
 							openHelp={openHelp}
 							user={GameContext.user}
 							troops={GameContext.troops}
-							startTime={this.state.base}
+							startTime={base}
 							interval={GameContext.interval}
 							nextTroops={getUserTroops()}
 						/>
@@ -339,7 +339,7 @@ function SideBar() {
 				countryStates={GameContext.countryStates}
 				convertISO={convertISO}
 				hideUnrelated={hideUnrelated}
-				isUnrelated={this.state.isUnrelated}
+				isUnrelated={isUnrelated}
 			/>
 		</div>
 	);

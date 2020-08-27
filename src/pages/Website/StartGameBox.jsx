@@ -61,9 +61,9 @@ function StartGameBox() {
 			case 0:
 				return <StartContent setModeToOne={handleModeOne} setModeToTwo={handleModeTwo} />;
 			case 1:
-				return <JoinGame setModeToZero={handleModeZero} />;
+				return <NewJoinGame setModeToZero={handleModeZero} />;
 			case 2:
-				return <CreateGame setModeToZero={handleModeZero} />;
+				return <NewCreateGame setModeToZero={handleModeZero} />;
 			default:
 				throw new Error('?? what happened ...');
 		}
@@ -71,7 +71,6 @@ function StartGameBox() {
 
 	return (
 		<div>
-			<CssBaseline />
 			<Paper className={classes.paper} elevation={3}>
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
@@ -134,11 +133,64 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 	);
 };
 
+const NewJoinGame = ({ setModeToZero }) => {
+	return (
+		<Grid items xs={12}>
+			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
+			<Paper className="gamebox-wrapper">
+				<form action="/join" method="POST">
+					<div class="uk-margin">
+						<label class="uk-form-label">Username</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon" uk-icon="icon: user" />
+								<input class="uk-input" type="text" placeholder="Username" name="username" required />
+							</div>
+						</div>
+					</div>
+
+					<div class="uk-margin">
+						<label class="uk-form-label">Password</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon uk-form-icon-flip " uk-icon="icon: lock" />
+								<input class="uk-input" type="password" name="password" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">Game ID</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon uk-form-icon-flip " uk-icon="icon: hashtag" />
+								<input class="uk-input" type="text" placeholder="000000" name="gameid" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<Button type="submit" name="submit" value="join" variant="outlined" color="secondary">
+							Join Game
+						</Button>
+					</div>
+				</form>
+			</Paper>
+			<IconButton aria-label="return" color="secondary" onClick={setModeToZero}>
+				<ArrowBackIcon
+					style={{
+						fontSize: '50'
+					}}
+				/>
+				<Typography variant="subtitle1">Back</Typography>
+			</IconButton>
+		</Grid>
+	);
+};
+
 const JoinGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
 			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
-			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
+			<Paper className="gamebox-wrapper">
 				<form action="/join" method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
@@ -170,13 +222,142 @@ const JoinGame = ({ setModeToZero }) => {
 	);
 };
 
+const NewCreateGame = ({ setModeToZero }) => {
+	return (
+		<Grid items xs={12}>
+			<DialogContentText style={{ color: 'white' }}>Creating a new game...</DialogContentText>
+
+			<Paper className="gamebox-wrapper">
+				<form action="/create" method="POST" class="uk-grid-small">
+					<div class="uk-margin">
+						<label class="uk-form-label">Gamemode</label>
+						<div class="uk-form-controls">
+							<div uk-form-custom="target: > * > span:first-child">
+								<select required>
+									<option value="">Please select...</option>
+									<option value="1">Regular</option>
+									<option value="2">Campaign</option>
+									<option value="3">Capital Supremacy</option>
+								</select>
+								<button class="uk-button uk-button-default" type="button" tabindex="-1">
+									<span />
+									<span uk-icon="icon: chevron-down" />
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="uk-margin">
+						<label class="uk-form-label">Game Map</label>
+						<div class="uk-form-controls">
+							<div uk-form-custom="target: > * > span:first-child">
+								<select required>
+									<option value="">Please select...</option>
+									<option value="1">World</option>
+								</select>
+								<button class="uk-button uk-button-default" type="button" tabindex="-1">
+									<span />
+									<span uk-icon="icon: chevron-down" />
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="uk-margin">
+						<label class="uk-form-label">Username</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon" uk-icon="icon: user" />
+								<input class="uk-input" type="text" placeholder="Username" name="username" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">Password</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon uk-form-icon-flip " uk-icon="icon: lock" />
+								<input class="uk-input" type="password" name="password" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">Starting Number of Countries</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon" uk-icon="icon: location" />
+								<input
+									class="uk-input"
+									type="number"
+									placeholder="3"
+									name="startingCountries"
+									required
+								/>
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">Starting Number of Troops</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon" uk-icon="icon: cog" />
+								<input class="uk-input" type="number" placeholder="5" name="startingTroops" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">Maximum Number of Players</label>
+						<div class="uk-form-controls">
+							<div class="uk-inline">
+								<span class="uk-form-icon" uk-icon="icon: users" />
+								<input class="uk-input" type="number" placeholder="10" name="maxPlayers" required />
+							</div>
+						</div>
+					</div>
+					<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+						<label>
+							<input class="uk-checkbox" type="checkbox" required /> I agree with the Imperium Games Terms
+							and Conditions
+						</label>
+					</div>
+					<div class="uk-margin">
+						<Button type="submit" name="submit" value="create" variant="outlined" color="secondary">
+							Commence WAR
+						</Button>
+					</div>
+				</form>
+			</Paper>
+			<IconButton aria-label="return" color="secondary" onClick={setModeToZero}>
+				<ArrowBackIcon
+					style={{
+						fontSize: '50'
+					}}
+				/>
+				<Typography variant="subtitle1">Back</Typography>
+			</IconButton>
+		</Grid>
+	);
+};
 const CreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
-			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
+			<Paper className="gamebox-wrapper">
 				<DialogContentText>Creating a new game...</DialogContentText>
 				<form action="/create" method="POST">
 					<Grid container spacing={3}>
+						<Grid item xs={12}>
+							<Select
+								className="gamemap"
+								id="type"
+								name="map"
+								label="Gamemap"
+								required
+								variant="outlined"
+								placeholder="World"
+							>
+								<MenuItem value="realtime">World</MenuItem>
+							</Select>
+						</Grid>
 						<Grid item xs={12}>
 							<Select
 								className="gamemode"
@@ -187,9 +368,9 @@ const CreateGame = ({ setModeToZero }) => {
 								variant="outlined"
 								placeholder="Regular"
 							>
-								<MenuItem value="realtime">Regular</MenuItem>
-								<MenuItem value="campaign">Campaign</MenuItem>
-								<MenuItem value="capital">Capital Supremacy</MenuItem>
+								<MenuItem value="Realtime">Regular</MenuItem>
+								<MenuItem value="Campaign">Campaign</MenuItem>
+								<MenuItem value="Capital">Capital Supremacy</MenuItem>
 							</Select>
 						</Grid>
 						<Grid item xs={12}>
@@ -247,7 +428,7 @@ const CreateGame = ({ setModeToZero }) => {
 						</Grid>
 						<Grid item xs={12}>
 							<FormControlLabel
-								control={<Checkbox color="secondary" name="tncs" value="yes" />}
+								control={<Checkbox color="secondary" name="tncs" value="yes" required={true} />}
 								label="I agree with the Imperium Games Terms and Conditions"
 							/>
 						</Grid>

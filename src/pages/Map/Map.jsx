@@ -59,10 +59,6 @@ function getUserTroops() {
 	return 3 + Math.floor(userCountries / 6);
 }
 
-function parseCookie(txt) {
-	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == txt)[0][1];
-}
-
 function getInterval() {
 	console.log(document.cookie);
 	const decodedCookie = decodeURIComponent(document.cookie).replace(/ /g, '').split(';');
@@ -87,6 +83,10 @@ function getInterval() {
 	}
 }
 
+function parseCookie(txt) {
+	return document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == txt)[0][1];
+}
+
 function getOwner(player) {
 	while (player != GameContext.allegiances[player]) {
 		player = GameContext.allegiances[player];
@@ -109,7 +109,7 @@ class GameMap extends Component {
 
 		let updateTime = () => {
 			let date = new Date();
-			this.state.base = Math.floor(date.getTime() / 1000);
+			this.setState({ base: Math.floor(date.getTime() / 1000) });
 		};
 
 		if (parseCookie('type') === 'capital') {
@@ -132,7 +132,7 @@ class GameMap extends Component {
 		GameContext.interval = getInterval();
 		//Ascertain from cookies the current player's username
 		GameContext.user = parseCookie('username');
-		//Ascertain from cookies the map to be used for the game
+		//TODO: Ascertain from cookies the map to be used for the game
 		GameContext.gamemap = getGameMap();
 
 		GameContext.socket.onmessage = (msg) => {
@@ -184,9 +184,7 @@ class GameMap extends Component {
 					}
 					break;
 				case 'readyPlayer':
-					console.log('readyPlayer token received. Setting ready state to true');
 					GameContext.playerReady[action.Player] = true;
-					console.log(GameContext.playerReady);
 					break;
 				case 'start':
 					this.setState({ lobby: false });
@@ -205,12 +203,8 @@ class GameMap extends Component {
 					GameContext.allegiances[action.Player] = GameContext.countryStates[action.Country].Player;
 					break;
 				case 'won':
-					alert(getOwner(action.Player) + ' won');
-				/*if (user == action.Player) {
-                window.location.replace("https://www.youtube.com/watch?v=tS_2hEmGnzA");
-            } else {
-                window.location.replace("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-            }*/
+					alert(getOwner(action.Player) + ' has conquered the world!');
+					window.location.replace('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 			}
 			this.forceUpdate();
 		};
@@ -238,11 +232,11 @@ class GameMap extends Component {
 			/>
 		) : (
 			<body id="map-page">
-				<SideBar />
+				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} />
 			</body>
 		);
 	}
 }
 
 export default GameMap;
-export { getUserTroops, getOwner, GameContext };
+export { getUserTroops, getOwner, GameContext, parseCookie };
