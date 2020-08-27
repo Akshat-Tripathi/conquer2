@@ -25,8 +25,11 @@ type DefaultProcessor struct {
 	validateMove     func(src *CountryState, player string, troops int) bool
 }
 
-//Init initialises the processor
-func (d *DefaultProcessor) Init(countries []string) {
+var _ StateProcessor = (*DefaultProcessor)(nil)
+
+//NewDefaultProcessor creates a new DefaultProcessor
+func NewDefaultProcessor(countries []string) *DefaultProcessor {
+	d := &DefaultProcessor{}
 	d.countryNames = countries
 	d.countries = make(map[string]*CountryState)
 	d.players = make(map[string]*PlayerState)
@@ -39,6 +42,7 @@ func (d *DefaultProcessor) Init(countries []string) {
 	d.validateDeploy = d.deployValid
 	d.validateDonate = d.donateValid
 	d.validateMove = d.moveValid
+	return d
 }
 
 func (d *DefaultProcessor) withLockedCountries(src, dest string, op func(src, dest *CountryState) bool) bool {

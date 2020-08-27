@@ -30,9 +30,10 @@ type DefaultGame struct {
 
 var _ Game = (*DefaultGame)(nil)
 
-//Init initialises a default game from a context
-//PRE: ctx is valid
-func (d *DefaultGame) Init(ctx Context) {
+//NewDefaultGame creates a new DefaultGame from context
+//PRE: ctx must be valid
+func NewDefaultGame(ctx Context) *DefaultGame {
+	d := &DefaultGame{}
 	d.context = ctx
 	d.Sockets = sockets.NewSockets()
 	d.FSM = sockets.NewFSM(d.lobbyProcess, d.process)
@@ -67,15 +68,14 @@ func (d *DefaultGame) Init(ctx Context) {
 		countries[i] = country
 		i++
 	}
-	d.processor = &gs.DefaultProcessor{}
-	d.processor.Init(countries)
-
+	d.processor = gs.NewDefaultProcessor(countries)
 	maxCountries := len(countries) / ctx.MaxPlayers
 	if ctx.StartingCountries > maxCountries {
 		d.context.StartingCountries = maxCountries
 	}
 
 	d.sendInitialState = d.sendInitialStateFunc
+	return d
 }
 
 //routePlayer will either add a new player, connect an existing player or reject the player

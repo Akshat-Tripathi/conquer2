@@ -20,7 +20,6 @@ type StateProcessor interface {
 	executor
 	validator
 
-	Init([]string)
 	Destroy()
 
 	RangeCountries(func(name string, country *CountryState))

@@ -12,14 +12,15 @@ type CapitalGame struct {
 
 var _ Game = (*CapitalGame)(nil)
 
-//Init replaces the DefaultGame's state processor
-func (cg *CapitalGame) Init(ctx Context) {
-	cg.DefaultGame.Init(ctx)
-	teamProcessor := &stateprocessors.CapitalProcessor{}
-	teamProcessor.DefaultProcessor = *cg.processor.(*stateprocessors.DefaultProcessor)
-	cg.processor = teamProcessor
-	cg.processor.Init(nil)
+//NewCapitalGame creates a new CapitalGame from context
+//PRE: ctx is valid
+func NewCapitalGame(ctx Context) *CapitalGame {
+	cg := &CapitalGame{}
+	cg.DefaultGame = *NewDefaultGame(ctx)
+	cg.processor = stateprocessors.NewCapitalProcessor(*cg.processor.(*stateprocessors.DefaultProcessor))
+
 	cg.sendInitialState = cg.sendInitialStateFunc
+	return cg
 }
 
 func (cg *CapitalGame) sendInitialStateFunc(playerName string) {

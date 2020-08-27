@@ -14,10 +14,12 @@ type CampaignGame struct {
 
 var _ Game = (*CampaignGame)(nil)
 
-//Init initialises a persistentGame then sets the sendInitialState function
-func (cg *CampaignGame) Init(ctx Context) {
-	cg.persistentGame = &persistentGame{}
-	cg.persistentGame.Init(ctx)
+//NewCampaignGame creates a new CampaignGame from context
+//PRE: ctx is valid
+func NewCampaignGame(ctx Context) *CampaignGame {
+	cg := &CampaignGame{}
+
+	cg.persistentGame = newPersistentGame(ctx)
 	cg.processor.ToggleAttack()
 	cg.sendInitialState = cg.sendInitialStateFunc
 
@@ -54,6 +56,7 @@ func (cg *CampaignGame) Init(ctx Context) {
 				cg.End()
 			},
 		)
+		cg.cron.Start()
 	})
 	cg.Start()
 	cg.lobby = newLobby()
@@ -62,6 +65,8 @@ func (cg *CampaignGame) Init(ctx Context) {
 	if cg.numPlayers > 0 {
 		cg.NextState()
 	}
+
+	return cg
 }
 
 func (cg *CampaignGame) sendInitialStateFunc(playerName string) {

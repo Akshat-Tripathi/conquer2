@@ -20,15 +20,17 @@ type CapitalProcessor struct {
 
 var _ StateProcessor = (*CapitalProcessor)(nil)
 
-//Init overrides the validation functions
-//PRE: the DefaultProcessor is already provided
-func (cp *CapitalProcessor) Init(countries []string) {
-	//cp.DefaultProcessor.Init(countries)
+//NewCapitalProcessor creates a new CapitalProcessor from an existing DefaultProcessor
+func NewCapitalProcessor(d DefaultProcessor) *CapitalProcessor {
+	cp := &CapitalProcessor{DefaultProcessor: d}
+
 	cp.capitals = make(map[string]string)
 	cp.allegiances = make(map[string]*playerAllegiance)
 	cp.validateAttack = cp.attackValid
 	cp.validateDeploy = cp.deployValid
 	cp.validateMove = cp.moveValid
+
+	return cp
 }
 
 //AddPlayer adds a player and creates a capital and allegiance for them
