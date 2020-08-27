@@ -1,7 +1,10 @@
 {
 	"name": "conquer2",
 	"version": "0.6.0",
-	"authors": [ "Shashwat Kansal", "Akshat Tripathi" ],
+	"authors": [
+		"Shashwat Kansal",
+		"Akshat Tripathi"
+	],
 	"private": true,
 	"dependencies": {
 		"@auth0/auth0-react": "^1.0.0",
@@ -56,10 +59,19 @@
 		}
 	},
 	"browserslist": {
-		"production": [ ">0.2%", "not dead", "not op_mini all" ],
-		"development": [ "last 1 chrome version", "last 1 firefox version", "last 1 safari version" ]
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
 	},
 	"devDependencies": {
-		"html-loader": "^1.1.0"
+		"html-loader": "^1.1.0",
+		"jest": "^26.4.2"
 	}
 }

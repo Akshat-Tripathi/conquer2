@@ -2,8 +2,9 @@ import React, { memo } from 'react';
 import { ZoomableGroup, ComposableMap, Geographies, Geography, Marker, Annotation, Graticule } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
 import ReactTooltip from 'react-tooltip';
+import { gamemap } from './Map';
 
-const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
+// const geoUrl = 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 
 const rounded = (num) => {
 	num = Math.round(num);
@@ -17,7 +18,7 @@ const rounded = (num) => {
 	return num;
 };
 
-//Can I optimise?
+// Remove a particular country in the map by setting it to false
 function notThisCountry(geo) {
 	// const { NAME } = geo.properties;
 	// return NAME !== '';
@@ -34,9 +35,10 @@ const MapChart = ({
 	handleColorFill,
 	handleClick,
 	countryStates,
-    convertISO,
-    hideUnrelated,
-    isUnrelated,
+	convertISO,
+	hideUnrelated,
+	isUnrelated,
+	gamemap
 }) => {
 	return (
 		<div>
@@ -45,7 +47,7 @@ const MapChart = ({
 			<ComposableMap data-tip="" /*projection="geoOrthographic"*/ projectionConfig={{ scale: 140 }}>
 				<ZoomableGroup>
 					<Graticule stroke="#2e3131" />
-					<Geographies geography={geoUrl}>
+					<Geographies geography={gamemap}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
 								const fillcolor = handleColorFill(geo);
@@ -87,7 +89,7 @@ const MapChart = ({
 								) : null;
 							})}
 					</Geographies>
-					<Geographies geography={geoUrl}>
+					<Geographies geography={gamemap}>
 						{({ geographies }) =>
 							geographies.map((geo) => {
 								const { NAME, ISO_A2 } = geo.properties;
@@ -173,9 +175,9 @@ const VectorMap = ({
 	handleColorFill,
 	handleClick,
 	countryStates,
-    convertISO,
-    hideUnrelated,
-    isUnrelated
+	convertISO,
+	hideUnrelated,
+	isUnrelated
 }) => {
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
@@ -194,13 +196,22 @@ const VectorMap = ({
 				handleColorFill={handleColorFill}
 				handleClick={handleClick}
 				countryStates={countryStates}
-                convertISO={convertISO}
-                hideUnrelated={hideUnrelated}
-                isUnrelated={isUnrelated}
+				convertISO={convertISO}
+				hideUnrelated={hideUnrelated}
+				isUnrelated={isUnrelated}
+				gamemap={() => handleGameMap()}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>
 	);
+};
+
+const handleGameMap = ({ gamemap }) => {
+	// switch (gamemap) {
+	// 	case 'world':
+	// 		return 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
+	// }
+	return 'https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json';
 };
 
 export default memo(VectorMap);

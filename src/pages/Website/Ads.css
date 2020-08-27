@@ -6,8 +6,8 @@
 }
 
 .ads {
-	background: var(--white);
-	color: var(--dark);
+	background: var(--dark);
+	color: var(--white);
 }
 
 .ads-title {
@@ -36,20 +36,19 @@
 	}
 }
 
-.icon {
-	color: var(--dark);
+.icon-browser {
+	color: var(--white);
 	font-size: 50px;
-	padding-bottom: 2rem;
-	animation: all 0.5s ease-in;
+	text-shadow: 1px 1px #ff4520;
 }
-
-.icon:hover {
+/* 
+.icon-browser:hover {
 	color: var(--brand);
 	transform: scale(1.1);
-	animation-name: spin;
-  	animation-duration: 1500ms; /* How long lasts 1 turn */
-  	animation-iteration-count: infinite;
-  	animation-timing-function: linear;
+	  animation-name: spin;
+  animation-duration: 5000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
 }
 
 @keyframes spin {
@@ -59,56 +58,4 @@
     to {
         transform:rotate(360deg);
     }
-}
-
-
-
-
-
-
-
-
-
-/* .self-ads {
-	background-color: #fff;
-	color: #242424;
-	margin: 0 auto;
-	padding: 2rem;
-}
-
-.self-ads-grid {
-	display: grid;
-	grid-template-areas: 'alld alld alld compb';
-	/* grid-template-columns: 2fr 1fr;
-	min-height: 700px;
-	grid-gap: 2rem;
-} */
-
-
-/* Whats happening here ... ?? */
-/* @media screen and (max-width: 1300px) {
-	.self-ads-grid {
-		grid-template-areas: 'alld compb';
-	}
-	.all-browsers {
-		background: transparent;
-	}
-} */
-
-/* .compatible-devices {
-	grid-area: compb;
-	background: url(../../media/CompatibleBrowsers.jpg);
-	background-size: cover;
-	background-position: center;
-	border-radius: 20px;
-	box-shadow: 10px 10px 10px 1px #242424;
-}
-
-.all-browsers {
-	grid-area: alld;
-	background: url(../../media/AllDevices.png);
-	background-size: cover;
-	background-position: right;
-	border-radius: 20px;
-	box-shadow: 10px 10px 10px 1px #242424;
 } */

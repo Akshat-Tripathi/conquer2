@@ -16,24 +16,24 @@ function Ads() {
 		<div className="ads">
 			<div className="ads-title">
 				<h1>Supported Browsers</h1>
-				<p>Now play on any browser anytime, anywhere, without the hassle</p>
+				<p>Now play on any browser anytime, anywhere, without any hassle</p>
 			</div>
 			<div className="ads-wrapper">
 				<div>
-					<i class="fab fa-chrome icon" />
-					<h3>Chrome</h3>
+					<i class="fab fa-chrome fa-spin icon-browser" />
+					<h2 style={{ padding: '1rem' }}>Chrome</h2>
 				</div>
 				<div>
-					<i class="fab fa-safari icon" />
-					<h3>Safari</h3>
+					<i class="fab fa-safari fa-spin icon-browser" />
+					<h2 style={{ padding: '1rem' }}>Safari</h2>
 				</div>
 				<div>
-					<i class="fab fa-firefox icon" />
-					<h3>Firefox</h3>
+					<i class="fab fa-firefox fa-spin icon-browser" />
+					<h2 style={{ padding: '1rem' }}>Firefox</h2>
 				</div>
 				<div>
-					<i class="fab fa-edge icon" />
-					<h3>Edge</h3>
+					<i class="fab fa-edge fa-spin icon-browser" />
+					<h2 style={{ padding: '1rem' }}>Edge</h2>
 				</div>
 			</div>
 		</div>

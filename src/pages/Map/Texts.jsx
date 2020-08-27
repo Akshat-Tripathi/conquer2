@@ -145,7 +145,8 @@ const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 									container
 									spacing={12}
 									direction="row"
-									style={{ display: 'flex', alignItems: 'center' }}>
+									style={{ display: 'flex', alignItems: 'center' }}
+								>
 									<Grid item xs={9}>
 										<Typography variant="p">
 											<span style={{ color: colour }}>{player}</span>
@@ -160,5 +161,4 @@ const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 		</div>
 	) : null;
 };
-
 export { SpyDetails, PlayerBox, Title };

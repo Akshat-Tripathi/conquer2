@@ -4,6 +4,7 @@ import Media from '../Media';
 import Jumbotron from '../Jumbotron';
 import Navbar from '../Header';
 import Ads from '../Ads';
+import Timeline from '../Timeline';
 
 function Home() {
 	return (
@@ -12,6 +13,7 @@ function Home() {
 			<Jumbotron />
 			<Media />
 			<Ads />
+			<Timeline />
 			<Footer />
 		</div>
 	);

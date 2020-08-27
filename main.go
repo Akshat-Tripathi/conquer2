@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -22,7 +21,8 @@ const (
 )
 
 func main() {
-	port := os.Getenv("PORT")
+	port := "5000"
+	// port := os.Getenv("PORT")
 
 	if port == "" {
 		port = "80"
@@ -57,7 +57,8 @@ func main() {
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/play", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
-	r.Use(static.Serve("/play", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/forums", static.LocalFile("./build", true)))
+	r.Use(static.Serve("/tutorial", static.LocalFile("./build", true)))
 
 	r.LoadHTMLGlob("./**/*.html")
 
