@@ -4,9 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
-	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -16,11 +14,11 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-type msgIn = string
+type msgIn string
 
 type msgOut struct {
-	name string
-	text string
+	Name string
+	Text msgIn
 }
 
 type member struct {
@@ -46,7 +44,7 @@ func (m *member) read() {
 	}
 	//Filter out the "keepAlive" messages
 	if msg != "" {
-		m.requests <- action
+		m.requests <- msg
 	}
 }
 
@@ -66,18 +64,20 @@ func NewRoom() *Room {
 }
 
 //newMember connects a member to the room
-func (r *Room) newMember(w http.ResponseWriter, r *http.Request, name string) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+func (r *Room) newMember(w http.ResponseWriter, req *http.Request, name string) *member {
+	conn, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Println(err)
-		return
+		return nil
 	}
-	r.members[name] = &member{
+	m := &member{
 		responses: make(chan msgOut, 10),
 		requests:  make(chan msgIn),
 		close:     make(chan struct{}),
 		conn:      conn,
 	}
+	r.members[name] = m
+	return m
 }
 
 //Handle handles an incomming connection
@@ -86,36 +86,38 @@ func (r *Room) Handle(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	m := newMember(ctx.Writer, ctx.Request, username)
-	r.listen(m)
+	m := r.newMember(ctx.Writer, ctx.Request, username)
+	if m != nil {
+		r.listen(username, m)
+	}
 }
 
 //listen manages the connection of 1 member
 //PRE: name is in members
-func (r *Room) listen(m *member) {
-	defer member.conn.Close()
+func (r *Room) listen(name string, m *member) {
+	defer m.conn.Close()
 	defer delete(r.members, name)
 	go func() {
 		for {
-			member.read()
+			m.read()
 		}
 	}()
 	for {
 		select {
 		case <-r.close:
 			return
-		case <-member.close:
+		case <-m.close:
 			return
-		case msg := <-member.responses:
-			err := member.conn.WriteJSON(msg)
+		case msg := <-m.responses:
+			err := m.conn.WriteJSON(msg)
 			if err != nil {
 				log.Println(err)
 				return
 			}
-		case msg := <-member.requests:
+		case msg := <-m.requests:
 			r.sendToAll(msgOut{
-				name: name,
-				text: msg,
+				Name: name,
+				Text: msg,
 			})
 		}
 	}
@@ -124,8 +126,8 @@ func (r *Room) listen(m *member) {
 func (r *Room) sendToAll(msg msgOut) {
 	r.Lock()
 	defer r.Unlock()
-	for _, member := range r.members {
-		member.send(msg)
+	for _, m := range r.members {
+		m.send(msg)
 	}
 }
 
