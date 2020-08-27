@@ -8,7 +8,7 @@ function Play() {
 		<div className="play-wrapper">
 			<header>
 				<img src={Logo} />
-				<h6>By Imperium Games &copy;</h6>
+				<h6 style={{ color: 'white' }}>By Imperium Games &copy;</h6>
 			</header>
 			<div className="gamebox">
 				<StartGameBox />

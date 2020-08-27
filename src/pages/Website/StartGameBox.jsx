@@ -27,7 +27,7 @@ import './StartGameBox.css';
 const useStyles = makeStyles((theme) => ({
 	paper: {
 		backgroundColor: '#242424',
-		color: 'white',
+		color: '#fff',
 		padding: theme.spacing(3)
 	},
 	buttons: {
@@ -71,10 +71,10 @@ function StartGameBox() {
 
 	return (
 		<div>
-			<Paper className={classes.paper} elevation={3}>
+			<Paper className={classes.paper} elevation={3} style={{ backgroundColor: '#242424', color: '#fff' }}>
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
-						<Typography component="h3" variant="h5" align="center">
+						<Typography component="h3" variant="h5" align="center" style={{ color: 'white' }}>
 							It's time to begin Commander.
 						</Typography>
 					</Grid>
@@ -96,7 +96,8 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 						marginTop: '10%',
 						marginBottom: '10%',
 						textAlign: 'center',
-						fontSize: '50'
+						fontSize: '50',
+						color: '#fff'
 					}}
 				>
 					<IconButton aria-label="newgame" color="primary" size="medium" onClick={setModeToTwo}>
@@ -106,7 +107,9 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 							}}
 						/>
 					</IconButton>
-					<Typography variant="subtitle2">Create New Game</Typography>
+					<Typography variant="subtitle2" style={{ color: 'white' }}>
+						Create New Game
+					</Typography>
 				</div>
 			</Grid>
 			<Grid item xs={12} sm={6}>
@@ -126,7 +129,9 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 							}}
 						/>
 					</IconButton>
-					<Typography variant="subtitle2">Join Game</Typography>
+					<Typography variant="subtitle2" style={{ color: 'white' }}>
+						Join Game
+					</Typography>
 				</div>
 			</Grid>
 		</React.Fragment>
@@ -136,9 +141,9 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 const NewJoinGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
-			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
 			<Paper className="gamebox-wrapper">
 				<form action="/join" method="POST">
+					<legend class="uk-legend">Join a game</legend>
 					<div class="uk-margin">
 						<label class="uk-form-label">Username</label>
 						<div class="uk-form-controls">
@@ -225,10 +230,9 @@ const JoinGame = ({ setModeToZero }) => {
 const NewCreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
-			<DialogContentText style={{ color: 'white' }}>Creating a new game...</DialogContentText>
-
 			<Paper className="gamebox-wrapper">
 				<form action="/create" method="POST" class="uk-grid-small">
+					<legend class="uk-legend">Create a game</legend>
 					<div class="uk-margin">
 						<label class="uk-form-label">Gamemode</label>
 						<div class="uk-form-controls">
@@ -319,6 +323,32 @@ const NewCreateGame = ({ setModeToZero }) => {
 							<input class="uk-checkbox" type="checkbox" required /> I agree with the Imperium Games Terms
 							and Conditions
 						</label>
+					</div>
+					<div class="uk-margin">
+						<label class="uk-form-label">
+							Interval of Troop Drops [Realtime and Capital Supremacy Modes Only]
+						</label>
+						<Slider
+							defaultValue={5}
+							aria-labelledby="troopInterval"
+							step={1}
+							marks
+							min={1}
+							max={5}
+							valueLabelDisplay="auto"
+							name="troopInterval"
+						/>
+						{/* <input
+							class="uk-range"
+							type="range"
+							required
+							min="1"
+							max="5"
+							step="1"
+							aria-labelledby="troopInterval"
+							valueLabelDisplay="auto"
+							name="troopInterval"
+						/> */}
 					</div>
 					<div class="uk-margin">
 						<Button type="submit" name="submit" value="create" variant="outlined" color="secondary">
