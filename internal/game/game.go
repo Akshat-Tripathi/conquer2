@@ -9,7 +9,6 @@ import (
 
 //Game provides the methods which every game should fulfil
 type Game interface {
-	Init(Context)
 	Run() func(ctx *gin.Context)
 	GetContext() Context
 	routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string)

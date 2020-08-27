@@ -30,9 +30,8 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Type:   "readyPlayer",
 		Player: name,
 	})
-	//FIXME: Change back to this after done with testing
-	// return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
-	return int(d.numPlayers) == d.lobby.length()
+	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
+	//return int(d.numPlayers) == d.lobby.length()
 }
 
 func (d *DefaultGame) process(name string, action common.Action) (done bool) {
@@ -134,12 +133,10 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 			})
 		}
 		return false
-	//TODO: Check if chatMessages working
-	//TODO: When working, add to all gamemodes;
 	case "chatMessageSent":
 		d.SendToAll(common.UpdateMessage{
-			Type: "chatMessageReceived",
-			Player: name,
+			Type:    "chatMessageReceived",
+			Player:  name,
 			Country: action.Dest,
 		})
 		return

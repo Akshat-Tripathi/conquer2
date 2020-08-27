@@ -47,8 +47,7 @@ func main() {
 		Client:            client,
 	}
 
-	g := &game.CapitalGame{}
-	g.Init(ctx)
+	g := game.NewDefaultGame(ctx)
 	games["001f91"] = g
 	r.GET("/game/001f91/ws", g.Run())
 
@@ -118,18 +117,15 @@ func main() {
 		g := func() game.Game {
 			switch gameType {
 			case "realtime":
-				g := &game.DefaultGame{}
-				g.Init(ctx)
+				g := game.NewDefaultGame(ctx)
 				return g
 			case "campaign":
 				year, month, day := time.Now().Date()
 				ctx.StartTime = time.Date(year, month, day, 0, 0, 0, 0, time.Now().Location())
-				g := &game.CampaignGame{}
-				g.Init(ctx)
+				g := game.NewCampaignGame(ctx)
 				return g
 			case "capital":
-				g := &game.CapitalGame{}
-				g.Init(ctx)
+				g := game.NewCapitalGame(ctx)
 				return g
 			default:
 				fmt.Println(req.FormValue("type"))
@@ -227,8 +223,7 @@ func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]g
 	games := make(map[string]game.Game)
 	if err == nil {
 		for _, refs := range allRefs {
-			g := &game.CampaignGame{}
-			g.Init(game.Context{
+			g := game.NewCampaignGame(game.Context{
 				ID:      refs.ID,
 				Colours: colours,
 				Client:  client,

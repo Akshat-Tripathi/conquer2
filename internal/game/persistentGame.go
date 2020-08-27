@@ -21,9 +21,10 @@ type persistentGame struct {
 
 var _ Game = (*persistentGame)(nil)
 
-func (pg *persistentGame) Init(ctx Context) {
+func newPersistentGame(ctx Context) *persistentGame {
+	pg := &persistentGame{}
+
 	pg.timer = time.NewTimer(herokuTimeOut)
-	pg.DefaultGame = &DefaultGame{}
 	pg.persistence = &persistence{
 		docs: ctx.Client.Collection(ctx.ID),
 	}
@@ -35,12 +36,14 @@ func (pg *persistentGame) Init(ctx Context) {
 		pg.loadContext(&ctx)
 	}
 
-	pg.DefaultGame.Init(ctx)
+	pg.DefaultGame = NewDefaultGame(ctx)
 
 	if !ctxAlreadyInit {
 		pg.numPlayers = int32(pg.loadPlayers(pg.processor))
 		pg.loadCountries(pg.processor)
 	}
+
+	return pg
 }
 
 func (pg *persistentGame) Run() func(ctx *gin.Context) {
