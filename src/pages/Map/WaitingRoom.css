@@ -1,7 +1,3 @@
-body {
-	background-color: transparent;
-}
-
 .backdrop {
 	position: fixed;
 	top: 0;
@@ -21,77 +17,150 @@ body {
 	background-size: cover;
 }
 
-.container {
-	text-align: center;
-}
+/* NEW STUFF */
 
-.container h2 h4 {
+.wr-title {
+	text-align: center;
+	align-self: center;
 	color: orange;
-	align-content: center;
+	text-transform: uppercase;
+	grid-area: title;
 }
 
-.player-list {
+.lobby-grid {
+	display: grid;
 	text-align: center;
-	height: 80%;
-	width: 20%;
-	position: fixed;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: 1fr repeat(3, 2fr);
+	height: 100vh;
+	width: 100vw;
+	grid-gap: 1rem;
+	grid-template-areas: 
+	'. title loading'
+	'. tipbox .'
+	'plist . .'
+	'plist . rup';
+}
+
+.players-list {
+	grid-area: plist;
 	background-color: black;
 	opacity: 0.6;
-	z-index: 1;
-	left: 0;
-	bottom: 0;
-	overflow: hidden;
-	padding-top: 20px;
-	border-radius: 0px 20px 0px 0px;
+	border-radius: 0 20px 0 0;
 }
+
+.players-list-title {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+}
+.ready-up-button {
+	grid-area: rup;
+	background-color: black;
+	opacity: 0.6;
+	border-radius: 30px 0 0 0;
+	padding: 40px
+}
+
+.readyup-icons {
+ align-content: center;
+ display: flex;
+ flex-direction: column;
+
+
+}
+
+.tips-n-tricks {
+	grid-area: tipbox;
+	margin: 5%;
+	justify-self: center;
+	border-radius: 20px;
+	width: 40vw;
+	background-color: black;
+	opacity: 0.6;
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	color: orange;
+	text-align: center;
+	align-items: center;
+}
+
+.spinny-thingy {
+	grid-area: loading;
+	padding: 20px;
+	align-items: center;
+	justify-self: center;
+}
+
+.lds-hourglass {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-hourglass:after {
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  margin: 8px;
+  box-sizing: border-box;
+  border: 32px solid orange;
+  border-color: orange transparent orange transparent;
+  animation: lds-hourglass 1.2s infinite;
+}
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+@media screen and (max-width: 900px) {
+	.lobby-grid {
+		grid-template-areas: 'loading' 'title' 'tipbox' 'plist' 'rup';
+		text-align: center;
+		grid-template-columns: 2fr;
+		grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+		grid-row-gap: 1rem;
+	}
+
+	.wr-title {
+		align-self: unset;
+	}
+
+	.tips-n-tricks {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 0 0 0 0;
+	}
+
+	.players-list {
+		border-radius: 0 0 0 0;
+	}
+
+	.ready-up-button {
+		padding: 0;
+		border-radius: 0 0 0 0;
+	}
+}
+
+
+/* --X-- NEW STUFF --X-- */
 
 .players {
 	font-weight: bold;
 	text-shadow: white 0px 0px 10px;
 }
 
-.tips-and-tricks {
-	opacity: 0.7;
-	background: black;
-	position: absolute;
-	text-align: center;
-	left: 50%;
-	color: orange;
-	display: grid;
-	grid-template-columns: 10% 90%;
-	justify-content: center;
-	transform: translate(-50%, -50%);
-	width: 33.33%;
-	padding: 2em;
-	border-radius: 10px;
-	margin-top: 10vh;
-}
 
-/* .left-tat {
-	color: orange;
-	width: 20%;
-	display: flex;
-	float: left;
-	justify-content: left;
-}
 
-.right-tat {
-	width: 80%;
-	color: orange;
-	display: flex;
-	float: right;
-	justify-content: center;
-} */
-
-.br-box {
-	text-align: center;
-	background-color: black;
-	box-shadow: blue;
-	padding: 3%;
-	opacity: 0.7;
-	border-radius: 20px 0px 0px 0px;
-	overflow: hidden;
-	position: fixed;
-	bottom: 0;
-	right: 0;
-}

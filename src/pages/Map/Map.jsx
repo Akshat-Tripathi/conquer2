@@ -123,8 +123,6 @@ class GameMap extends Component {
 			};
 		}
 
-		this.SideBar = this.SideBar.bind(this);
-
 		GameContext.socket = connect();
 		var keepAlive = (keepAlive = window.setInterval(() => {
 			GameContext.socket.send('{}');

@@ -30,7 +30,9 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Type:   "readyPlayer",
 		Player: name,
 	})
-	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
+	//FIXME: Change back to this after done with testing
+	// return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
+	return int(d.numPlayers) == d.lobby.length()
 }
 
 func (d *DefaultGame) process(name string, action common.Action) (done bool) {

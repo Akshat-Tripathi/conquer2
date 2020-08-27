@@ -28,28 +28,28 @@ function handleVote({ socket, user }) {
 }
 
 const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
-	var playerColours = playerColours;
-	var ImReady = playerReady[user];
+	// var playerColours = playerColours;
+	// var ImReady = playerReady[user];
+
+	//FIXME: Temporary
+	var ImReady = false;
 
 	return (
 		<div>
 			<div className="backdrop" />
 			<header className="container">
-				<h2 style={{ color: 'orange' }} element={false}>
-					LOBBY - Waiting for players...
-				</h2>
-
-				<p style={{ color: 'orange' }}>
+				<h2 style={{ color: 'orange' }}>LOBBY - Waiting for players...</h2>
+				{/* <p style={{ color: 'orange' }}>
 					{'Game ID: ' +
 						document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1]}
-				</p>
+				</p> */}
 			</header>
-			<body>
+			<body className="lobby-grid">
 				<div className="player-list">
 					<div className="players">
-						<h4 style={{ color: 'white' }}>Joined Players </h4>
+						<h3 style={{ color: 'white' }}>Joined Players </h3>
 
-						{Object.keys(playerColours).map(function(player) {
+						{/* {Object.keys(playerColours).map(function(player) {
 							var isReady = playerReady[player];
 							var colour = playerColours[player];
 							return (
@@ -63,7 +63,7 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 									</div>
 								</div>
 							);
-						})}
+						})} */}
 					</div>
 				</div>
 				<div className="tips-and-tricks">
@@ -113,6 +113,104 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 	);
 };
 
+const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => {
+	// var playerColours = playerColours;
+	// var ImReady = playerReady[user];
+
+	//FIXME: Temporary
+	var ImReady = false;
+
+	return (
+		<div>
+			<div className="backdrop" />
+			<div className="lobby-grid">
+				<div className="wr-title">
+					<h1>Lobby</h1>
+					{/* <p style={{ color: 'orange' }}>
+					{'Game ID: ' +
+						document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1]}
+				</p> */}
+				</div>
+				<div className="spinny-thingy">
+					<div className="lds-hourglass" />
+				</div>
+				<div className="players-list">
+					<div className="players-list-title">
+						<h3 style={{ color: 'white' }}>Joined Players </h3>
+					</div>
+					<div className="players-list-playernames">
+						{/* {Object.keys(playerColours).map(function(player) {
+							var isReady = playerReady[player];
+							var colour = playerColours[player];
+							return (
+								<div className="player-name" key={player}>
+									<div style={{ verticalAlign: 'middle', marginBottom: '1%' }}>
+										<span style={{ color: colour, paddingInline: '1%' }}>
+											{player}
+											&ensp;
+											<ReadyIcon isReady={isReady} />
+										</span>
+									</div>
+								</div>
+							);
+						})} */}
+					</div>
+				</div>
+				<div className="tips-n-tricks">
+					<div className="left-tat">
+						<GiInfo style={{ fontSize: '60px' }} />
+					</div>
+					<div className="right-tat">
+						<AssistancesSlider />
+					</div>
+				</div>
+				<div className="ready-up-button">
+					<ReadyUp ImReady={ImReady} socket={socket} user={user} />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const ReadyUp = ({ ImReady, socket, user }) => {
+	return (
+		<div>
+			{!ImReady ? (
+				<div className="readyup-icons">
+					<IconButton
+						aria-label="ready-up"
+						style={{ color: 'red' }}
+						size="medium"
+						onClick={() => handleVote({ socket, user })}
+					>
+						<DoubleArrowIcon
+							style={{
+								fontSize: '50'
+							}}
+						/>
+					</IconButton>
+					<Typography variant="h6" style={{ color: 'red' }}>
+						READY UP
+					</Typography>
+				</div>
+			) : (
+				<div className="readyup-icons">
+					<IconButton aria-label="ready-up" style={{ color: 'green' }} size="medium">
+						<GiThumbUp
+							style={{
+								fontSize: '50'
+							}}
+						/>
+					</IconButton>
+					<Typography variant="h6" style={{ color: 'green' }}>
+						READY
+					</Typography>
+				</div>
+			)}
+		</div>
+	);
+};
+
 const ReadyIcon = ({ isReady }) => {
 	if (isReady === true) {
 		return <FcCheckmark />;
@@ -133,13 +231,13 @@ const AssistancesSlider = () => {
 		from: { o: 0 },
 		enter: { o: 1 },
 		leave: { o: 2 },
-		config: { duration: 1000 }
+		config: { duration: 150 }
 	});
 	return transitions.map(({ item, key, props }) => (
 		<a.div
 			style={{
-				position: 'absolute',
-				opacity: props.o.interpolate([ 0, 0.5, 1, 1.5, 2 ], [ 0, 0, 1, 0, 0 ])
+				opacity: props.o.interpolate([ 0, 0.5, 1, 1.5, 2 ], [ 0, 0, 1, 0, 0 ]),
+				width: '250px'
 			}}
 		>
 			{item}
@@ -154,4 +252,4 @@ const Assistances = [
 	'Form alliances! One vs All approaches have hardly ever won the game!'
 ];
 
-export default WaitingRoom;
+export default ResponsiveWaitingRoom;
