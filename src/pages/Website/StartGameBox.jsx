@@ -168,7 +168,7 @@ const NewJoinGame = ({ setModeToZero }) => {
 						<div class="uk-form-controls">
 							<div class="uk-inline">
 								<span class="uk-form-icon uk-form-icon-flip " uk-icon="icon: hashtag" />
-								<input class="uk-input" type="text" placeholder="000000" name="gameid" required />
+								<input class="uk-input" type="text" placeholder="000000" name="id" required />
 							</div>
 						</div>
 					</div>
@@ -237,11 +237,11 @@ const NewCreateGame = ({ setModeToZero }) => {
 						<label class="uk-form-label">Gamemode</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-								<select required>
+								<select name="type" required>
 									<option value="">Please select...</option>
-									<option value="1">Regular</option>
-									<option value="2">Campaign</option>
-									<option value="3">Capital Supremacy</option>
+									<option value="realtime">Regular</option>
+									<option value="campaign">Campaign</option>
+									<option value="capital">Capital Supremacy</option>
 								</select>
 								<button class="uk-button uk-button-default" type="button" tabindex="-1">
 									<span />
@@ -255,9 +255,9 @@ const NewCreateGame = ({ setModeToZero }) => {
 						<label class="uk-form-label">Game Map</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-								<select required>
+								<select name="situation" required>
 									<option value="">Please select...</option>
-									<option value="1">World</option>
+									<option value="world">World</option>
 								</select>
 								<button class="uk-button uk-button-default" type="button" tabindex="-1">
 									<span />
