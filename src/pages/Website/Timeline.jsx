@@ -40,7 +40,7 @@ function Timeline() {
 						<p>
 							COVID-19 joined the game, and wiped out all to take the victory royale. It was time for a
 							change and Shashwat joined Akshat in the quest for a new Conquer that could defeat COVID-19
-							in the player's thirst for boredom-allevation.{' '}
+							in the players' thirst for a crusade against boredom.{' '}
 						</p>
 					</div>
 				</div>
@@ -53,8 +53,8 @@ function Timeline() {
 						<p>
 							As countries struggled to develop the COVID-19 vaccine, Shashwat and Akshat perfected the
 							antidote to COVID-19 by way of perfecting Conquer 2, opening up new realms and passages of
-							tactics, alliances, and game dynamics never seen before in Conquer's history. Player's would
-							need to adapt to the new modern Conquer 2.0 warfare.
+							tactics, alliances, and game dynamics never seen before in Conquer's history. Players would
+							need to adapt to the modern Conquer 2.0 warfare.
 						</p>
 					</div>
 				</div>
