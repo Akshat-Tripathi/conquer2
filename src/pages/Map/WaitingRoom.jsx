@@ -9,6 +9,7 @@ import { playerReady } from './Map';
 // import { connect, loaddetails } from '../../websockets/index.js';
 import Typist from 'react-typist';
 import './WaitingRoom.css';
+import ChatPopup from './ChatPopup';
 
 // class readyPlayer {
 // 	constructor(Player, IsReady) {
@@ -114,8 +115,8 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 };
 
 const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => {
-	// var playerColours = playerColours;
-	// var ImReady = playerReady[user];
+	var playerColours = playerColours;
+	var ImReady = playerReady[user];
 
 	//FIXME: Temporary
 	var ImReady = false;
@@ -126,10 +127,10 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 			<div className="lobby-grid">
 				<div className="wr-title">
 					<h1>Lobby</h1>
-					{/* <p style={{ color: 'orange' }}>
-					{'Game ID: ' +
-						document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1]}
-				</p> */}
+					<p style={{ color: 'orange' }}>
+						{'Game ID: ' +
+							document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1]}
+					</p>
 				</div>
 				<div className="spinny-thingy">
 					<div className="lds-hourglass" />
@@ -139,7 +140,7 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 						<h3 style={{ color: 'white' }}>Joined Players </h3>
 					</div>
 					<div className="players-list-playernames">
-						{/* {Object.keys(playerColours).map(function(player) {
+						{Object.keys(playerColours).map(function(player) {
 							var isReady = playerReady[player];
 							var colour = playerColours[player];
 							return (
@@ -153,7 +154,7 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 									</div>
 								</div>
 							);
-						})} */}
+						})}
 					</div>
 				</div>
 				<div className="tips-n-tricks">
@@ -163,6 +164,9 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 					<div className="right-tat">
 						<AssistancesSlider />
 					</div>
+				</div>
+				<div className="chat">
+					<ChatPopup />
 				</div>
 				<div className="ready-up-button">
 					<ReadyUp ImReady={ImReady} socket={socket} user={user} />

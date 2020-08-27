@@ -5,6 +5,7 @@ import Jumbotron from '../Jumbotron';
 import Navbar from '../Header';
 import Ads from '../Ads';
 import Timeline from '../Timeline';
+import ChatPopup from '../../Map/ChatPopup';
 
 function Home() {
 	return (
@@ -14,6 +15,7 @@ function Home() {
 			<Media />
 			<Ads />
 			<Timeline />
+			<ChatPopup />
 			<Footer />
 		</div>
 	);

@@ -168,7 +168,7 @@ const NewJoinGame = ({ setModeToZero }) => {
 						<div class="uk-form-controls">
 							<div class="uk-inline">
 								<span class="uk-form-icon uk-form-icon-flip " uk-icon="icon: hashtag" />
-								<input class="uk-input" type="text" placeholder="000000" name="gameid" required />
+								<input class="uk-input" type="text" placeholder="000000" name="id" required />
 							</div>
 						</div>
 					</div>
@@ -231,13 +231,13 @@ const NewCreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
 			<Paper className="gamebox-wrapper">
-				<form action="/create" method="POST" class="uk-grid-small">
+				<form action="/create" method="POST">
 					<legend class="uk-legend">Create a game</legend>
 					<div class="uk-margin">
 						<label class="uk-form-label">Gamemode</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-								<select required>
+								<select required id="type" name="type" label="Gamemode">
 									<option value="">Please select...</option>
 									<option value="1">Regular</option>
 									<option value="2">Campaign</option>
@@ -255,9 +255,9 @@ const NewCreateGame = ({ setModeToZero }) => {
 						<label class="uk-form-label">Game Map</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-								<select required>
+								<select required id="type" name="map" label="Gamemap">
 									<option value="">Please select...</option>
-									<option value="1">World</option>
+									<option value="World">World</option>
 								</select>
 								<button class="uk-button uk-button-default" type="button" tabindex="-1">
 									<span />
@@ -320,8 +320,8 @@ const NewCreateGame = ({ setModeToZero }) => {
 					</div>
 					<div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
 						<label>
-							<input class="uk-checkbox" type="checkbox" required /> I agree with the Imperium Games Terms
-							and Conditions
+							<input class="uk-checkbox" type="checkbox" required name="tncs" /> I agree with the Imperium
+							Games Terms and Conditions
 						</label>
 					</div>
 					<div class="uk-margin">
@@ -338,17 +338,6 @@ const NewCreateGame = ({ setModeToZero }) => {
 							valueLabelDisplay="auto"
 							name="troopInterval"
 						/>
-						{/* <input
-							class="uk-range"
-							type="range"
-							required
-							min="1"
-							max="5"
-							step="1"
-							aria-labelledby="troopInterval"
-							valueLabelDisplay="auto"
-							name="troopInterval"
-						/> */}
 					</div>
 					<div class="uk-margin">
 						<Button type="submit" name="submit" value="create" variant="outlined" color="secondary">
@@ -368,6 +357,7 @@ const NewCreateGame = ({ setModeToZero }) => {
 		</Grid>
 	);
 };
+
 const CreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>

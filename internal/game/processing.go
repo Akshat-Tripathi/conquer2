@@ -136,9 +136,9 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 		return false
 	//TODO: Check if chatMessages working
 	//TODO: When working, add to all gamemodes;
-	case "chatMessageSent":
+	case "sendChatMessage":
 		d.SendToAll(common.UpdateMessage{
-			Type: "chatMessageReceived",
+			Type: "receiveChatMessage",
 			Player: name,
 			Country: action.Dest,
 		})

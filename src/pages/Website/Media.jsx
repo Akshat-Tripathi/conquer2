@@ -11,7 +11,7 @@ function Media() {
 	return (
 		<div className="media">
 			<div className="media-title">
-				<h1> Conquer 2.0 Propaganda Hub</h1>
+				<h1 style={{ color: '#fff' }}> Conquer 2.0 Propaganda Hub</h1>
 			</div>
 			<div className="media-grid">
 				<div className="tl">
@@ -35,40 +35,62 @@ function Media() {
 					</header>
 				</div>
 				<div className="r">
-					<h1>Latest Victors</h1>
+					<h3 style={{ color: '#fff' }}>Latest Victors</h3>
 					<hr />
 					<p>
-						<small>Game ID: ??</small>
+						<em>
+							<small>Game ID: 001281</small>
+						</em>
 					</p>
-					<ul>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-					</ul>
+					<table style={{ width: '100%', textAlign: 'center' }}>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '30px' }} />
+							</td>
+							<td>Belisarius</td>
+						</tr>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '30px' }} />
+							</td>
+							<td>Taeyeon Dynasty</td>
+						</tr>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '30px' }} />
+							</td>
+							<td>Champlain</td>
+						</tr>
+					</table>
 					<p>
-						<small>Game ID: ??</small>
+						<em>
+							<small>Game ID: 000000</small>
+						</em>
 					</p>
-
-					<ul>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-						<li>
-							<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} /> <h2>Angelo</h2>
-						</li>
-					</ul>
+					<table style={{ width: '100%', textAlign: 'center' }}>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '30px' }} />
+							</td>
+							<td> Oinky Kong </td>
+						</tr>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '30px' }} />
+							</td>
+							<td> Charles Chickens </td>
+						</tr>
+						<tr>
+							<td>
+								<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '30px' }} />
+							</td>
+							<td> John "Can't" See ya </td>
+						</tr>
+					</table>
+					<br />
 				</div>
 				<div className="bl">
-					<div className="" styles={{ height: '100%', width: '100%' }}>
+					<div className="" styles={{ height: '100%', widtd: '100%' }}>
 						<Graph />
 					</div>
 					{/* <header>
@@ -77,7 +99,7 @@ function Media() {
 				</div>
 				<div className="mb">
 					<iframe
-						width="560"
+						widtd="560"
 						height="365"
 						src="https://www.youtube.com/embed/5YRbeA31W-M"
 						frameborder="0"
@@ -92,6 +114,60 @@ function Media() {
 		</div>
 	);
 }
+
+const Winners = () => {
+	return (
+		<div>
+			<p>
+				<small>Game ID: 001281</small>
+			</p>
+			<ul className="winner">
+				<li>
+					<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}>Belisarius</h3>
+				</li>
+				<li>
+					<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}>Taeyeon Dynasty</h3>
+				</li>
+				<li>
+					<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}>Champlain</h3>
+				</li>
+			</ul>
+			<p>
+				<small>Game ID: ??</small>
+			</p>
+
+			<ul className="winner">
+				<li>
+					<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}> ? </h3>
+				</li>
+				<li>
+					<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}> ? </h3>
+				</li>
+				<li>
+					<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} />
+				</li>
+				<li>
+					<h3 style={{ color: '#fff' }}> ? </h3>
+				</li>
+			</ul>
+		</div>
+	);
+};
 
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 var CanvasJS = CanvasJSReact.CanvasJS;
@@ -131,9 +207,9 @@ class Graph extends Component {
 			<div>
 				<CanvasJSChart
 					options={options}
-					/* onRef={ref => this.chart = ref} */
+					/* onRef={ref => tdis.chart = ref} */
 				/>
-				{/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+				{/*You can get reference to tde chart instance as shown above using onRef. tdis allows you to access all chart properties and metdods*/}
 			</div>
 		);
 	}

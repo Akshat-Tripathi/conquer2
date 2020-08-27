@@ -33,9 +33,9 @@ a:hover {
 
 .media-grid {
 	display: grid;
-	grid-template-areas: 'mt mt r' 'mt mt r' 'tl mb bl';
+	grid-template-areas: 'mt mt r' 'tl mb bl';
 	grid-template-columns: minmax(200px, auto) 550px minmax(200px, auto);
-	grid-template-rows: repeat(3, minmax(300px, auto));
+	grid-template-rows: repeat(2, minmax(300px, auto));
 	width: 100%;
 }
 

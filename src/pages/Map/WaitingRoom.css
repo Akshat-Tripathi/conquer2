@@ -39,7 +39,7 @@
 	'. title loading'
 	'. tipbox .'
 	'plist . .'
-	'plist . rup';
+	'plist chat rup';
 }
 
 .players-list {
@@ -66,8 +66,10 @@
  align-content: center;
  display: flex;
  flex-direction: column;
+}
 
-
+.chat {
+	grid-area: chat;
 }
 
 .tips-n-tricks {
