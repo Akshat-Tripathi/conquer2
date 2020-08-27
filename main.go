@@ -11,6 +11,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"github.com/Akshat-Tripathi/conquer2/internal/chat"
 	"github.com/Akshat-Tripathi/conquer2/internal/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,7 @@ func main() {
 	r := gin.Default()
 
 	client, games := loadGames(colours, r)
+	rooms := make(map[string]*chat.Room)
 
 	ctx := game.Context{
 		ID:                "001f91",
@@ -133,8 +135,12 @@ func main() {
 			}
 		}()
 
+		room := chat.NewRoom()
+
 		games[id] = g
+		rooms[id] = room
 		r.GET("/game/"+id+"/ws", g.Run())
+		r.GET("/chat/"+id+"/ws", room.Handle)
 
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
