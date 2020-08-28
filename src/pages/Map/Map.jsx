@@ -46,7 +46,8 @@ var GameContext = {
 	user: '',
 	interval: undefined,
 	playerReady: {},
-	gamemap: ''
+	gamemap: '',
+	globalChat: []
 };
 
 function getUserTroops() {
@@ -205,6 +206,12 @@ class GameMap extends Component {
 				case 'won':
 					alert(getOwner(action.Player) + ' has conquered the world!');
 					window.location.replace('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+					break;
+				case 'chatMessageReceived':
+					//Add latest message to the globalChat
+					let newMessage = {};
+					newMessage[action.Player] = action.Country;
+					GameContext.globalChat.push(newMessage);
 			}
 			this.forceUpdate();
 		};

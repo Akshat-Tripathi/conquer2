@@ -118,15 +118,12 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 	var playerColours = playerColours;
 	var ImReady = playerReady[user];
 
-	//FIXME: Temporary
-	var ImReady = false;
-
 	return (
 		<div>
 			<div className="backdrop" />
 			<div className="lobby-grid">
 				<div className="wr-title">
-					<h1>Lobby</h1>
+					<h1 style={{ color: 'orange' }}>Lobby</h1>
 					<p style={{ color: 'orange' }}>
 						{'Game ID: ' +
 							document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] == 'id')[0][1]}

@@ -98,6 +98,7 @@ const MapChart = ({
 								return !(hideUnrelated && isUnrelated(iso_a2)) ? (
 									<Marker
 										coordinates={[ centroid[0] + OffsetsX(NAME), centroid[1] + OffsetsY(NAME) ]}
+										key={`${NAME}_${ISO_A2}_marker`}
 									>
 										<text
 											y="2"
@@ -182,6 +183,7 @@ const VectorMap = ({
 	const [ content, setContent ] = React.useState('');
 	const mapWidth = 1000;
 	const mapHeight = 600;
+	const gamemap = handleGameMap();
 	return (
 		<div>
 			<MapChart
@@ -199,7 +201,7 @@ const VectorMap = ({
 				convertISO={convertISO}
 				hideUnrelated={hideUnrelated}
 				isUnrelated={isUnrelated}
-				gamemap={() => handleGameMap()}
+				gamemap={gamemap}
 			/>
 			<ReactTooltip>{content}</ReactTooltip>
 		</div>

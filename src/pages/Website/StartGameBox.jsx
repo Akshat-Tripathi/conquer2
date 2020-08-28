@@ -237,11 +237,7 @@ const NewCreateGame = ({ setModeToZero }) => {
 						<label class="uk-form-label">Gamemode</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-<<<<<<< HEAD
-								<select required id="type" name="type" label="Gamemode">
-=======
 								<select name="type" required>
->>>>>>> 710aabc1ddf795df723514471c179cf95f261f35
 									<option value="">Please select...</option>
 									<option value="realtime">Regular</option>
 									<option value="campaign">Campaign</option>
@@ -259,15 +255,9 @@ const NewCreateGame = ({ setModeToZero }) => {
 						<label class="uk-form-label">Game Map</label>
 						<div class="uk-form-controls">
 							<div uk-form-custom="target: > * > span:first-child">
-<<<<<<< HEAD
-								<select required id="type" name="map" label="Gamemap">
-									<option value="">Please select...</option>
-									<option value="World">World</option>
-=======
 								<select name="situation" required>
 									<option value="">Please select...</option>
 									<option value="world">World</option>
->>>>>>> 710aabc1ddf795df723514471c179cf95f261f35
 								</select>
 								<button class="uk-button uk-button-default" type="button" tabindex="-1">
 									<span />

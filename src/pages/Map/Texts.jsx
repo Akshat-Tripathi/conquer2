@@ -91,20 +91,20 @@ function ETA(interval, start) {
 const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interval, startTime, nextTroops }) => {
 	return (
 		<div>
-			<IconButton aria-label="help" color="primary" size="small">
+			<IconButton aria-label="help" color="primary" size="small" onClick={handleOpenHelp}>
 				<HelpIcon
 					style={{
 						fontSize: '20'
 					}}
-					onClick={handleOpenHelp}
 				/>
-				<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
-					<Alert onClose={handleCloseHelp} severity="info">
-						This is your control room. Hover above countries to receive encrypted data. Click on countries
-						to see your military options.
-					</Alert>
-				</Snackbar>
 			</IconButton>
+
+			<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
+				<Alert onClose={handleCloseHelp} severity="info">
+					This is your control room. Hover above countries to receive encrypted data. Click on countries to
+					see your military options.
+				</Alert>
+			</Snackbar>
 			<Grid item xs={12}>
 				<Typography variant="h4" align="center">
 					Welcome, Commander {user}!

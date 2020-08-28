@@ -15,7 +15,7 @@ function Home() {
 			<Media />
 			<Ads />
 			<Timeline />
-			<ChatPopup />
+			{/* <ChatPopup /> */}
 			<Footer />
 		</div>
 	);
