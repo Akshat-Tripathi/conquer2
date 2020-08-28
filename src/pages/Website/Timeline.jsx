@@ -7,7 +7,7 @@ function Timeline() {
 			<h1 style={{ fontSize: '40px' }}>The Wonderful History Of Conquer</h1>
 			<div className="timeline">
 				<div className="container left">
-					<div className="content">
+					<div className="timeline-time">
 						<h3>Summer 2019</h3>
 						<h4 style={{ color: '#ff4520' }}>
 							<em>The Spark of Life</em>
@@ -19,7 +19,7 @@ function Timeline() {
 					</div>
 				</div>
 				<div className="container right">
-					<div className="content">
+					<div className="timeline-time">
 						<h3>Winter 2019</h3>
 						<h4 style={{ color: '#ff4520' }}>
 							<em>Games Night Every Night</em>
@@ -32,7 +32,7 @@ function Timeline() {
 					</div>
 				</div>
 				<div className="container left">
-					<div className="content">
+					<div className="timeline-time">
 						<h3>Spring 2020</h3>
 						<h4 style={{ color: '#ff4520' }}>
 							<em>Pandemic Pandemonium</em>
@@ -45,7 +45,7 @@ function Timeline() {
 					</div>
 				</div>
 				<div className="container right">
-					<div className="content">
+					<div className="timeline-time">
 						<h3>Summer 2020</h3>
 						<h4 style={{ color: '#ff4520' }}>
 							<em>A New Chapter</em>

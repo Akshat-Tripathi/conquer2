@@ -6,6 +6,9 @@ import VectorMap from './VectorMap';
 import { Paper, Grid } from '@material-ui/core';
 import useStyles from './SideBarStyles';
 import { GameContext, getUserTroops, getOwner, parseCookie } from './Map';
+import SidebarGeneral from './Components/Sidebar';
+import ChatPopup from './ChatPopup';
+import './SideBar.css';
 
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
 //POST: The hex colour, p% darker
@@ -240,8 +243,10 @@ function SideBar({ isUnrelated, base }) {
 					allegiances={GameContext.allegiances}
 				/>
 			)}
+			<ChatPopup />
 			{!hidden ? (
-				<Paper className={classes.sidebar}>
+				<div className="main-game-sidebar">
+					{/* <Paper className={classes.sidebar}> */}
 					<Grid container style={{ alignText: 'center' }}>
 						<Title
 							handleCloseHelp={handleCloseHelp}
@@ -253,64 +258,65 @@ function SideBar({ isUnrelated, base }) {
 							interval={GameContext.interval}
 							nextTroops={getUserTroops()}
 						/>
-						{/* Show Donation options when clicked on Donate Button */}
-						{fromCountry === '' && (
-							<DonateForm
-								classes={classes}
-								handleDonate={handleDonate}
-								handletargetPlayer={handletargetPlayer}
-								handleNumTroops={handleNumTroops}
-								showDonate={showDonate}
-								numTroops={numTroops}
-								targetPlayer={targetPlayer}
-								socket={GameContext.socket}
-								user={GameContext.user}
-								players={GameContext.players}
-								reset={reset}
-							/>
-						)}
-
-						{/* Only show Attack and move/assist options when two countries clicked */}
-						{toCountry !== '' && (
-							<Grid item xs={12}>
-								<Options
+						<div style={{ margin: '20px' }}>
+							{/* Show Donation options when clicked on Donate Button */}
+							{fromCountry === '' && (
+								<DonateForm
 									classes={classes}
-									toCountry={toCountry}
-									fromCountry={fromCountry}
-									toCountryOwner={toCountryOwner}
-									allowMove={allowMove}
-									numTroops={numTroops}
+									handleDonate={handleDonate}
+									handletargetPlayer={handletargetPlayer}
 									handleNumTroops={handleNumTroops}
-									handleMove={handleMove}
-									handleAssist={handleAssist}
-									showMove={showMove}
-									showAssist={showAssist}
-									fromCountryISO={fromCountryISO}
-									toCountryISO={toCountryISO}
+									showDonate={showDonate}
+									numTroops={numTroops}
+									targetPlayer={targetPlayer}
 									socket={GameContext.socket}
 									user={GameContext.user}
+									players={GameContext.players}
 									reset={reset}
 								/>
-							</Grid>
-						)}
+							)}
 
-						{/* Deploy troops from base to country */}
-						{allowDeploy && (
-							<OptionsDeploy
-								classes={classes}
-								numTroops={numTroops}
-								handleNumTroops={handleNumTroops}
-								fromCountry={fromCountry}
-								handleDeploy={handleDeploy}
-								showDeploy={showDeploy}
-								fromCountryISO={fromCountryISO}
-								socket={GameContext.socket}
-								user={GameContext.user}
-								troops={GameContext.troops}
-								reset={reset}
-							/>
-						)}
+							{/* Only show Attack and move/assist options when two countries clicked */}
+							{toCountry !== '' && (
+								<Grid item xs={12}>
+									<Options
+										classes={classes}
+										toCountry={toCountry}
+										fromCountry={fromCountry}
+										toCountryOwner={toCountryOwner}
+										allowMove={allowMove}
+										numTroops={numTroops}
+										handleNumTroops={handleNumTroops}
+										handleMove={handleMove}
+										handleAssist={handleAssist}
+										showMove={showMove}
+										showAssist={showAssist}
+										fromCountryISO={fromCountryISO}
+										toCountryISO={toCountryISO}
+										socket={GameContext.socket}
+										user={GameContext.user}
+										reset={reset}
+									/>
+								</Grid>
+							)}
 
+							{/* Deploy troops from base to country */}
+							{allowDeploy && (
+								<OptionsDeploy
+									classes={classes}
+									numTroops={numTroops}
+									handleNumTroops={handleNumTroops}
+									fromCountry={fromCountry}
+									handleDeploy={handleDeploy}
+									showDeploy={showDeploy}
+									fromCountryISO={fromCountryISO}
+									socket={GameContext.socket}
+									user={GameContext.user}
+									troops={GameContext.troops}
+									reset={reset}
+								/>
+							)}
+						</div>
 						{/* Only Show SpyDetails when not clicked anything */}
 						<Grid item xs={12}>
 							{fromCountry === '' &&
@@ -325,22 +331,24 @@ function SideBar({ isUnrelated, base }) {
 							)}
 						</Grid>
 					</Grid>
-				</Paper>
+					{/* </Paper> */}
+				</div>
 			) : null}
-			;
-			<VectorMap
-				setname={setname}
-				setpop_est={setpop_est}
-				setsubrg={setsubrg}
-				setcontinent={setcontinent}
-				setgdp={setgdp}
-				handleColorFill={handleColorFill}
-				handleClick={handleClick}
-				countryStates={GameContext.countryStates}
-				convertISO={convertISO}
-				hideUnrelated={hideUnrelated}
-				isUnrelated={isUnrelated}
-			/>
+			<div style={{ backgroundPosition: 'cover' }}>
+				<VectorMap
+					setname={setname}
+					setpop_est={setpop_est}
+					setsubrg={setsubrg}
+					setcontinent={setcontinent}
+					setgdp={setgdp}
+					handleColorFill={handleColorFill}
+					handleClick={handleClick}
+					countryStates={GameContext.countryStates}
+					convertISO={convertISO}
+					hideUnrelated={hideUnrelated}
+					isUnrelated={isUnrelated}
+				/>
+			</div>
 		</div>
 	);
 }

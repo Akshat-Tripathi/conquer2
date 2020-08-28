@@ -298,8 +298,8 @@ const MoveForm = ({
 		</Grid>
 	) : (
 		<div>
-			<Grid container spacing={2} style={{ alignContent: 'center' }}>
-				<Grid item xs>
+			<Grid container spacing={2}>
+				<Grid item xs={12}>
 					<FormControl classes={classes.input}>
 						<Input
 							autoFocus
@@ -318,7 +318,7 @@ const MoveForm = ({
 						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to move</FormHelperText>
 					</FormControl>
 				</Grid>
-				<Grid item xs={6}>
+				<Grid item xs={12}>
 					<Button
 						variant="outlined"
 						size="small"

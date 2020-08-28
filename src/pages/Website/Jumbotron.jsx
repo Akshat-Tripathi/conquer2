@@ -9,7 +9,7 @@ function Jumbotron() {
 		<div className="hero-container">
 			<video src={BkgVid} autoPlay loop muted />
 			<h1 style={{ textShadow: '4px 4px #ff4520' }}>CONQUER 2.0</h1>
-			<p style={{ textShadow: '0 0 10px #fff' }}>Version Beta 2 Out Now</p>
+			<h3 style={{ textShadow: '0 0 10px #fff', textTransform: 'uppercase' }}>Vincit Qui Se Vincit</h3>
 			<div className="hero-btns">
 				<Button className="btns" buttonStyle="btn--outline" buttonSize="btn--large" link="/play">
 					INITIATE CONQUEST

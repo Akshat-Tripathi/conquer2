@@ -15,6 +15,7 @@ import Forums from './pages/Website/Pages/Forums';
 import DominoMemes from './pages/Website/Pages/DominoMemes';
 import Play from './pages/Website/Pages/Play';
 import SideBar from './pages/Map/SideBar';
+import { Sidebar } from './pages/Map/Components/Sidebar';
 
 class App extends React.Component {
 	render() {
@@ -41,6 +42,7 @@ class App extends React.Component {
 
 						{/* ALPHA TESTING PURPOSES ONLY. PROHIBIT PUBLIC ACCESS*/}
 						<Route path="/alpha" component={SideBar} />
+						<Route path="/sidebar/test" component={Sidebar} />
 					</Switch>
 				</Router>
 			</React.Fragment>

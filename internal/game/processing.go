@@ -139,7 +139,7 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 			Player:  name,
 			Country: action.Dest,
 		})
-		return
+		return false
 	default:
 		return false
 	}

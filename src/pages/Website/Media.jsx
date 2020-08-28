@@ -17,7 +17,9 @@ function Media() {
 				<div className="tl">
 					<header>
 						<p>
-							<a href="/memes">DOMINO MEMES</a>
+							<a href="/memes" style={{ fontSize: '15px' }}>
+								DOMINO MEMES
+							</a>
 						</p>
 					</header>
 				</div>
@@ -34,60 +36,20 @@ function Media() {
 						</h1>
 					</header>
 				</div>
-				<div className="r">
-					<h3 style={{ color: '#fff' }}>Latest Victors</h3>
+				<div className="r" style={{ textAlign: 'center' }}>
+					<h3 style={{ color: '#fff', fontSize: '32px' }}>Latest Victors</h3>
 					<hr />
-					<p>
-						<em>
-							<small>Game ID: 001281</small>
-						</em>
-					</p>
-					<table style={{ width: '100%', textAlign: 'center' }}>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '30px' }} />
-							</td>
-							<td>Belisarius</td>
-						</tr>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '30px' }} />
-							</td>
-							<td>Taeyeon Dynasty</td>
-						</tr>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '30px' }} />
-							</td>
-							<td>Champlain</td>
-						</tr>
+					<table style={{ textAlign: 'center', paddingLeft: '2rem' }} cellSpacing="5">
+						<WinnerEntry
+							gameid="000fee"
+							first="Some Latin Name here"
+							second="Constantinople"
+							third="shash will bash u"
+						/>
+						<WinnerEntry gameid="001281" first="Belisarius" second="Taeyeon Dynasty" third="Champlain" />
+						<WinnerEntry gameid="000000" first="Oinky Kong" second="CharlesChickens" third="John See ya" />
+						<br />
 					</table>
-					<p>
-						<em>
-							<small>Game ID: 000000</small>
-						</em>
-					</p>
-					<table style={{ width: '100%', textAlign: 'center' }}>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '30px' }} />
-							</td>
-							<td> Oinky Kong </td>
-						</tr>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '30px' }} />
-							</td>
-							<td> Charles Chickens </td>
-						</tr>
-						<tr>
-							<td>
-								<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '30px' }} />
-							</td>
-							<td> John "Can't" See ya </td>
-						</tr>
-					</table>
-					<br />
 				</div>
 				<div className="bl">
 					<div className="" styles={{ height: '100%', widtd: '100%' }}>
@@ -115,56 +77,35 @@ function Media() {
 	);
 }
 
-const Winners = () => {
+const WinnerEntry = ({ gameid, first, second, third }) => {
 	return (
 		<div>
-			<p>
-				<small>Game ID: 001281</small>
-			</p>
-			<ul className="winner">
-				<li>
-					<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}>Belisarius</h3>
-				</li>
-				<li>
-					<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}>Taeyeon Dynasty</h3>
-				</li>
-				<li>
-					<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}>Champlain</h3>
-				</li>
-			</ul>
-			<p>
-				<small>Game ID: ??</small>
-			</p>
-
-			<ul className="winner">
-				<li>
-					<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}> ? </h3>
-				</li>
-				<li>
-					<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}> ? </h3>
-				</li>
-				<li>
-					<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '50px' }} />
-				</li>
-				<li>
-					<h3 style={{ color: '#fff' }}> ? </h3>
-				</li>
-			</ul>
+			<tr>
+				<th>
+					<em>
+						<small>Game ID: {gameid}</small>
+					</em>
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<i class="fas fa-medal" style={{ color: '#ffdf00', fontSize: '30px' }} />
+				</td>
+				<td> {first} </td>
+			</tr>
+			<tr>
+				<td>
+					<i class="fas fa-medal" style={{ color: '#a7a7ad', fontSize: '30px' }} />
+				</td>
+				<td> {second} </td>
+			</tr>
+			<tr>
+				<td>
+					<i class="fas fa-medal" style={{ color: '#824A02', fontSize: '30px' }} />
+				</td>
+				<td> {third} </td>
+			</tr>
+			<br />
 		</div>
 	);
 };

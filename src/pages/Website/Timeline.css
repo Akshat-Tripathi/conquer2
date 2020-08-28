@@ -12,6 +12,10 @@
   font-size: 32px;
 }
 
+.timeline-time > h3 {
+  color: #242424;
+}
+
 /* The actual timeline (the vertical ruler) */
 .timeline {
   position: relative;
@@ -99,7 +103,7 @@
 }
 
 /* The actual content */
-.content {
+.timeline-time {
   padding: 20px 30px;
   background-color: white;
   position: relative;

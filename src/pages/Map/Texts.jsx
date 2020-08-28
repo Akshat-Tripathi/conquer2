@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Typography, Paper, Snackbar, IconButton } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import HelpIcon from '@material-ui/icons/Help';
-import { createMuiTheme } from '@material-ui/core/styles';
+import SidebarGeneral from './Components/Sidebar';
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
@@ -12,31 +12,37 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 					<h2>
 						Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
 					</h2>
+					<br />
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<h3>Population: </h3>
-					<Typography variant="subtitle1">{pop_est} </Typography>
+					<subtitle1>{pop_est}</subtitle1>
+					<br />
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<h3>GDP (PPP): </h3>
-
-					<Typography variant="subtitle1">{gdp} </Typography>
+					<subtitle1>{gdp}</subtitle1>
+					<br />
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					<h3>Continent</h3>
-					<Typography variant="subtitle1">{continent} </Typography>
+					<subtitle1>{continent}</subtitle1>
+					<br />
 				</Grid>
 				<Grid item xs={12} sm={6}>
 					{continent !== 'South America' && (
 						<div>
 							<h3>Subregion: </h3>
+							<subtitle1>{subrg}</subtitle1>
 							<Typography variant="subtitle1">{subrg} </Typography>
 						</div>
 					)}
+					<br />
 				</Grid>
 				<Grid item xs={12}>
 					<h3>Allegiance: </h3>
 					<Typography variant="subtitle1">Ohio </Typography>
+					<br />
 				</Grid>
 			</Grid>
 		</div>
@@ -105,23 +111,18 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 					see your military options.
 				</Alert>
 			</Snackbar>
-			<Grid item xs={12}>
-				<Typography variant="h4" align="center">
-					Welcome, Commander {user}!
-				</Typography>
-			</Grid>
+
+			<h4 style={{ textAlign: 'center', padding: '1rem' }}>Welcome, Commander {user}!</h4>
 			<br />
-			<Grid item xs={12}>
-				<Typography variant="h6" align="center">
-					Stonks: {troops}
-				</Typography>
-				<Typography variant="h6" align="center">
-					<span style={{ color: 'red' }}>{nextTroops} stonks arriving in</span>
-				</Typography>
-				<Typography variant="h6" align="center">
-					<span style={{ color: 'red' }}>{ETA(interval, startTime)}</span>
-				</Typography>
-			</Grid>
+
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>Stonks: {troops}</h6>
+
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
+				<span style={{ color: 'red' }}>{nextTroops} stonks arriving in</span>
+			</h6>
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
+				<span style={{ color: 'red' }}>{ETA(interval, startTime)}</span>
+			</h6>
 			<br />
 		</div>
 	);
@@ -130,34 +131,27 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 	return !hidden ? (
 		<div>
-			<Paper className={classes.players}>
+			{/* <Paper className={classes.players}> */}
+			<SidebarGeneral width={300} height={'100vh'} title="Players">
+				<div style={{ padding: '1rem' }}>
+					<h1>Players</h1>
+				</div>
 				<Typography variant="subtitle2">
 					{'Game ID: ' +
 						document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] === 'id')[0][1]}
 				</Typography>
-				<Typography variant="subtitle1">PLAYERS:</Typography>
-				<Grid container spacing={12} direction={'column'}>
-					{Object.keys(playerColours).map(function(player) {
-						var colour = playerColours[allegiances[player]];
-						return (
-							<div key={player} style={{ padding: '5%' }}>
-								<Grid
-									container
-									spacing={12}
-									direction="row"
-									style={{ display: 'flex', alignItems: 'center' }}
-								>
-									<Grid item xs={9}>
-										<Typography variant="p">
-											<span style={{ color: colour }}>{player}</span>
-										</Typography>
-									</Grid>
-								</Grid>
-							</div>
-						);
-					})}
-				</Grid>
-			</Paper>
+				{Object.keys(playerColours).map(function(player) {
+					var colour = playerColours[allegiances[player]];
+					return (
+						<div key={player} style={{ padding: '5%' }}>
+							<p style={{ fontSize: '10px', textAlign: 'center' }}>
+								<span style={{ color: colour }}>{player}</span>
+							</p>
+						</div>
+					);
+				})}
+			</SidebarGeneral>
+			{/* </Paper> */}
 		</div>
 	) : null;
 };

@@ -141,6 +141,7 @@ const StartContent = ({ setModeToOne, setModeToTwo }) => {
 const NewJoinGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.7/dist/css/uikit.min.css" />
 			<Paper className="gamebox-wrapper">
 				<form action="/join" method="POST">
 					<legend class="uk-legend">Join a game</legend>
@@ -185,7 +186,9 @@ const NewJoinGame = ({ setModeToZero }) => {
 						fontSize: '50'
 					}}
 				/>
-				<Typography variant="subtitle1">Back</Typography>
+				<Typography variant="subtitle1" style={{ color: 'white' }}>
+					Back
+				</Typography>
 			</IconButton>
 		</Grid>
 	);
@@ -221,7 +224,9 @@ const JoinGame = ({ setModeToZero }) => {
 						fontSize: '50'
 					}}
 				/>
-				<Typography variant="subtitle1">Back</Typography>
+				<Typography variant="subtitle1" style={{ color: 'white' }}>
+					Back
+				</Typography>
 			</IconButton>
 		</Grid>
 	);
@@ -230,6 +235,7 @@ const JoinGame = ({ setModeToZero }) => {
 const NewCreateGame = ({ setModeToZero }) => {
 	return (
 		<Grid items xs={12}>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.7/dist/css/uikit.min.css" />
 			<Paper className="gamebox-wrapper">
 				<form action="/create" method="POST">
 					<legend class="uk-legend">Create a game</legend>
@@ -352,7 +358,9 @@ const NewCreateGame = ({ setModeToZero }) => {
 						fontSize: '50'
 					}}
 				/>
-				<Typography variant="subtitle1">Back</Typography>
+				<Typography variant="subtitle1" style={{ color: 'white' }}>
+					Back
+				</Typography>
 			</IconButton>
 		</Grid>
 	);
