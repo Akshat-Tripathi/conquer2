@@ -8,14 +8,14 @@ function Footer() {
 		<div className="footer-container">
 			<section className="footer-subscription">
 				<div className="form">
-					<p className="footer-subscription-heading">Stay updated as our conquest proceeds!</p>
-					<p className="footer-subscription-text">
+					<p className="footer-subscription-heading" style={{color: 'white'}}>Stay updated as our conquest proceeds!</p>
+					<p className="footer-subscription-text" style={{color: 'white'}}>
 						You can unsubscribe at any time<small>*</small>
 					</p>
 					<div className="input-areas">
 						<form>
 							<input className="footer-input" name="email" type="email" placeholder="Your Email" />
-							<Button buttonStyle="btn--outline">Subscribe</Button>
+							<Button buttonStyle="btn--outline" style={{color: 'white'}}>Subscribe</Button>
 						</form>
 					</div>
 				</div>

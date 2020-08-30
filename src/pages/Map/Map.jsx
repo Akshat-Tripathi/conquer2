@@ -47,7 +47,7 @@ var GameContext = {
 	interval: undefined,
 	playerReady: {},
 	gamemap: '',
-	globalChat: []
+	globalChat: [],
 };
 
 function getUserTroops() {
@@ -211,7 +211,10 @@ class GameMap extends Component {
 					//Add latest message to the globalChat
 					let newMessage = {};
 					newMessage[action.Player] = action.Country;
-					GameContext.globalChat.push(newMessage);
+					console.log('message received, pushing to local vars.')
+					let gc = GameContext.globalChat;
+					gc.push(newMessage);
+					// this.setState({globalChat: this.state.globalChat.push(newMessage)});
 			}
 			this.forceUpdate();
 		};
@@ -236,10 +239,11 @@ class GameMap extends Component {
 				user={GameContext.user}
 				socket={GameContext.socket}
 				playerReady={GameContext.playerReady}
+				globalChat={this.state.globalChat}
 			/>
 		) : (
 			<body id="map-page">
-				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} />
+				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} globalChat={this.state.globalChat}/>
 			</body>
 		);
 	}
