@@ -5,7 +5,6 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	color: #fff;
 }
 
 .footer-subscription {
@@ -46,7 +45,6 @@
 .form {
 	grid-area: form;
 	text-align: left;
-	color: #ffffff;
 }
 
 .discord-widget {
@@ -55,7 +53,6 @@
 
 .footer-subscription > p {
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-	color: #fff;
 }
 
 .footer-subscription-heading {

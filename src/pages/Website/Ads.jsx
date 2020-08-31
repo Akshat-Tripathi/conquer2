@@ -16,7 +16,7 @@ function Ads() {
 		<div className="ads">
 			<div className="ads-title">
 				<h1 style={{ color: '#fff' }}>Supported Browsers</h1>
-				<p style={{color: '#fff'}}>Now play on any browser anytime, anywhere, without any hassle</p>
+				<p>Now play on any browser anytime, anywhere, without any hassle</p>
 			</div>
 			<div className="ads-wrapper">
 				<div>

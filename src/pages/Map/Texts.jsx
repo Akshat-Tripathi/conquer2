@@ -6,31 +6,48 @@ import SidebarGeneral from './Components/Sidebar';
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
-			<table cellSpacing="10" cellPadding="10">
-				<thead>
-					<tr><th colspan="2" style={{fontSize: '1.5rem'}}>Spy Report On: <div style={{ color: 'yellow' }}>{name}</div></th></tr>
-				</thead>
-				<SpyDetailItem title="Name" info={name} />
-				<SpyDetailItem title="Population:" info={pop_est} />
-				<SpyDetailItem title="GDP (PPP):" info={gdp} />
-				<SpyDetailItem title="Continent:" info={continent} />
-				<SpyDetailItem title="Subregion:" info={subrg} />
-			</table>
+		<div>
+			<Grid container spacing={12}>
+				<Grid item xs={12} style={{ alignText: 'center' }}>
+					<h2>
+						Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
+					</h2>
+					<br />
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>Population: </h3>
+					<subtitle1>{pop_est}</subtitle1>
+					<br />
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>GDP (PPP): </h3>
+					<subtitle1>{gdp}</subtitle1>
+					<br />
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<h3>Continent</h3>
+					<subtitle1>{continent}</subtitle1>
+					<br />
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					{continent !== 'South America' && (
+						<div>
+							<h3>Subregion: </h3>
+							<subtitle1>{subrg}</subtitle1>
+							<Typography variant="subtitle1">{subrg} </Typography>
+						</div>
+					)}
+					<br />
+				</Grid>
+				<Grid item xs={12}>
+					<h3>Allegiance: </h3>
+					<Typography variant="subtitle1">Ohio </Typography>
+					<br />
+				</Grid>
+			</Grid>
+		</div>
 	);
 };
-
-const SpyDetailItem = ({title, info}) => {
-	return (
-		<tr>
-			<td>
-				<h4><em>{title}</em></h4>
-			</td>
-			<td>
-				<h5>{info}</h5>
-			</td>
-		</tr>
-	)
-}
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -83,10 +100,11 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 			<IconButton aria-label="help" color="primary" size="small" onClick={handleOpenHelp}>
 				<HelpIcon
 					style={{
-						fontSize: '20px'
+						fontSize: '20'
 					}}
 				/>
 			</IconButton>
+
 			<Snackbar open={openHelp} autoHideDuration={5000} onClose={handleCloseHelp}>
 				<Alert onClose={handleCloseHelp} severity="info">
 					This is your control room. Hover above countries to receive encrypted data. Click on countries to
@@ -94,22 +112,18 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 				</Alert>
 			</Snackbar>
 
-			<h1>Welcome, Commander {user}!</h1>
+			<h4 style={{ textAlign: 'center', padding: '1rem' }}>Welcome, Commander {user}!</h4>
+			<br />
 
-			<div className="stonks-info" style={{color: '#ff4520'}}>
-			<h4 style={{color: '#ff4520'}}>Stonks: {troops}</h4>
-			<h4 style={{color: '#ff4520'}}>{nextTroops} stonks arriving in <br/> {ETA(interval, startTime)}</h4>
-			</div>
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>Stonks: {troops}</h6>
 
-			
-			{/* <h4 style={{ textAlign: 'center', padding: '1rem', fontSize: '2px' }}>Welcome, Commander {user}!</h4>
-			<h6 style={{ textAlign: 'center', fontSize: '1rem' }}>Stonks: {troops}</h6>
-			<h6 style={{ textAlign: 'center', fontSize: '1rem' }}>
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
 				<span style={{ color: 'red' }}>{nextTroops} stonks arriving in</span>
 			</h6>
-			<h6 style={{ textAlign: 'center', fontSize: '1rem' }}>
+			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
 				<span style={{ color: 'red' }}>{ETA(interval, startTime)}</span>
-			</h6> */}
+			</h6>
+			<br />
 		</div>
 	);
 };
@@ -126,12 +140,11 @@ const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
 					{'Game ID: ' +
 						document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] === 'id')[0][1]}
 				</Typography>
-				<br/><br/>
 				{Object.keys(playerColours).map(function(player) {
 					var colour = playerColours[allegiances[player]];
 					return (
-						<div key={player}>
-							<p style={{ fontSize: '30px', textAlign: 'center' }}>
+						<div key={player} style={{ padding: '5%' }}>
+							<p style={{ fontSize: '10px', textAlign: 'center' }}>
 								<span style={{ color: colour }}>{player}</span>
 							</p>
 						</div>

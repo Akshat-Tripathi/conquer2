@@ -46,7 +46,7 @@ const Options = ({
 					<div>
 						{toCountryOwner !== user ? (
 							<Grid container>
-								<Grid item xs={12}>
+								<Grid item xs={12} sm={4}>
 									<Button
 										variant="contained"
 										size="small"
@@ -60,7 +60,7 @@ const Options = ({
 										ATTACK
 									</Button>
 								</Grid>
-								<Grid item xs={12}>
+								<Grid item xs={12} sm={8}>
 									{/* TODO: Send num of troops */}
 									<Button
 										variant="contained"
@@ -77,7 +77,7 @@ const Options = ({
 								</Grid>
 							</Grid>
 						) : null}
-						<Grid item xs={12}>
+						<Grid item xs={12} sm={6}>
 							<AssistForm
 								showAssist={showAssist}
 								handleNumTroops={handleNumTroops}
@@ -94,7 +94,7 @@ const Options = ({
 					</div>
 				) : (
 					<div>
-						<Grid item xs={12}>
+						<Grid item xs>
 							<MoveForm
 								showMove={showMove}
 								handleNumTroops={handleNumTroops}
@@ -136,8 +136,8 @@ const DonateForm = ({
 		</Grid>
 	) : (
 		<div>
-			<Grid container spacing={3} style={{ alignContent: 'center' }}>
-				<Grid item xs={12}>
+			<Grid container spacing={1} style={{ alignContent: 'center' }}>
+				<Grid item xs>
 					<FormControl className={classes.input}>
 						<Select
 							name="donateTo"
@@ -156,7 +156,7 @@ const DonateForm = ({
 						<FormHelperText style={{ color: 'white' }}>Select Player to Donate to</FormHelperText>
 					</FormControl>
 				</Grid>
-				<Grid item xs={12}>
+				<Grid item xs>
 					<FormControl classes={classes.input}>
 						<Input
 							autoFocus
@@ -173,7 +173,7 @@ const DonateForm = ({
 						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to Donate</FormHelperText>
 					</FormControl>
 				</Grid>
-				<Grid item xs={12}>
+				<Grid item xs={6}>
 					<Button
 						variant="outlined"
 						size="small"
@@ -223,7 +223,7 @@ const AssistForm = ({
 		</Grid>
 	) : (
 		<div>
-			<Grid container spacing={3} style={{ alignContent: 'center' }}>
+			<Grid container spacing={2} style={{ alignContent: 'center' }}>
 				<Grid item xs>
 					<FormControl classes={classes.input}>
 						<Input
@@ -241,7 +241,7 @@ const AssistForm = ({
 						<FormHelperText style={{ color: 'white' }}>Select Number of Troops to send </FormHelperText>
 					</FormControl>
 				</Grid>
-				<Grid item xs={12}>
+				<Grid item xs={6}>
 					<Button
 						variant="outlined"
 						size="small"
@@ -268,7 +268,7 @@ const AssistForm = ({
 				>
 					<ArrowBackIcon
 						style={{
-							fontSize: '30px'
+							fontSize: '30'
 						}}
 					/>
 					<Typography variant="subtitle2">Back</Typography>

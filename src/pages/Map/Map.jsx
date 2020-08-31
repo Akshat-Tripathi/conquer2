@@ -48,7 +48,7 @@ var GameContext = {
 	interval: undefined,
 	playerReady: {},
 	gamemap: '',
-	globalChat: [],
+	globalChat: []
 };
 
 function getUserTroops() {
@@ -246,11 +246,10 @@ class GameMap extends Component {
 				user={GameContext.user}
 				socket={GameContext.gameSocket}
 				playerReady={GameContext.playerReady}
-				globalChat={this.state.globalChat}
 			/>
 		) : (
 			<body id="map-page">
-				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} globalChat={this.state.globalChat}/>
+				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} />
 			</body>
 		);
 	}
