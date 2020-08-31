@@ -62,7 +62,11 @@ func (pg *persistentGame) process(name string, action common.Action) {
 	pg.DefaultGame.process(name, action)
 }
 
-func (pg *persistentGame) End() {
+func (pg *persistentGame) end() {
 	pg.persistence.delete()
 	pg.DefaultGame.end()
+	pg.context.EventListener <- Event{
+		ID:    pg.context.ID,
+		Event: Finished,
+	}
 }

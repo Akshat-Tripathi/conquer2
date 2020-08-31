@@ -18,7 +18,7 @@ type Game interface {
 //Context stores the fields neccessary to initialise a game
 type Context struct {
 	ID                string
-	MaxPlayers        int
+	MaxPlayers        int //IMPORTANT: is this necessary now that the lobby exists?
 	StartingCountries int
 	StartingTroops    int
 	StartTime         time.Time
@@ -26,4 +26,17 @@ type Context struct {
 	Minutes           int
 	Colours           []string
 	Client            *firestore.Client
+	EventListener     chan<- Event
+}
+
+//These status codes are used to indicate the state of the game
+const (
+	StoppedAccepting = iota + 1
+	Finished
+)
+
+//Event represents the most recent event processed by the game
+type Event struct {
+	ID    string
+	Event int8
 }

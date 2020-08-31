@@ -42,6 +42,12 @@ func NewDefaultGame(ctx Context) *DefaultGame {
 			Type: "start",
 		})
 		d.processor.StopAccepting()
+		go func() {
+			d.context.EventListener <- Event{
+				ID:    ctx.ID,
+				Event: StoppedAccepting,
+			}
+		}()
 		d.lobby.full = true
 		d.cron = minuteCron(d.context.Minutes, func() {
 			for player, troops := range d.processor.ProcessTroops() {
@@ -181,6 +187,10 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 func (d *DefaultGame) end() {
 	d.Close()
 	d.processor.Destroy()
+	d.context.EventListener <- Event{
+		ID:    d.context.ID,
+		Event: Finished,
+	}
 }
 
 //GetContext returns the context information

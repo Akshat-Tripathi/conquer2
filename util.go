@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
+
+	"github.com/Akshat-Tripathi/conquer2/internal/game"
 )
 
 func loadColours() []string {
@@ -36,4 +39,30 @@ func shuffle(strs []string) []string {
 		shuffled[i] = strs[j]
 	}
 	return shuffled
+}
+
+//This is used to store a queue of pointers to games -> should have all public games in one of these
+type gameQueue struct {
+	sync.RWMutex
+	items []*game.Game
+}
+
+func (gq *gameQueue) push(g *game.Game) {
+	gq.Lock()
+	defer gq.Unlock()
+	gq.items = append(gq.items, g)
+}
+
+func (gq *gameQueue) pop() *game.Game {
+	gq.Lock()
+	defer gq.Unlock()
+	top := gq.items[0]
+	gq.items = gq.items[1:]
+	return top
+}
+
+func (gq *gameQueue) peek() *game.Game {
+	gq.RLock()
+	defer gq.RUnlock()
+	return gq.items[0]
 }

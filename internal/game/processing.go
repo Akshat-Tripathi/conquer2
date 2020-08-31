@@ -214,7 +214,7 @@ func (cg *CampaignGame) process(name string, action common.Action) bool {
 					Type:   "won",
 					Player: name,
 				})
-				cg.End()
+				cg.end()
 				return true
 			}
 		} else {

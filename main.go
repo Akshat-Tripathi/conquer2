@@ -34,8 +34,23 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	client, games := loadGames(colours, r)
+	events := make(chan game.Event)
+
+	client, games := loadGames(colours, r, events)
 	rooms := make(map[string]*chat.Room)
+
+	go func() {
+		for {
+			event := <-events
+			switch event.Event {
+			case game.StoppedAccepting:
+				return
+			case game.Finished:
+				delete(games, event.ID)
+				delete(rooms, event.ID)
+			}
+		}
+	}()
 
 	ctx := game.Context{
 		ID:                "001f91",
@@ -47,6 +62,7 @@ func main() {
 		StartTime:         time.Now().Add(time.Minute * 0),
 		Colours:           colours,
 		Client:            client,
+		EventListener:     events,
 	}
 
 	g := game.NewDefaultGame(ctx)
@@ -214,7 +230,7 @@ func main() {
 	r.Run(":" + port)
 }
 
-func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]game.Game) {
+func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*firestore.Client, map[string]game.Game) {
 	auth := option.WithCredentialsFile("./internal/game/conquer2.json")
 	app, err := firebase.NewApp(context.Background(), nil, auth)
 	if err != nil {
@@ -233,9 +249,10 @@ func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]g
 	if err == nil {
 		for _, refs := range allRefs {
 			g := game.NewCampaignGame(game.Context{
-				ID:      refs.ID,
-				Colours: colours,
-				Client:  client,
+				ID:            refs.ID,
+				Colours:       colours,
+				Client:        client,
+				EventListener: events,
 			})
 			games[refs.ID] = g
 			r.GET("/game/"+refs.ID+"/ws", g.Run())
