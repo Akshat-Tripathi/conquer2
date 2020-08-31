@@ -106,10 +106,6 @@ a:hover {
 	text-align: center;
 }
 
-table {
-    margin: 0 auto; /* or margin: 0 auto 0 auto */
-  }
-  
 .r > ul {
 	display: grid;
 	grid-template-rows: repeat(auto-fit, minmax(50px, auto-fit));
