@@ -36,7 +36,8 @@ class countryState {
 
 //TODO: Use redux / React Context in the future to streamline global state as one immutable tree in DOM.
 var GameContext = {
-	socket: undefined,
+    gameSocket: undefined,
+    chatSocket: undefined,
 	troops: 0,
 	countryStates: {},
 	capitals: {},
@@ -47,7 +48,7 @@ var GameContext = {
 	interval: undefined,
 	playerReady: {},
 	gamemap: '',
-	globalChat: []
+	globalChat: [],
 };
 
 function getUserTroops() {
@@ -124,9 +125,10 @@ class GameMap extends Component {
 			};
 		}
 
-		GameContext.socket = connect();
+        GameContext.gameSocket = connect("game");
+        GameContext.chatSocket = connect("chat");        
 		var keepAlive = (keepAlive = window.setInterval(() => {
-			GameContext.socket.send('{}');
+			GameContext.gameSocket.send('{}');
 		}, 54 * 1000));
 
 		//Ascertain from cookies the base troop drop time intervals
@@ -134,13 +136,26 @@ class GameMap extends Component {
 		//Ascertain from cookies the current player's username
 		GameContext.user = parseCookie('username');
 		//TODO: Ascertain from cookies the map to be used for the game
-		GameContext.gamemap = getGameMap();
+        GameContext.gamemap = getGameMap();
+        
+        GameContext.chatSocket.onmessage = (msg) => {
+            //Add latest message to the globalChat
+            console.log(msg)
+            msg = JSON.parse(msg.data)
+            let newMessage = {};
+            newMessage[msg.Name] = msg.Text;
+            console.log('message received, pushing to local vars.')
+            let gc = GameContext.globalChat;
+            gc.push(newMessage);
+            this.forceUpdate();
+            // this.setState({globalChat: this.state.globalChat.push(newMessage)});
+        }
 
-		GameContext.socket.onmessage = (msg) => {
+		GameContext.gameSocket.onmessage = (msg) => {
 			var action = JSON.parse(msg.data);
 			window.clearInterval(keepAlive);
 			keepAlive = window.setInterval(() => {
-				GameContext.socket.send('{}');
+				GameContext.gameSocket.send('{}');
 			}, 54 * 1000);
 			switch (action.Type) {
 				case 'updateTroops':
@@ -207,12 +222,7 @@ class GameMap extends Component {
 					alert(getOwner(action.Player) + ' has conquered the world!');
 					window.location.replace('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 					break;
-				case 'chatMessageReceived':
-					//Add latest message to the globalChat
-					let newMessage = {};
-					newMessage[action.Player] = action.Country;
-					GameContext.globalChat.push(newMessage);
-			}
+ 			}
 			this.forceUpdate();
 		};
 	}
@@ -234,12 +244,13 @@ class GameMap extends Component {
 			<WaitingRoom
 				playerColours={GameContext.playerColours}
 				user={GameContext.user}
-				socket={GameContext.socket}
+				socket={GameContext.gameSocket}
 				playerReady={GameContext.playerReady}
+				globalChat={this.state.globalChat}
 			/>
 		) : (
 			<body id="map-page">
-				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} />
+				<SideBar isUnrelated={this.state.isUnrelated} base={this.state.base} globalChat={this.state.globalChat}/>
 			</body>
 		);
 	}

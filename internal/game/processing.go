@@ -133,13 +133,6 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 			})
 		}
 		return false
-	case "chatMessageSent":
-		d.SendToAll(common.UpdateMessage{
-			Type:    "chatMessageReceived",
-			Player:  name,
-			Country: action.Dest,
-		})
-		return false
 	default:
 		return false
 	}

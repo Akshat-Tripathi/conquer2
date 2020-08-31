@@ -35,16 +35,17 @@ func (m *member) send(msg msgOut) {
 }
 
 func (m *member) read() {
-	var msg msgIn
-	err := m.conn.ReadJSON(&msg)
+	// err := m.conn.ReadJSON(&msg)
+	_, msg, err := m.conn.ReadMessage()
+	log.Println(string(msg))
 	if err != nil {
 		log.Println(err)
 		m.close <- struct{}{}
 		return
 	}
 	//Filter out the "keepAlive" messages
-	if msg != "" {
-		m.requests <- msg
+	if string(msg) != "" {
+		m.requests <- msgIn(msg)
 	}
 }
 

@@ -51,6 +51,9 @@ func main() {
 
 	g := game.NewDefaultGame(ctx)
 	games["001f91"] = g
+	c := chat.NewRoom()
+	rooms["001f91"] = c
+	r.GET("/chat/001f91/ws", c.Handle)
 	r.GET("/game/001f91/ws", g.Run())
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
@@ -145,8 +148,8 @@ func main() {
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("username", username, cookieMaxAge, "/", "", false, false)
+		c.SetCookie("password", password, cookieMaxAge, "/", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("type", gameType, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
@@ -175,8 +178,8 @@ func main() {
 		}
 		ctx := g.GetContext()
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("username", username, cookieMaxAge, "/", "", false, false)
+		c.SetCookie("password", password, cookieMaxAge, "/", "", false, true)
 		c.SetCookie("situation", ctx.Situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
 

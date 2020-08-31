@@ -114,7 +114,7 @@ const WaitingRoom = ({ playerColours, user, socket, playerReady }) => {
 	);
 };
 
-const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => {
+const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady, globalChat }) => {
 	var playerColours = playerColours;
 	var ImReady = playerReady[user];
 
@@ -163,7 +163,8 @@ const ResponsiveWaitingRoom = ({ playerColours, user, socket, playerReady }) => 
 					</div>
 				</div>
 				<div className="chat">
-					<ChatPopup />
+					{/* <ChatPopup globalChat={globalChat}/> */}
+					<ChatPopup/>
 				</div>
 				<div className="ready-up-button">
 					<ReadyUp ImReady={ImReady} socket={socket} user={user} />
