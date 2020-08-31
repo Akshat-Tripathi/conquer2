@@ -183,6 +183,15 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 	sockets.CloseWithMessage(conn, msg)
 }
 
+//AddReservation adds a player to the reserved list of the game
+//This was created to handle adding players to public games but can also be used for creating tournaments
+func (d *DefaultGame) AddReservation(player, password string) bool {
+	if int(d.numPlayers) == d.context.MaxPlayers {
+		return false
+	}
+	return d.lobby.addReservation(player, password)
+}
+
 //end is used to destroy all structs associated with the game
 func (d *DefaultGame) end() {
 	d.Close()

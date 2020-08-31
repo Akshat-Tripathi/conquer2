@@ -11,6 +11,7 @@ import (
 type Game interface {
 	Run() func(ctx *gin.Context)
 	GetContext() Context
+	AddReservation(player, password string) bool
 	routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string)
 	end()
 }

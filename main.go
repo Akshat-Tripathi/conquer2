@@ -37,6 +37,7 @@ func main() {
 	events := make(chan game.Event)
 
 	client, games := loadGames(colours, r, events)
+	publicGames := newGameSubset()
 	rooms := make(map[string]*chat.Room)
 
 	go func() {
@@ -44,7 +45,7 @@ func main() {
 			event := <-events
 			switch event.Event {
 			case game.StoppedAccepting:
-				return
+				publicGames.remove(event.ID)
 			case game.Finished:
 				delete(games, event.ID)
 				delete(rooms, event.ID)
@@ -154,6 +155,11 @@ func main() {
 			}
 		}()
 
+		private := req.FormValue("private")
+		if private == "" {
+			publicGames.add(id, &g)
+		}
+
 		room := chat.NewRoom()
 
 		games[id] = g
@@ -179,15 +185,23 @@ func main() {
 	r.POST("/join", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
+		reason := "Invalid game ID"
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 
 		id := req.FormValue("id")
+
+		if id == "" {
+			id = publicGames.find(username, password)
+			if id == "NOOP" {
+				reason = "No public games are available right now"
+			}
+		}
+
 		g, validID := games[id]
 		if !validID {
-			fmt.Fprint(c.Writer, `<script>
-			alert("Invalid game ID");
+			fmt.Fprint(c.Writer, `<script>alert(`+reason+`);
 			window.location.replace(window.location.href.replace("/join", ""));
 			</script>`)
 			return

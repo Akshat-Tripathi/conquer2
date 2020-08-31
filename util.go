@@ -42,27 +42,36 @@ func shuffle(strs []string) []string {
 }
 
 //This is used to store a queue of pointers to games -> should have all public games in one of these
-type gameQueue struct {
+type gameSubset struct {
 	sync.RWMutex
-	items []*game.Game
+	items map[string]*game.Game
 }
 
-func (gq *gameQueue) push(g *game.Game) {
-	gq.Lock()
-	defer gq.Unlock()
-	gq.items = append(gq.items, g)
+func newGameSubset() *gameSubset {
+	return &gameSubset{
+		items: make(map[string]*game.Game),
+	}
 }
 
-func (gq *gameQueue) pop() *game.Game {
-	gq.Lock()
-	defer gq.Unlock()
-	top := gq.items[0]
-	gq.items = gq.items[1:]
-	return top
+func (gs *gameSubset) add(id string, g *game.Game) {
+	gs.Lock()
+	defer gs.Unlock()
+	gs.items[id] = g
 }
 
-func (gq *gameQueue) peek() *game.Game {
-	gq.RLock()
-	defer gq.RUnlock()
-	return gq.items[0]
+func (gs *gameSubset) remove(id string) {
+	gs.Lock()
+	defer gs.Unlock()
+	delete(gs.items, id)
+}
+
+func (gs *gameSubset) find(player, password string) string {
+	gs.RLock()
+	defer gs.RUnlock()
+	for id, g := range gs.items {
+		if (*g).AddReservation(player, password) {
+			return id
+		}
+	}
+	return "NOOP"
 }

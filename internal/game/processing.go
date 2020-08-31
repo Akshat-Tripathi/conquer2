@@ -30,7 +30,7 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Type:   "readyPlayer",
 		Player: name,
 	})
-	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
+	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length() && len(d.lobby.reservedPlayers) == 0
 	//return int(d.numPlayers) == d.lobby.length()
 }
 
