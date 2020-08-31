@@ -22,7 +22,7 @@ def comment(set):
 
 def toggle_sourcemap():
     sourcemap = "\nGENERATE_SOURCEMAP=false"
-    with open(".env", "r") as file:
+    with open(".env", "r+") as file:
         txt = file.read()
         if sourcemap in txt:
             txt.replace(sourcemap, "")
