@@ -13,8 +13,6 @@ import {
 	FormControlLabel,
 	Checkbox
 } from '@material-ui/core';
-
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -77,7 +75,6 @@ function StartGameBox() {
 
 	return (
 		<div>
-			<CssBaseline />
 			<Paper className={classes.paper} elevation={3}>
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
