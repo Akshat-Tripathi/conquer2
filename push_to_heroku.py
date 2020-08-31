@@ -14,20 +14,21 @@ def comment(set):
     new = '#'
     if not set:
         old, new = new, old
-    with open(".gitignore", 'r') as file:
+    with open(".gitignore", 'r+') as file:
         raw = file.read()
         raw = raw.replace(old + "internal/game/*.json", new + "internal/game/*.json")
-    with open(".gitignore", 'w') as file:
+        file.seek(0)
         file.write(raw)
 
 def toggle_sourcemap():
     sourcemap = "\nGENERATE_SOURCEMAP=false"
-    with open(".env", "w") as file:
+    with open(".env", "r") as file:
         txt = file.read()
         if sourcemap in txt:
             txt.replace(sourcemap, "")
         else:
             txt += sourcemap
+        file.seek(0)
         file.write(txt)
 
 comment(True)
