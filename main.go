@@ -50,7 +50,7 @@ func main() {
 			case game.PlayerLost:
 				leaderBoard.push(event.ID, event.Data.(string))
 			case game.Finished:
-				leaderBoard.flush(event.ID)
+				leaderBoard.flush("localhost", event.ID)
 				delete(games, event.ID)
 				delete(rooms, event.ID)
 			}

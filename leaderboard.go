@@ -32,7 +32,7 @@ func (l *leaderBoard) push(id, name string) {
 	l.games[id] = board
 }
 
-func (l *leaderBoard) flush(id string) {
+func (l *leaderBoard) flush(url, id string) {
 	defer delete(l.games, id)
 	msg, err := json.Marshal(message{
 		ID:    id,
@@ -42,7 +42,7 @@ func (l *leaderBoard) flush(id string) {
 	if err != nil {
 		log.Println(err)
 	}
-	_, err = http.Post("url", "application/json", bytes.NewBuffer(msg))
+	_, err = http.Post(url, "application/json", bytes.NewBuffer(msg))
 	if err != nil {
 		log.Println(err)
 	}
