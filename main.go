@@ -270,6 +270,7 @@ func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*fire
 				ID:            refs.ID,
 				Colours:       colours,
 				Client:        client,
+				MaxPlayers:    20,
 				EventListener: events,
 			})
 			games[refs.ID] = g

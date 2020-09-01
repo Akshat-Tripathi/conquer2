@@ -269,7 +269,7 @@ function SideBar({ isUnrelated, base }) {
 									showDonate={showDonate}
 									numTroops={numTroops}
 									targetPlayer={targetPlayer}
-									socket={GameContext.socket}
+									socket={GameContext.gameSocket}
 									user={GameContext.user}
 									players={GameContext.players}
 									reset={reset}
@@ -293,7 +293,7 @@ function SideBar({ isUnrelated, base }) {
 										showAssist={showAssist}
 										fromCountryISO={fromCountryISO}
 										toCountryISO={toCountryISO}
-										socket={GameContext.socket}
+										socket={GameContext.gameSocket}
 										user={GameContext.user}
 										reset={reset}
 									/>
@@ -310,7 +310,7 @@ function SideBar({ isUnrelated, base }) {
 									handleDeploy={handleDeploy}
 									showDeploy={showDeploy}
 									fromCountryISO={fromCountryISO}
-									socket={GameContext.socket}
+									socket={GameContext.gameSocket}
 									user={GameContext.user}
 									troops={GameContext.troops}
 									reset={reset}
