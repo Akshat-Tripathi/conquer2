@@ -1,8 +1,6 @@
 package game
 
 import (
-	"time"
-
 	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
@@ -30,7 +28,7 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Type:   "readyPlayer",
 		Player: name,
 	})
-	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length()
+	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length() && len(d.lobby.reservedPlayers) == 0
 	//return int(d.numPlayers) == d.lobby.length()
 }
 
@@ -40,7 +38,7 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return false
 		}
-		valid, won, conquered, deltaSrc, deltaDest :=
+		valid, won, conquered, deltaSrc, deltaDest, playerLost :=
 			d.processor.Attack(action.Src, action.Dest, name, action.Troops)
 		if !valid {
 			return false
@@ -65,8 +63,15 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 					Type:   "won",
 					Player: name,
 				})
-				time.AfterFunc(time.Second*5, d.end)
+				d.end(name)
 				return true
+			}
+			if playerLost != "" {
+				d.context.EventListener <- Event{
+					ID:    d.context.ID,
+					Event: PlayerLost,
+					Data:  playerLost,
+				}
 			}
 		} else {
 			d.SendToAll(common.UpdateMessage{
@@ -133,13 +138,6 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 			})
 		}
 		return false
-	case "chatMessageSent":
-		d.SendToAll(common.UpdateMessage{
-			Type:    "chatMessageReceived",
-			Player:  name,
-			Country: action.Dest,
-		})
-		return false
 	default:
 		return false
 	}
@@ -168,7 +166,7 @@ func (cg *CampaignGame) process(name string, action common.Action) bool {
 			return false
 		}
 		oldPlayer := cg.processor.GetCountry(action.Dest).Player
-		valid, won, conquered, deltaSrc, deltaDest :=
+		valid, won, conquered, deltaSrc, deltaDest, playerLost :=
 			cg.processor.Attack(action.Src, action.Dest, name, 1)
 		if !valid {
 			return false
@@ -221,8 +219,15 @@ func (cg *CampaignGame) process(name string, action common.Action) bool {
 					Type:   "won",
 					Player: name,
 				})
-				cg.End()
+				cg.end(name)
 				return true
+			}
+			if playerLost != "" {
+				cg.context.EventListener <- Event{
+					ID:    cg.context.ID,
+					Event: PlayerLost,
+					Data:  playerLost,
+				}
 			}
 		} else {
 			cg.sendToRelevantPlayers(action.Dest, common.UpdateMessage{

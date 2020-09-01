@@ -42,6 +42,12 @@ func NewDefaultGame(ctx Context) *DefaultGame {
 			Type: "start",
 		})
 		d.processor.StopAccepting()
+		go func() {
+			d.context.EventListener <- Event{
+				ID:    ctx.ID,
+				Event: StoppedAccepting,
+			}
+		}()
 		d.lobby.full = true
 		d.cron = minuteCron(d.context.Minutes, func() {
 			for player, troops := range d.processor.ProcessTroops() {
@@ -177,10 +183,28 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 	sockets.CloseWithMessage(conn, msg)
 }
 
+//AddReservation adds a player to the reserved list of the game
+//This was created to handle adding players to public games but can also be used for creating tournaments
+func (d *DefaultGame) AddReservation(player, password string) bool {
+	if int(d.numPlayers) == d.context.MaxPlayers {
+		return false
+	}
+	return d.lobby.addReservation(player, password)
+}
+
 //end is used to destroy all structs associated with the game
-func (d *DefaultGame) end() {
+func (d *DefaultGame) end(winner string) {
 	d.Close()
 	d.processor.Destroy()
+	d.context.EventListener <- Event{
+		ID:    d.context.ID,
+		Event: PlayerLost,
+		Data:  winner,
+	}
+	d.context.EventListener <- Event{
+		ID:    d.context.ID,
+		Event: Finished,
+	}
 }
 
 //GetContext returns the context information

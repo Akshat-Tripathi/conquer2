@@ -94,14 +94,14 @@ func (d *DefaultProcessor) withLockedPlayers(src, dest string, op func(src, dest
 }
 
 //Attack attacks
-func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
+func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int, playerLost string) {
 	srcCountry, ok := d.countries[src]
 	if !ok {
-		return false, false, false, 0, 0
+		return false, false, false, 0, 0, ""
 	}
 	destCountry, ok := d.countries[dest]
 	if !ok {
-		return false, false, false, 0, 0
+		return false, false, false, 0, 0, ""
 	}
 	if src > dest {
 		srcCountry.Lock()
@@ -130,6 +130,7 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 			//Conquered
 			destCountry.Troops = 1
 			srcCountry.Troops--
+			var playerLost string
 
 			source := d.players[srcCountry.Player]
 			source.Lock()
@@ -140,6 +141,9 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 				destination.Lock()
 				defer destination.Unlock()
 				destination.Countries--
+				if destination.Countries == 0 {
+					playerLost = destCountry.Player
+				}
 			}
 			destCountry.Player = player
 
@@ -147,11 +151,11 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 			if source.Countries == d.winCountries {
 				won = true
 			}
-			return true, won, true, deltaSrc, deltaDest
+			return true, won, true, deltaSrc, deltaDest, playerLost
 		}
-		return true, false, false, deltaSrc, deltaDest
+		return true, false, false, deltaSrc, deltaDest, ""
 	}
-	return false, false, false, 0, 0
+	return false, false, false, 0, 0, ""
 }
 
 //Donate validates a donation

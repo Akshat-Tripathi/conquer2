@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Chat, addResponseMessage, addLinkSnippet, addUserMessage } from 'react-chat-popup';
 import { GameContext } from './Map';
-import { action } from '../Map/ActionButtons';
 import './ChatPopup.css';
 
 function ChatPopup() {
@@ -21,9 +20,7 @@ function ChatPopup() {
 	const handleNewUserMessage = (newMessage) => {
 		console.log(`New message incoming! ${newMessage}`);
 
-		// send the message through the backend
-		var sendmsg = new action(0, 'chatMessageSent', newMessage, '', this.props.user);
-		GameContext.socket.send(JSON.stringify(sendmsg));
+		GameContext.chatSocket.send(newMessage);
 	};
 
 	return (

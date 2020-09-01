@@ -8,7 +8,7 @@ type validator interface {
 }
 
 type executor interface {
-	Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int)
+	Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int, playerLost string)
 	Donate(src, dest string, troops int) bool
 	Assist(src, dest string, troops int, player string) bool
 	Move(src, dest string, troops int, player string) bool

@@ -62,7 +62,7 @@ func (pg *persistentGame) process(name string, action common.Action) {
 	pg.DefaultGame.process(name, action)
 }
 
-func (pg *persistentGame) End() {
+func (pg *persistentGame) end(winner string) {
 	pg.persistence.delete()
-	pg.DefaultGame.end()
+	pg.DefaultGame.end(winner)
 }

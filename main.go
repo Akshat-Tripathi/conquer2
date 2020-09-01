@@ -34,8 +34,28 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	client, games := loadGames(colours, r)
+	events := make(chan game.Event)
+
+	client, games := loadGames(colours, r, events)
+	publicGames := newGameSubset()
+	leaderBoard := newLeaderBoard()
 	rooms := make(map[string]*chat.Room)
+
+	go func() {
+		for {
+			event := <-events
+			switch event.Event {
+			case game.StoppedAccepting:
+				publicGames.remove(event.ID)
+			case game.PlayerLost:
+				leaderBoard.push(event.ID, event.Data.(string))
+			case game.Finished:
+				leaderBoard.flush("localhost", event.ID)
+				delete(games, event.ID)
+				delete(rooms, event.ID)
+			}
+		}
+	}()
 
 	ctx := game.Context{
 		ID:                "001f91",
@@ -47,10 +67,14 @@ func main() {
 		StartTime:         time.Now().Add(time.Minute * 0),
 		Colours:           colours,
 		Client:            client,
+		EventListener:     events,
 	}
 
 	g := game.NewDefaultGame(ctx)
 	games["001f91"] = g
+	c := chat.NewRoom()
+	rooms["001f91"] = c
+	r.GET("/chat/001f91/ws", c.Handle)
 	r.GET("/game/001f91/ws", g.Run())
 
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
@@ -135,6 +159,11 @@ func main() {
 			}
 		}()
 
+		private := req.FormValue("private")
+		if private == "" {
+			publicGames.add(id, &g)
+		}
+
 		room := chat.NewRoom()
 
 		games[id] = g
@@ -145,8 +174,8 @@ func main() {
 		//Sets a cookie for the current game id
 		//Avoids the issue of opening loads of connections
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("username", username, cookieMaxAge, "/", "", false, false)
+		c.SetCookie("password", password, cookieMaxAge, "/", "", false, true)
 		c.SetCookie("situation", situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("type", gameType, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
@@ -160,23 +189,31 @@ func main() {
 	r.POST("/join", func(c *gin.Context) {
 		req := c.Request
 		req.ParseForm()
+		reason := "Invalid game ID"
 
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 
 		id := req.FormValue("id")
+
+		if id == "" {
+			id = publicGames.find(username, password)
+			if id == "NOOP" {
+				reason = "No public games are available right now"
+			}
+		}
+
 		g, validID := games[id]
 		if !validID {
-			fmt.Fprint(c.Writer, `<script>
-			alert("Invalid game ID");
+			fmt.Fprint(c.Writer, `<script>alert(`+reason+`);
 			window.location.replace(window.location.href.replace("/join", ""));
 			</script>`)
 			return
 		}
 		ctx := g.GetContext()
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("username", username, cookieMaxAge, "/game", "", false, false)
-		c.SetCookie("password", password, cookieMaxAge, "/game", "", false, true)
+		c.SetCookie("username", username, cookieMaxAge, "/", "", false, false)
+		c.SetCookie("password", password, cookieMaxAge, "/", "", false, true)
 		c.SetCookie("situation", ctx.Situation, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("start", strconv.FormatInt(ctx.StartTime.Unix(), 10), cookieMaxAge, "/game", "", false, false)
 
@@ -211,7 +248,7 @@ func main() {
 	r.Run(":" + port)
 }
 
-func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]game.Game) {
+func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*firestore.Client, map[string]game.Game) {
 	auth := option.WithCredentialsFile("./internal/game/conquer2.json")
 	app, err := firebase.NewApp(context.Background(), nil, auth)
 	if err != nil {
@@ -230,9 +267,10 @@ func loadGames(colours []string, r *gin.Engine) (*firestore.Client, map[string]g
 	if err == nil {
 		for _, refs := range allRefs {
 			g := game.NewCampaignGame(game.Context{
-				ID:      refs.ID,
-				Colours: colours,
-				Client:  client,
+				ID:            refs.ID,
+				Colours:       colours,
+				Client:        client,
+				EventListener: events,
 			})
 			games[refs.ID] = g
 			r.GET("/game/"+refs.ID+"/ws", g.Run())

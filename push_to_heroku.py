@@ -14,17 +14,33 @@ def comment(set):
     new = '#'
     if not set:
         old, new = new, old
-    with open(".gitignore", 'r') as file:
+    with open(".gitignore", 'r+') as file:
         raw = file.read()
         raw = raw.replace(old + "internal/game/*.json", new + "internal/game/*.json")
-    with open(".gitignore", 'w') as file:
+        file.seek(0)
         file.write(raw)
+        file.truncate()
 
-comment(True)
-system("git add .")
-system("git commit -m \"heroku release\"")
-system("git push heroku master --force")
-system("git reset --soft HEAD~1")
-system("git rm -r --cached internal/game/*.json")
-comment(False)
-system("git add .gitignore")
+def toggle_sourcemap():
+    sourcemap = "\nGENERATE_SOURCEMAP=false"
+    with open(".env", "r+") as file:
+        txt = file.read()
+        if sourcemap in txt:
+            txt = txt.replace(sourcemap, "")
+        else:
+            txt += sourcemap
+        file.seek(0)
+        print(txt)
+        file.write(txt)
+        file.truncate()
+
+# comment(True)
+# toggle_sourcemap()
+# system("git add .")
+# system("git commit -m \"heroku release\"")
+# system("git push heroku master --force")
+# system("git reset --soft HEAD~1")
+# system("git rm -r --cached internal/game/*.json")
+toggle_sourcemap()
+# comment(False)
+# system("git add .gitignore")

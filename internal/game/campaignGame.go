@@ -29,6 +29,12 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 			Type: "start",
 		})
 		cg.processor.StopAccepting()
+		go func() {
+			cg.context.EventListener <- Event{
+				ID:    ctx.ID,
+				Event: StoppedAccepting,
+			}
+		}()
 		cg.lobby.full = true
 		cg.cron = tripleCron(ctx.StartTime, func() {
 			for player, troops := range cg.processor.ProcessTroops() {
@@ -53,7 +59,7 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 					Type:   "won",
 					Player: playerName,
 				})
-				cg.End()
+				cg.end(playerName)
 			},
 		)
 		cg.cron.Start()
