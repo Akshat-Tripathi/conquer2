@@ -7,43 +7,36 @@ import SidebarGeneral from './Components/Sidebar';
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
 	return (
 		<div>
-			<Grid container spacing={12}>
-				<Grid item xs={12} style={{ alignText: 'center' }}>
+			<Grid container spacing={12} style={{textAlign: 'center'}}>
 					<h2>
 						Spy Report On: <div style={{ color: 'yellow' }}>{name}</div>
 					</h2>
 					<br />
-				</Grid>
-				<Grid item xs={12} sm={6}>
+					<br />
+				
 					<h3>Population: </h3>
+					<br />
 					<subtitle1>{pop_est}</subtitle1>
-					<br />
-				</Grid>
-				<Grid item xs={12} sm={6}>
+					<br /><br />
+			
 					<h3>GDP (PPP): </h3>
+					<br />
 					<subtitle1>{gdp}</subtitle1>
-					<br />
-				</Grid>
-				<Grid item xs={12} sm={6}>
+					<br /><br />
+				
 					<h3>Continent</h3>
-					<subtitle1>{continent}</subtitle1>
 					<br />
-				</Grid>
-				<Grid item xs={12} sm={6}>
+					<subtitle1>{continent}</subtitle1>
+					<br /><br />
+				
+				
 					{continent !== 'South America' && (
 						<div>
 							<h3>Subregion: </h3>
 							<subtitle1>{subrg}</subtitle1>
-							<Typography variant="subtitle1">{subrg} </Typography>
 						</div>
 					)}
 					<br />
-				</Grid>
-				<Grid item xs={12}>
-					<h3>Allegiance: </h3>
-					<Typography variant="subtitle1">Ohio </Typography>
-					<br />
-				</Grid>
 			</Grid>
 		</div>
 	);
@@ -112,15 +105,15 @@ const Title = ({ handleCloseHelp, handleOpenHelp, openHelp, user, troops, interv
 				</Alert>
 			</Snackbar>
 
-			<h4 style={{ textAlign: 'center', padding: '1rem' }}>Welcome, Commander {user}!</h4>
+			<h1 style={{ textAlign: 'center', padding: '1rem' }}>Welcome, Commander {user}!</h1>
 			<br />
 
-			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>Stonks: {troops}</h6>
+			<h6 style={{ textAlign: 'center', fontSize: '1.5rem' }}>Stonks: {troops}</h6>
 
-			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
-				<span style={{ color: 'red' }}>{nextTroops} stonks arriving in</span>
+			<h6 style={{ textAlign: 'center', fontSize: '1rem' }}>
+				<span style={{ color: 'red'}}>{nextTroops} stonks arriving in</span>
 			</h6>
-			<h6 style={{ textAlign: 'center', fontSize: '2rem' }}>
+			<h6 style={{ textAlign: 'center', fontSize: '1rem' }}>
 				<span style={{ color: 'red' }}>{ETA(interval, startTime)}</span>
 			</h6>
 			<br />
