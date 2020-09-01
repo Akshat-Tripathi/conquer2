@@ -36,10 +36,10 @@ function Media() {
 						</h1>
 					</header>
 				</div>
-				<div className="r" style={{ textAlign: 'center' }}>
+				<div className="r">
 					<h3 style={{ color: '#fff', fontSize: '32px' }}>Latest Victors</h3>
 					<hr />
-					<table style={{ textAlign: 'center', paddingLeft: '2rem' }} cellSpacing="5">
+					<table cellSpacing="5">
 						<WinnerEntry
 							gameid="000fee"
 							first="Some Latin Name here"
@@ -61,7 +61,7 @@ function Media() {
 				</div>
 				<div className="mb">
 					<iframe
-						widtd="560"
+						width="560"
 						height="365"
 						src="https://www.youtube.com/embed/5YRbeA31W-M"
 						frameborder="0"
