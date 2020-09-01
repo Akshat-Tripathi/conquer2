@@ -38,6 +38,7 @@ func main() {
 
 	client, games := loadGames(colours, r, events)
 	publicGames := newGameSubset()
+	leaderBoard := newLeaderBoard()
 	rooms := make(map[string]*chat.Room)
 
 	go func() {
@@ -46,7 +47,10 @@ func main() {
 			switch event.Event {
 			case game.StoppedAccepting:
 				publicGames.remove(event.ID)
+			case game.PlayerLost:
+				leaderBoard.push(event.ID, event.Data.(string))
 			case game.Finished:
+				leaderBoard.flush(event.ID)
 				delete(games, event.ID)
 				delete(rooms, event.ID)
 			}

@@ -139,14 +139,14 @@ func (cp *CapitalProcessor) deployValid(src *PlayerState, dest *CountryState, pl
 }
 
 //Attack performs an attack then checks for any change of allegiance
-func (cp *CapitalProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int) {
+func (cp *CapitalProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int, playerLost string) {
 	oldPlayer := func() string {
 		destination := cp.countries[dest]
 		destination.Lock()
 		defer destination.Unlock()
 		return destination.Player
 	}()
-	valid, won, conquered, nSrc, nDest = cp.DefaultProcessor.Attack(src, dest, player, times)
+	valid, won, conquered, nSrc, nDest, _ = cp.DefaultProcessor.Attack(src, dest, player, times)
 	if conquered && cp.isCapital(dest) {
 		//change allegiances
 		cp.allegianceLock.Lock()
@@ -159,7 +159,7 @@ func (cp *CapitalProcessor) Attack(src, dest, player string, times int) (valid, 
 		// then the game should already be over as all capitals would have been taken
 		won = atomic.AddInt32(&cp.nIndependent, -1) == 1
 	}
-	return valid, won, conquered, nSrc, nDest
+	return valid, won, conquered, nSrc, nDest, ""
 }
 
 //RangeCapitals does what the name suggests

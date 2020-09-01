@@ -59,7 +59,7 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 					Type:   "won",
 					Player: playerName,
 				})
-				cg.end()
+				cg.end(playerName)
 			},
 		)
 		cg.cron.Start()

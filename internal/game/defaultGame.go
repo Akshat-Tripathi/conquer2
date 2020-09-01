@@ -193,9 +193,14 @@ func (d *DefaultGame) AddReservation(player, password string) bool {
 }
 
 //end is used to destroy all structs associated with the game
-func (d *DefaultGame) end() {
+func (d *DefaultGame) end(winner string) {
 	d.Close()
 	d.processor.Destroy()
+	d.context.EventListener <- Event{
+		ID:    d.context.ID,
+		Event: PlayerLost,
+		Data:  winner,
+	}
 	d.context.EventListener <- Event{
 		ID:    d.context.ID,
 		Event: Finished,
