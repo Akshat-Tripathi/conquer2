@@ -16,7 +16,6 @@ import (
 	"github.com/Akshat-Tripathi/conquer2/internal/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	cors "github.com/rs/cors/wrapper/gin"
 	"google.golang.org/api/option"
 )
 
@@ -33,7 +32,7 @@ func main() {
 
 	colours := loadColours()
 
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(config.Mode)
 	r := gin.Default()
 
 	events := make(chan game.Event)
@@ -79,6 +78,7 @@ func main() {
 	r.GET("/chat/001f91/ws", c.Handle)
 	r.GET("/game/001f91/ws", g.Run())
 
+	config.CORSConfig(r)
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
@@ -86,7 +86,6 @@ func main() {
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
 	r.Use(static.Serve("/forums", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/tutorial", static.LocalFile("./build", true)))
-	r.Use(cors.Default())
 
 	r.LoadHTMLGlob("./**/*.html")
 
