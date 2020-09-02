@@ -12,9 +12,11 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/Akshat-Tripathi/conquer2/internal/chat"
+	"github.com/Akshat-Tripathi/conquer2/internal/config"
 	"github.com/Akshat-Tripathi/conquer2/internal/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	cors "github.com/rs/cors/wrapper/gin"
 	"google.golang.org/api/option"
 )
 
@@ -84,6 +86,7 @@ func main() {
 	r.Use(static.Serve("/maps/", static.LocalFile("./maps", true)))
 	r.Use(static.Serve("/forums", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/tutorial", static.LocalFile("./build", true)))
+	r.Use(cors.Default())
 
 	r.LoadHTMLGlob("./**/*.html")
 
@@ -227,7 +230,7 @@ func main() {
 			c.SetCookie("type", "campaign", cookieMaxAge, "/game", "", false, false)
 		}
 
-		c.Redirect(http.StatusFound, "/game")
+		c.Redirect(http.StatusFound, config.GameLocation)
 	})
 
 	r.GET("/", func(c *gin.Context) {

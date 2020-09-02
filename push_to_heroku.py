@@ -1,11 +1,11 @@
 #This file should be used to push to heroku
 #The process is:
-#1. stop ignoring internal/game/conquer2.json
+#1. stop ignoring internal/game/conquer2.json and remove the sourcemap from yarn build
 #2. git add .
 #3. git commit -m "heroku release"
 #4. ignore internal/game/conquer2.json
 #5. remove all staged files
-#6. go to previous commit
+#6. go to previous commit and add the sourcemap back
 
 from os import system
 

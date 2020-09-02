@@ -5,14 +5,13 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/Akshat-Tripathi/conquer2/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 //Since every action from a websocket will only be used once it makes sense to
 //process actions immediately after they are received
-
-var upgrader = websocket.Upgrader{}
 
 type msgIn string
 
@@ -66,7 +65,7 @@ func NewRoom() *Room {
 
 //newMember connects a member to the room
 func (r *Room) newMember(w http.ResponseWriter, req *http.Request, name string) *member {
-	conn, err := upgrader.Upgrade(w, req, nil)
+	conn, err := config.Upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Println(err)
 		return nil
