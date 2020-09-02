@@ -143,7 +143,7 @@ const NewJoinGame = ({ setModeToZero }) => {
 		<Grid items xs={12}>
 			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.7/dist/css/uikit.min.css" />
 			<Paper className="gamebox-wrapper">
-				<form action={window.location.toString().replace(":3000/play", "/join")} method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "join")} method="POST">
 					<legend class="uk-legend">Join a game</legend>
 					<div class="uk-margin">
 						<label class="uk-form-label">Username</label>
@@ -199,7 +199,7 @@ const JoinGame = ({ setModeToZero }) => {
 		<Grid items xs={12}>
 			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
 			<Paper className="gamebox-wrapper">
-				<form action={window.location.toString().replace(":3000/play", "/join")} method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "join")} method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
 							<TextField type="text" id="ign" placeholder="Username" name="username" required />
@@ -237,7 +237,7 @@ const NewCreateGame = ({ setModeToZero }) => {
 		<Grid items xs={12}>
 			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.7/dist/css/uikit.min.css" />
 			<Paper className="gamebox-wrapper">
-				<form action={window.location.toString().replace(":3000/play", "/create")} method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "create")} method="POST">
 					<legend class="uk-legend">Create a game</legend>
 					<div class="uk-margin">
 						<label class="uk-form-label">Gamemode</label>
@@ -370,7 +370,7 @@ const CreateGame = ({ setModeToZero }) => {
 		<Grid items xs={12}>
 			<Paper className="gamebox-wrapper">
 				<DialogContentText>Creating a new game...</DialogContentText>
-				<form action={window.location.toString().replace(":3000/play", "/create")} method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "create")} method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
 							<Select
