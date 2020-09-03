@@ -49,5 +49,5 @@ func (l *lobby) rangeLobby(f func(string)) {
 func (l *lobby) length() int {
 	l.RLock()
 	defer l.RUnlock()
-	return len(l.readyPlayers) + len(l.reservedPlayers)
+	return len(l.readyPlayers)
 }
