@@ -247,7 +247,6 @@ function SideBar({ isUnrelated, base }) {
 			{!hidden ? (
 				<div className="main-game-sidebar">
 					{/* <Paper className={classes.sidebar}> */}
-					<Grid container style={{ alignText: 'center' }}>
 						<Title
 							handleCloseHelp={handleCloseHelp}
 							handleOpenHelp={handleOpenHelp}
@@ -258,7 +257,7 @@ function SideBar({ isUnrelated, base }) {
 							interval={GameContext.interval}
 							nextTroops={getUserTroops()}
 						/>
-						<div style={{ margin: '20px' }}>
+						<div style={{ marginTop: '50px', width: '100%' }}>
 							{/* Show Donation options when clicked on Donate Button */}
 							{fromCountry === '' && (
 								<DonateForm
@@ -278,7 +277,7 @@ function SideBar({ isUnrelated, base }) {
 
 							{/* Only show Attack and move/assist options when two countries clicked */}
 							{toCountry !== '' && (
-								<Grid item xs={12}>
+								
 									<Options
 										classes={classes}
 										toCountry={toCountry}
@@ -297,7 +296,7 @@ function SideBar({ isUnrelated, base }) {
 										user={GameContext.user}
 										reset={reset}
 									/>
-								</Grid>
+							
 							)}
 
 							{/* Deploy troops from base to country */}
@@ -318,7 +317,7 @@ function SideBar({ isUnrelated, base }) {
 							)}
 						</div>
 						{/* Only Show SpyDetails when not clicked anything */}
-						<Grid item xs={12}>
+						
 							{fromCountry === '' &&
 							name !== '' && (
 								<SpyDetails
@@ -329,8 +328,8 @@ function SideBar({ isUnrelated, base }) {
 									gdp={gdp}
 								/>
 							)}
-						</Grid>
-					</Grid>
+						
+					
 					{/* </Paper> */}
 				</div>
 			) : null}
