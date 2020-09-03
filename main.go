@@ -12,6 +12,7 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/Akshat-Tripathi/conquer2/internal/chat"
+	"github.com/Akshat-Tripathi/conquer2/internal/config"
 	"github.com/Akshat-Tripathi/conquer2/internal/game"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -31,7 +32,7 @@ func main() {
 
 	colours := loadColours()
 
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(config.Mode)
 	r := gin.Default()
 
 	events := make(chan game.Event)
@@ -77,6 +78,7 @@ func main() {
 	r.GET("/chat/001f91/ws", c.Handle)
 	r.GET("/game/001f91/ws", g.Run())
 
+	config.CORSConfig(r)
 	r.Use(static.Serve("/", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game", static.LocalFile("./build", true)))
 	r.Use(static.Serve("/game_intro", static.LocalFile("./build", true)))
@@ -227,7 +229,7 @@ func main() {
 			c.SetCookie("type", "campaign", cookieMaxAge, "/game", "", false, false)
 		}
 
-		c.Redirect(http.StatusFound, "/game")
+		c.Redirect(http.StatusFound, config.GameLocation)
 	})
 
 	r.GET("/", func(c *gin.Context) {

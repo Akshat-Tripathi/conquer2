@@ -1,8 +1,7 @@
 var loaddetails;
 let connect = (path) => {
 	const id = document.cookie.split('; ').map((s) => s.split('=')).filter((arr) => arr[0] === 'id')[0][1];
-    const socketURL = window.location.href.replace('http', 'ws').replace("game", path) + '/' + id + '/ws';
-    //const socketURL = "ws://localhost/" + path + "/" + id + "/ws";
+    const socketURL = window.location.href.replace('http', 'ws').replace("game", path).replace(":3000", "") + '/' + id + '/ws';
 
 	var socket = new WebSocket(socketURL);
 	console.log('Attempting connection to: ' + socketURL);

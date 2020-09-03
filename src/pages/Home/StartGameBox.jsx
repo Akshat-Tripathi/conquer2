@@ -142,7 +142,7 @@ const JoinGame = ({ setModeToZero, setusername }) => {
 		<Grid items xs={12}>
 			<DialogContentText style={{ color: 'white' }}>Join a world war and save the day.</DialogContentText>
 			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
-				<form action="/join" method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "join")} method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
 							<TextField
@@ -185,7 +185,7 @@ const CreateGame = ({ setModeToZero, setusername }) => {
 		<Grid items xs={12}>
 			<Paper className="gamebox-wrapper" styles={{ height: '50px', backgroundColor: 'black' }}>
 				<DialogContentText>Creating a new game...</DialogContentText>
-				<form action="/create" method="POST">
+				<form action={window.location.toString().replace(":3000", "").replace("play", "create")} method="POST">
 					<Grid container spacing={3}>
 						<Grid item xs={12}>
 							<Select

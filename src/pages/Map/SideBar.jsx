@@ -76,8 +76,13 @@ function SideBar({ isUnrelated, base }) {
 
 	//TODO: Generalize for Different Game Maps
 	function loadMap() {
-		fetch('/maps/world.txt')
-			.then((raw) => raw.text())
+		fetch(window.location.toString().replace(":3000", ":80").replace("game", "maps/world.txt"), {
+            mode: "cors",
+        })
+            .then((raw) => {
+                console.log(raw);
+                return raw.text();
+            })
 			.then((raw) => {
 				let sep = raw.includes('\r') ? '\r\n' : '\n';
 				return raw.split(sep);

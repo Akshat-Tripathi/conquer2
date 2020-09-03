@@ -6,16 +6,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Akshat-Tripathi/conquer2/internal/config"
 	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	"github.com/gorilla/websocket"
 )
 
 //Since every action from a websocket will only be used once it makes sense to
 //process actions immediately after they are received
-
-var (
-	upgrader = websocket.Upgrader{}
-)
 
 type socket struct {
 	responses chan common.UpdateMessage
@@ -62,7 +59,7 @@ func NewSockets() *Sockets {
 
 //NewPlayer connects a player to a websocket
 func (s *Sockets) NewPlayer(w http.ResponseWriter, r *http.Request, name string) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := config.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
