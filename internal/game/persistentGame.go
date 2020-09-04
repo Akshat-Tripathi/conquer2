@@ -25,12 +25,16 @@ func newPersistentGame(ctx Context) *persistentGame {
 	pg := &persistentGame{}
 
 	pg.timer = time.NewTimer(herokuTimeOut)
-	pg.persistence = &persistence{
-		docs: ctx.Client.Collection(ctx.ID),
-	}
 
 	//This indicates that the context has already been loaded
 	ctxAlreadyInit := ctx.MaxPlayers > 0
+
+	if ctx.Client != nil {
+		ctxAlreadyInit = true
+		pg.persistence = &persistence{
+			docs: ctx.Client.Collection(ctx.ID),
+		}
+	}
 
 	if !ctxAlreadyInit {
 		pg.loadContext(&ctx)

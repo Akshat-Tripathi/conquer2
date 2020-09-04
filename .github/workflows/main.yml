@@ -13,7 +13,12 @@ jobs:
        - name: Check out source code
          uses: actions/checkout@v1
        
+       - name: Cleanup
+         env:
+           GOPROXY: "https://proxy.golang.org"
+         run: go clean -testcache
+
        - name: Test
          env:
            GOPROXY: "https://proxy.golang.org"
-         run: go test -v .
+         run: go test -v . ./internal/...

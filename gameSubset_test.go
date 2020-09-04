@@ -20,10 +20,12 @@ func init() {
 	auth := option.WithCredentialsFile("./internal/game/conquer2.json")
 	app, err := firebase.NewApp(context.Background(), nil, auth)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if client, err = app.Firestore(context.Background()); err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 }
 
