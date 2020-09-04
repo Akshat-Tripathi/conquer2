@@ -58,7 +58,7 @@ func newPlayer(onMessage func(msg common.UpdateMessage, i ...int), i int) *webso
 		for {
 			err := conn.ReadJSON(&msg)
 			if err != nil {
-				//log.Println(err)
+				log.Println(err)
 				conn.Close()
 				return
 			}
@@ -72,14 +72,18 @@ func TestWebsocketSendToPlayer(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	conn := newPlayer(func(msg common.UpdateMessage, _ ...int) {
+		wg.Done()
 		assert.Equal(t, 2, msg.Troops)
 		assert.Equal(t, "1", msg.Player)
-		wg.Done()
 	}, 0)
 	defer conn.Close()
-	conn.WriteJSON(common.Action{
-		Troops: 1,
+	err := conn.WriteJSON(common.Action{
+		ActionType: "0",
+		Troops:     1,
 	})
+	if err != nil {
+		log.Fatalln(err)
+	}
 	wg.Wait()
 }
 
@@ -103,9 +107,7 @@ func TestWebsocketSendToAll(t *testing.T) {
 		})
 		defer conns[i].Close()
 	}
-	log.Println("All sent")
 	wg.Wait()
-	log.Println("done")
 }
 
 //This is commented out because I don't think that message order should matter for most messages

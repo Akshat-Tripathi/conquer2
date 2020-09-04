@@ -2,6 +2,7 @@ package chat_test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -19,6 +20,7 @@ type msgOut struct {
 }
 
 func init() {
+	log.SetOutput(ioutil.Discard)
 	gin.SetMode(gin.ReleaseMode)
 	go func() {
 		r := chat.NewRoom()
@@ -74,7 +76,7 @@ func TestSendMessage(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	m.WriteJSON("hello")
+	m.WriteMessage(websocket.TextMessage, []byte("hello"))
 	wg.Wait()
 }
 
@@ -98,6 +100,6 @@ func TestMessagesSentToAll(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	m.WriteJSON("hello")
+	m.WriteMessage(websocket.TextMessage, []byte("hello"))
 	wg.Wait()
 }
