@@ -5,14 +5,14 @@ import "sync"
 type lobby struct {
 	sync.RWMutex
 	reservedPlayers map[string]string
-	readyPlayers    map[string]bool
+	readyPlayers    map[string]struct{}
 	full            bool
 }
 
 func newLobby() *lobby {
 	return &lobby{
 		reservedPlayers: make(map[string]string),
-		readyPlayers:    make(map[string]bool),
+		readyPlayers:    make(map[string]struct{}),
 	}
 }
 
@@ -35,7 +35,7 @@ func (l *lobby) add(player string) {
 	if _, ok := l.reservedPlayers[player]; ok {
 		delete(l.reservedPlayers, player)
 	}
-	l.readyPlayers[player] = true
+	l.readyPlayers[player] = struct{}{}
 }
 
 func (l *lobby) rangeLobby(f func(string)) {
