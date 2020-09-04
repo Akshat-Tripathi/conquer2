@@ -2,6 +2,7 @@ package game
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"strings"
 )
@@ -24,7 +25,7 @@ func loadSituations() {
 	for _, v := range mapTypes {
 		file, err := os.Open("./maps/" + v + ".txt")
 		if err != nil {
-			panic(err)
+			log.Println(err)
 		}
 
 		scanner := bufio.NewScanner(file)
