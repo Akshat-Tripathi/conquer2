@@ -71,7 +71,7 @@ const ResponsiveWaitingRoom = ({
       </div>
 
       {/* Hourglass */}
-      <div className="spinny-thingy absolute top-0 right-0">
+      <div className="p-8 absolute top-0 right-0">
         <div className="lds-hourglass" />
       </div>
 
@@ -79,7 +79,9 @@ const ResponsiveWaitingRoom = ({
       <div className="">
         <div className="absolute bottom-0 left-0 bg-black opacity-90 w-64 h-96 text-center rounded-tr-3xl">
           <div className="players-list-title">
-            <h3 className="text-white text-2xl font-bold">Joined Players </h3>
+            <h3 className="text-white text-2xl font-bold p-2">
+              Joined Players{" "}
+            </h3>
           </div>
 
           <div className="text-center text-white p-2">

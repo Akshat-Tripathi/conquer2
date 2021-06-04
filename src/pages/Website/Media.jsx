@@ -11,7 +11,7 @@ function Media() {
 	return (
 		<div className="media">
 			<div className="media-title">
-				<h1 style={{ color: '#fff' }}> Conquer 2.0 Propaganda Hub</h1>
+				<h1 className="text-yellow-400 font-bold text-4xl"> Conquer 2.0 Propaganda Hub</h1>
 			</div>
 			<div className="media-grid">
 				<div className="tl">
