@@ -38,36 +38,50 @@ const ResponsiveWaitingRoom = ({
   var ImReady = playerReady[user];
 
   return (
-    <div>
+    <div className="">
+      {/* Backdrop */}
       <div className="backdrop" />
-      <div className="lobby-grid">
-        <div className="wr-title">
-          <h1 className="text-yellow-400 text-5xl font-bold p-4">Lobby</h1>
-          <p className="text-white">
-            {"Game ID: " +
-              document.cookie
-                .split("; ")
-                .map((s) => s.split("="))
-                .filter((arr) => arr[0] == "id")[0][1]}
-          </p>
-          <div className="m-4">
-            <div className="bg-black bg-center opacity-75 text-center p-4 rounded-xl grid gap-2 grid-cols-3">
-              <div className="">
-                <GiInfo className="text-7xl" />
-              </div>
-              <div className="text-left text-sm col-span-2">
-                <AssistancesSlider />
-              </div>
+
+      {/* Title */}
+      <div className="text-center align-middle grid grid-cols-1">
+        <h1 className="text-yellow-400 text-5xl font-bold p-4">
+          Waiting for all players...
+        </h1>
+
+        {/* Game ID */}
+        <p className="text-white">
+          {"Game ID: " +
+            document.cookie
+              .split("; ")
+              .map((s) => s.split("="))
+              .filter((arr) => arr[0] == "id")[0][1]}
+        </p>
+
+        {/* Tips box */}
+        <div className="m-4 w-96 h-64 text-yellow-400 mx-auto">
+          <div className="bg-black bg-center opacity-75 text-center p-4 rounded-xl grid gap-2 grid-cols-3">
+            <div className="">
+              <GiInfo className="text-7xl" />
+            </div>
+            <div className="text-left text-sm col-span-2">
+              <AssistancesSlider />
             </div>
           </div>
         </div>
-        <div className="spinny-thingy">
-          <div className="lds-hourglass" />
-        </div>
-        <div className="players-list">
+      </div>
+
+      {/* Hourglass */}
+      <div className="spinny-thingy absolute top-0 right-0">
+        <div className="lds-hourglass" />
+      </div>
+
+      {/* Players box */}
+      <div className="">
+        <div className="absolute bottom-0 left-0 bg-black opacity-90 w-64 h-96 text-center rounded-tr-3xl">
           <div className="players-list-title">
             <h3 className="text-white text-2xl font-bold">Joined Players </h3>
           </div>
+
           <div className="text-center text-white p-2">
             {Object.keys(playerColours).map(function (player) {
               var isReady = playerReady[player];
@@ -89,13 +103,16 @@ const ResponsiveWaitingRoom = ({
             })}
           </div>
         </div>
+      </div>
 
-        <div className="chat">
-          <ChatPopup />
-        </div>
-        <div className="ready-up-button">
-          <ReadyUp ImReady={ImReady} socket={socket} user={user} />
-        </div>
+      {/* Chat Popup */}
+      <div className="chat">
+        <ChatPopup />
+      </div>
+
+      {/* Ready Up Box */}
+      <div className="">
+        <ReadyUp ImReady={ImReady} socket={socket} user={user} />
       </div>
     </div>
   );
@@ -103,47 +120,49 @@ const ResponsiveWaitingRoom = ({
 
 const ReadyUp = ({ ImReady, socket, user }) => {
   return (
-    <div>
-      {!ImReady ? (
-        <div className="text-center">
-          <IconButton
-            aria-label="ready-up"
-            style={{ color: "red" }}
-            size="medium"
-            onClick={() => handleVote({ socket, user })}
-            className="outline-none focus:outline-none animate-bounce"
-          >
-            <h6
-              className="text-center text-2xl capitalize font-bold"
+    <div className="">
+      <div className="absolute bottom-0 right-0 h-64 w-64 bg-black opacity-90 text-center p-8 rounded-tl-3xl">
+        {!ImReady ? (
+          <div className="text-center">
+            <IconButton
+              aria-label="ready-up"
               style={{ color: "red" }}
+              size="medium"
+              onClick={() => handleVote({ socket, user })}
+              className="outline-none focus:outline-none animate-bounce"
             >
-              READY UP
-            </h6>
-            <DoubleArrowIcon
-              style={{
-                fontSize: "50",
-              }}
-            />
-          </IconButton>
-        </div>
-      ) : (
-        <div className="readyup-icons">
-          <IconButton
-            aria-label="ready-up"
-            style={{ color: "green" }}
-            size="medium"
-          >
-            <GiThumbUp
-              style={{
-                fontSize: "50",
-              }}
-            />
-          </IconButton>
-          <Typography variant="h6" style={{ color: "green" }}>
-            READY
-          </Typography>
-        </div>
-      )}
+              <h6
+                className="text-center text-2xl capitalize font-bold"
+                style={{ color: "red" }}
+              >
+                READY UP
+              </h6>
+              <DoubleArrowIcon
+                style={{
+                  fontSize: "50",
+                }}
+              />
+            </IconButton>
+          </div>
+        ) : (
+          <div className="readyup-icons">
+            <IconButton
+              aria-label="ready-up"
+              style={{ color: "green" }}
+              size="medium"
+            >
+              <GiThumbUp
+                style={{
+                  fontSize: "50",
+                }}
+              />
+            </IconButton>
+            <Typography variant="h6" style={{ color: "green" }}>
+              READY
+            </Typography>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -175,7 +194,9 @@ const AssistancesSlider = () => {
 
   return (
     <div key={key}>
-      <a.div style={scrolling}>{Assistances[key]}</a.div>
+      <a.div style={scrolling} className="text-lg">
+        {Assistances[key]}
+      </a.div>
     </div>
   );
 };
