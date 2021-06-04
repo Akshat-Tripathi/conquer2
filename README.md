@@ -1,11 +1,7 @@
-# conquer2
+# Conquer 2.0
 
-The thrilling sequel to Conquer, it'll blast you away!
-# conquer2
-# Conquer2
-
-The thrilling sequel to Conquer, it'll blast you away!
 The thrilling sequel to [Conquer](https://github.com/Akshat-Tripathi/Conquer), it'll blast you away!
+## Created by Shashwat Kansal && Akshat Tripathi
 
 ---
 ## Motivation
