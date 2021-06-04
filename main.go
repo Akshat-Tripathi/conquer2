@@ -25,8 +25,7 @@ const (
 
 func main() {
 	port := os.Getenv("PORT")
-
-	if port == "" {
+	if port == "5000" {
 		port = "80"
 	}
 
@@ -173,8 +172,8 @@ func main() {
 		r.GET("/game/"+id+"/ws", g.Run())
 		r.GET("/chat/"+id+"/ws", room.Handle)
 
-		//Sets a cookie for the current game id
-		//Avoids the issue of opening loads of connections
+		// Sets a cookie for the current game id
+		// Avoids the issue of opening loads of connections
 		c.SetCookie("id", id, cookieMaxAge, "/game", "", false, false)
 		c.SetCookie("username", username, cookieMaxAge, "/", "", false, false)
 		c.SetCookie("password", password, cookieMaxAge, "/", "", false, true)
@@ -257,7 +256,6 @@ func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*fire
 		log.Fatalln(err)
 	}
 	client, err := app.Firestore(context.Background())
-
 	if err != nil {
 		log.Println("Error retrieving saved games")
 		return client, make(map[string]game.Game)

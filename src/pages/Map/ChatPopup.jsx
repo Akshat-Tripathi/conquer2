@@ -43,8 +43,8 @@ class ChatPopup extends React.Component {
 		this.handleNewUserMessage.bind(this);
 	}
 
-	componentDidMount() {
-		addResponseMessage("Welcome to the Conquer2 Game Chat ", GameContext.user );
+	componentWillUnmount() {
+		addResponseMessage("Welcome to the Conquer2 Game Chat", GameContext.user );
 	}
 
 	componentDidUpdate() {
