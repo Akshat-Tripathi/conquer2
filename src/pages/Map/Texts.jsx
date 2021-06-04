@@ -7,11 +7,11 @@ import SidebarGeneral from "./Components/Sidebar";
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
   return (
     <div className="">
-      <h2 className="text-4xl">
+      <h2 className="text-xl p-2">
         Spy Report On: <span className="text-yellow-300">{name}</span>
       </h2>
 
-      <div className="grid grid-cols-2">
+      <div className="">
         <div>
           <SpyDetailsItem item="Population:" data={pop_est} />
         </div>
@@ -27,25 +27,16 @@ const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
           )}
         </div>
       </div>
-
-      {/* <table cellPadding="5" cellSpacing="10" className="text-center">
-        <SpyDetailsItem item="Population:" data={pop_est} />
-        <SpyDetailsItem item="GDP (PPP):" data={gdp} />
-        <SpyDetailsItem item="Continent:" data={continent} />
-        {continent !== "South America" && (
-          <SpyDetailsItem item="Subregion:" data={subrg} />
-        )}
-      </table> */}
     </div>
   );
 };
 
 const SpyDetailsItem = ({ item, data }) => {
   return (
-    <tr>
-      <th className="p-1">{item}</th>
-      <td className="p-1">{data}</td>
-    </tr>
+    <div className="text-white text-sm">
+      <span className="text-white">{item}</span> &ensp;{" "}
+      <span className="text-white">{data}</span>
+    </div>
   );
 };
 
@@ -106,19 +97,6 @@ const Title = ({
 }) => {
   return (
     <div>
-      <IconButton
-        aria-label="help"
-        color="primary"
-        size="small"
-        onClick={handleOpenHelp}
-      >
-        <HelpIcon
-          style={{
-            fontSize: "20",
-          }}
-        />
-      </IconButton>
-
       <Snackbar
         open={openHelp}
         autoHideDuration={5000}
@@ -146,7 +124,7 @@ const Title = ({
   );
 };
 
-const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
+const PlayerBox = ({ playerColours, hidden, allegiances }) => {
   return !hidden ? (
     <div>
       {/* <Paper className={classes.players}> */}

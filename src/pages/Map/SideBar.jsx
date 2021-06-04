@@ -8,6 +8,8 @@ import useStyles from "./SideBarStyles";
 import { GameContext, getUserTroops, getOwner, parseCookie } from "./Map";
 import SidebarGeneral from "./Components/Sidebar";
 import ChatPopup from "./ChatPopup";
+import HelpIcon from "@material-ui/icons/Help";
+import { Snackbar, IconButton } from "@material-ui/core";
 import "./SideBar.css";
 
 //PRE: A hex colour of the format #______ and a percentage p (0 < p < 1)
@@ -268,88 +270,103 @@ function SideBar({ isUnrelated, base }) {
       )}
       <ChatPopup />
       {!hidden ? (
-        <div className="main-game-sidebar">
+        <div className="absolute inset-y-0 right-0 w-1/4 h-screen bg-black opacity-90 rounded-l-xl">
           {/* <Paper className={classes.sidebar}> */}
-          <Title
-            handleCloseHelp={handleCloseHelp}
-            handleOpenHelp={handleOpenHelp}
-            openHelp={openHelp}
-            user={GameContext.user}
-            troops={GameContext.troops}
-            startTime={base}
-            interval={GameContext.interval}
-            nextTroops={getUserTroops()}
-          />
-          <div style={{ marginTop: "50px", width: "100%" }}>
-            {/* Show Donation options when clicked on Donate Button */}
-            {fromCountry === "" && (
-              <DonateForm
-                classes={classes}
-                handleDonate={handleDonate}
-                handletargetPlayer={handletargetPlayer}
-                handleNumTroops={handleNumTroops}
-                showDonate={showDonate}
-                numTroops={numTroops}
-                targetPlayer={targetPlayer}
-                socket={GameContext.gameSocket}
-                user={GameContext.user}
-                players={GameContext.players}
-                reset={reset}
-              />
-            )}
-
-            {/* Only show Attack and move/assist options when two countries clicked */}
-            {toCountry !== "" && (
-              <Options
-                classes={classes}
-                toCountry={toCountry}
-                fromCountry={fromCountry}
-                toCountryOwner={toCountryOwner}
-                allowMove={allowMove}
-                numTroops={numTroops}
-                handleNumTroops={handleNumTroops}
-                handleMove={handleMove}
-                handleAssist={handleAssist}
-                showMove={showMove}
-                showAssist={showAssist}
-                fromCountryISO={fromCountryISO}
-                toCountryISO={toCountryISO}
-                socket={GameContext.gameSocket}
-                user={GameContext.user}
-                reset={reset}
-              />
-            )}
-
-            {/* Deploy troops from base to country */}
-            {allowDeploy && (
-              <OptionsDeploy
-                classes={classes}
-                numTroops={numTroops}
-                handleNumTroops={handleNumTroops}
-                fromCountry={fromCountry}
-                handleDeploy={handleDeploy}
-                showDeploy={showDeploy}
-                fromCountryISO={fromCountryISO}
-                socket={GameContext.gameSocket}
-                user={GameContext.user}
-                troops={GameContext.troops}
-                reset={reset}
-              />
-            )}
-          </div>
-          {/* Only Show SpyDetails when not clicked anything */}
-
-          {fromCountry === "" && name !== "" && (
-            <SpyDetails
-              name={name}
-              subrg={subrg}
-              continent={continent}
-              pop_est={pop_est}
-              gdp={gdp}
+          <IconButton
+            aria-label="help"
+            color="primary"
+            size="small"
+            onClick={handleOpenHelp}
+            className="outline-none focus:outline-none"
+          >
+            <HelpIcon
+              style={{
+                fontSize: "20",
+              }}
             />
-          )}
+          </IconButton>
+          <div className="text-center">
+            <Title
+              handleCloseHelp={handleCloseHelp}
+              handleOpenHelp={handleOpenHelp}
+              openHelp={openHelp}
+              user={GameContext.user}
+              troops={GameContext.troops}
+              startTime={base}
+              interval={GameContext.interval}
+              nextTroops={getUserTroops()}
+            />
+            <div style={{ marginTop: "50px", width: "100%" }}>
+              {/* Show Donation options when clicked on Donate Button */}
+              {fromCountry === "" && (
+                <DonateForm
+                  classes={classes}
+                  handleDonate={handleDonate}
+                  handletargetPlayer={handletargetPlayer}
+                  handleNumTroops={handleNumTroops}
+                  showDonate={showDonate}
+                  numTroops={numTroops}
+                  targetPlayer={targetPlayer}
+                  socket={GameContext.gameSocket}
+                  user={GameContext.user}
+                  players={GameContext.players}
+                  reset={reset}
+                />
+              )}
 
-          {/* </Paper> */}
+              {/* Only show Attack and move/assist options when two countries clicked */}
+              {toCountry !== "" && (
+                <Options
+                  classes={classes}
+                  toCountry={toCountry}
+                  fromCountry={fromCountry}
+                  toCountryOwner={toCountryOwner}
+                  allowMove={allowMove}
+                  numTroops={numTroops}
+                  handleNumTroops={handleNumTroops}
+                  handleMove={handleMove}
+                  handleAssist={handleAssist}
+                  showMove={showMove}
+                  showAssist={showAssist}
+                  fromCountryISO={fromCountryISO}
+                  toCountryISO={toCountryISO}
+                  socket={GameContext.gameSocket}
+                  user={GameContext.user}
+                  reset={reset}
+                />
+              )}
+
+              {/* Deploy troops from base to country */}
+              {allowDeploy && (
+                <OptionsDeploy
+                  classes={classes}
+                  numTroops={numTroops}
+                  handleNumTroops={handleNumTroops}
+                  fromCountry={fromCountry}
+                  handleDeploy={handleDeploy}
+                  showDeploy={showDeploy}
+                  fromCountryISO={fromCountryISO}
+                  socket={GameContext.gameSocket}
+                  user={GameContext.user}
+                  troops={GameContext.troops}
+                  reset={reset}
+                />
+              )}
+            </div>
+            {/* Only Show SpyDetails when not clicked anything */}
+
+            {fromCountry === "" && name !== "" && (
+              <SpyDetails
+                name={name}
+                subrg={subrg}
+                continent={continent}
+                pop_est={pop_est}
+                gdp={gdp}
+              />
+            )}
+
+            {/* </Paper> */}
+          </div>
         </div>
       ) : null}
       <div style={{ backgroundPosition: "cover" }}>
