@@ -169,7 +169,9 @@ const DonateForm = ({
                         type="number"
                         onKeyPress={(e) => {
                             if (e.key === "f" || e.key === "F") {
-                                fillTroops();
+                                fillTroops(1);
+                            } else if (e.key === "h" || e.key === "H") {
+                                fillTroops(0.5);
                             }
                         }}
                         min="0"
@@ -250,7 +252,9 @@ const AssistForm = ({
                     type="number"
                     onKeyPress={(e) => {
                         if (e.key === "f" || e.key === "F") {
-                            fillTroops();
+                            fillTroops(1);
+                        } else if (e.key === "h" || e.key === "H") {
+                            fillTroops(0.5);
                         }
                     }}
                     min="0"
@@ -329,7 +333,9 @@ const MoveForm = ({
                     type="number"
                     onKeyPress={(e) => {
                         if (e.key === "f" || e.key === "F") {
-                            fillTroops();
+                            fillTroops(1);
+                        } else if (e.key === "h" || e.key === "H") {
+                            fillTroops(0.5);
                         }
                     }}
                     min="0"
@@ -429,7 +435,9 @@ const DeployForm = ({
                             type="number"
                             onKeyPress={(e) => {
                                 if (e.key === "f" || e.key === "F") {
-                                    fillTroops();
+                                    fillTroops(1);
+                                } else if (e.key === "h" || e.key === "H") {
+                                    fillTroops(0.5);
                                 }
                             }}
                             min="0"

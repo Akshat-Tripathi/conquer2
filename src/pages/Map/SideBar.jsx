@@ -190,14 +190,14 @@ function SideBar({ isUnrelated, base }) {
     }
   };
 
-  const donateAll = () => {
+  const fillFromBase = (p) => {
     let troops = GameContext.troops;
-    setnumTroops(troops);
+    setnumTroops(Math.round(troops * p));
   }
 
-  const moveAll = (fromCountryISO) => {
+  const fillFromCountry = (p, fromCountryISO) => {
     let troops = GameContext.countryStates[fromCountryISO].Troops - 1;
-    setnumTroops(troops);
+    setnumTroops(Math.round(troops * p));
   }
 
   const handleAssist = () => {
@@ -317,7 +317,7 @@ function SideBar({ isUnrelated, base }) {
                   handleDonate={handleDonate}
                   handletargetPlayer={handletargetPlayer}
                   handleNumTroops={handleNumTroops}
-                  fillTroops={donateAll}
+                  fillTroops={fillFromBase}
                   showDonate={showDonate}
                   numTroops={numTroops}
                   targetPlayer={targetPlayer}
@@ -340,7 +340,7 @@ function SideBar({ isUnrelated, base }) {
                   handleNumTroops={handleNumTroops}
                   handleMove={handleMove}
                   handleAssist={handleAssist}
-                  fillTroops={() => moveAll(fromCountryISO)}
+                  fillTroops={(p) => fillFromCountry(p, fromCountryISO)}
                   showMove={showMove}
                   showAssist={showAssist}
                   fromCountryISO={fromCountryISO}
@@ -357,7 +357,7 @@ function SideBar({ isUnrelated, base }) {
                   classes={classes}
                   numTroops={numTroops}
                   handleNumTroops={handleNumTroops}
-                  fillTroops={donateAll}
+                  fillTroops={fillFromBase}
                   fromCountry={fromCountry}
                   handleDeploy={handleDeploy}
                   showDeploy={showDeploy}
