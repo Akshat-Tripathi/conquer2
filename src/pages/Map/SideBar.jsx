@@ -190,6 +190,16 @@ function SideBar({ isUnrelated, base }) {
     }
   };
 
+  const donateAll = () => {
+    let troops = GameContext.troops;
+    setnumTroops(troops);
+  }
+
+  const moveAll = (fromCountryISO) => {
+    let troops = GameContext.countryStates[fromCountryISO].Troops - 1;
+    setnumTroops(troops);
+  }
+
   const handleAssist = () => {
     setshowAssist(!showAssist);
     if (!showAssist) {
@@ -220,6 +230,7 @@ function SideBar({ isUnrelated, base }) {
 
   //FIXME: Use useState hook here to avoid lag ?
   const handleNumTroops = (event) => {
+    console.log(event.target.value);
     setnumTroops(event.target.value);
   };
 
@@ -306,6 +317,7 @@ function SideBar({ isUnrelated, base }) {
                   handleDonate={handleDonate}
                   handletargetPlayer={handletargetPlayer}
                   handleNumTroops={handleNumTroops}
+                  fillTroops={donateAll}
                   showDonate={showDonate}
                   numTroops={numTroops}
                   targetPlayer={targetPlayer}
@@ -328,6 +340,7 @@ function SideBar({ isUnrelated, base }) {
                   handleNumTroops={handleNumTroops}
                   handleMove={handleMove}
                   handleAssist={handleAssist}
+                  fillTroops={() => moveAll(fromCountryISO)}
                   showMove={showMove}
                   showAssist={showAssist}
                   fromCountryISO={fromCountryISO}
@@ -344,6 +357,7 @@ function SideBar({ isUnrelated, base }) {
                   classes={classes}
                   numTroops={numTroops}
                   handleNumTroops={handleNumTroops}
+                  fillTroops={donateAll}
                   fromCountry={fromCountry}
                   handleDeploy={handleDeploy}
                   showDeploy={showDeploy}

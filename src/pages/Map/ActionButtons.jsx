@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import {
     Typography,
@@ -27,6 +26,7 @@ const Options = ({
     showAssist,
     handleMove,
     handleAssist,
+    fillTroops,
     socket,
     user,
     reset,
@@ -76,6 +76,7 @@ const Options = ({
                         <AssistForm
                             showAssist={showAssist}
                             handleNumTroops={handleNumTroops}
+                            fillTroops={fillTroops}
                             numTroops={numTroops}
                             classes={classes}
                             handleAssist={handleAssist}
@@ -91,6 +92,7 @@ const Options = ({
                         <MoveForm
                             showMove={showMove}
                             handleNumTroops={handleNumTroops}
+                            fillTroops={fillTroops}
                             numTroops={numTroops}
                             classes={classes}
                             handleMove={handleMove}
@@ -112,6 +114,7 @@ const DonateForm = ({
     classes,
     handleNumTroops,
     handletargetPlayer,
+    fillTroops,
     targetPlayer,
     showDonate,
     numTroops,
@@ -164,6 +167,11 @@ const DonateForm = ({
                     <Input
                         autoFocus
                         type="number"
+                        onKeyPress={(e) => {
+                            if (e.key === "f" || e.key === "F") {
+                                fillTroops();
+                            }
+                        }}
                         min="0"
                         name="donateNumTroops"
                         required
@@ -215,6 +223,7 @@ const AssistForm = ({
     numTroops,
     classes,
     handleNumTroops,
+    fillTroops,
     showAssist,
     handleAssist,
     fromCountryISO,
@@ -239,6 +248,11 @@ const AssistForm = ({
                 <Input
                     autoFocus
                     type="number"
+                    onKeyPress={(e) => {
+                        if (e.key === "f" || e.key === "F") {
+                            fillTroops();
+                        }
+                    }}
                     min="0"
                     name="donateNumTroops"
                     required
@@ -288,6 +302,7 @@ const MoveForm = ({
     numTroops,
     classes,
     handleNumTroops,
+    fillTroops,
     showMove,
     handleMove,
     fromCountryISO,
@@ -312,6 +327,11 @@ const MoveForm = ({
                 <Input
                     autoFocus
                     type="number"
+                    onKeyPress={(e) => {
+                        if (e.key === "f" || e.key === "F") {
+                            fillTroops();
+                        }
+                    }}
                     min="0"
                     name="donateNumTroops"
                     required
@@ -360,10 +380,11 @@ const MoveForm = ({
     );
 };
 
-const OptionsDeploy = ({
+const DeployForm = ({
     classes,
     numTroops,
     handleNumTroops,
+    fillTroops,
     fromCountry,
     handleDeploy,
     showDeploy,
@@ -406,6 +427,11 @@ const OptionsDeploy = ({
                         <Input
                             autoFocus
                             type="number"
+                            onKeyPress={(e) => {
+                                if (e.key === "f" || e.key === "F") {
+                                    fillTroops();
+                                }
+                            }}
                             min="0"
                             name="donateNumTroops"
                             required
@@ -529,4 +555,4 @@ let deploy = takeAction((numTroops, fromCountryISO, user, socket) => {
     );
 })
 
-export { Options, OptionsDeploy, DonateForm, action, repeatAction };
+export { Options, DeployForm as OptionsDeploy, DonateForm, action, repeatAction };
