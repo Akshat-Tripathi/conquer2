@@ -169,7 +169,7 @@ const DonateForm = ({
                         required
                         variant="outlined"
                         label="Number of Troops to Donate"
-                        value={numTroops > 0 ? numTroops - 1 : null}
+                        value={numTroops > 0 ? numTroops : null}
                         onChange={handleNumTroops}
                         style={{
                             color: "red",
