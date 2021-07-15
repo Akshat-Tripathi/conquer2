@@ -16,7 +16,7 @@ type Game interface {
 	end(winner string)
 }
 
-//Context stores the fields neccessary to initialise a game
+//Context stores the fields necessary to initialise a game
 type Context struct {
 	ID                string
 	MaxPlayers        int //IMPORTANT: is this necessary now that the lobby exists?

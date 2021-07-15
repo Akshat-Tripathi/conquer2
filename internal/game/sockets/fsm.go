@@ -27,8 +27,8 @@ func NewFSM(states ...State) *FSM {
 //AddTransitions adds transitions to a FSM
 //Transitions must be (no. states - 1)
 //A transition occurs once a state has ended
-func (fsm *FSM) AddTransitions(tranistions ...func()) {
-	for _, transition := range tranistions {
+func (fsm *FSM) AddTransitions(transitions ...func()) {
+	for _, transition := range transitions {
 		fsm.transitions <- transition
 	}
 }
