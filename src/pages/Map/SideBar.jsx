@@ -33,7 +33,7 @@ function SideBar({ isUnrelated, base }) {
     })
   );
 
-  useHotkeys("r", () => repeatAction(GameContext.gameSocket));
+  useHotkeys("r", () => repeatAction(GameContext.gameSocket), {keyup: true});
 
   useHotkeys("c", () =>
     setHideUnrelated((bool) => {
