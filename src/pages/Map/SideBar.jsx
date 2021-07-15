@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SpyDetails, PlayerBox, Title } from "./Texts";
-import { Options, OptionsDeploy, DonateForm } from "./ActionButtons";
+import { Options, OptionsDeploy, DonateForm, repeatAction } from "./ActionButtons";
 import VectorMap from "./VectorMap";
 import { Paper, Grid } from "@material-ui/core";
 import useStyles from "./SideBarStyles";
@@ -32,6 +32,8 @@ function SideBar({ isUnrelated, base }) {
       return !bool;
     })
   );
+
+  useHotkeys("r", () => repeatAction(GameContext.gameSocket));
 
   useHotkeys("c", () =>
     setHideUnrelated((bool) => {
