@@ -381,7 +381,7 @@ const OptionsDeploy = ({
     <div>
       <Typography variant="h5">
         <span>
-          Buy troops in
+          Buy troops in&ensp;
           {/*<strong>
 				<span style={{ color: 'green' }}>Base</span>
 			</strong> to*/}

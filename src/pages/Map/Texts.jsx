@@ -1,40 +1,42 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Paper,
-  Snackbar,
-  IconButton,
-} from "@material-ui/core";
+import { Snackbar, IconButton } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import HelpIcon from "@material-ui/icons/Help";
 import SidebarGeneral from "./Components/Sidebar";
 
 const SpyDetails = ({ name, pop_est, gdp, continent, subrg }) => {
   return (
-    <div>
-      <h2>
-        Spy Report On: <div style={{ color: "yellow" }}>{name}</div>
+    <div className="">
+      <h2 className="text-xl p-2">
+        Spy Report On: <span className="text-yellow-300">{name}</span>
       </h2>
 
-      <table cellPadding="5" cellSpacing="5" style={{ textAlign: "center" }}>
-        <SpyDetailsItem item="Population:" data={pop_est} />
-        <SpyDetailsItem item="GDP (PPP):" data={gdp} />
-        <SpyDetailsItem item="Continent:" data={continent} />
-        {continent !== "South America" && (
-          <SpyDetailsItem item="Subregion:" data={subrg} />
-        )}
-      </table>
+      <div className="">
+        <div>
+          <SpyDetailsItem item="Population:" data={pop_est} />
+        </div>
+        <div>
+          <SpyDetailsItem item="GDP (PPP):" data={gdp} />
+        </div>
+        <div>
+          <SpyDetailsItem item="Continent:" data={continent} />
+        </div>
+        <div>
+          {continent !== "South America" && (
+            <SpyDetailsItem item="Subregion:" data={subrg} />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
 const SpyDetailsItem = ({ item, data }) => {
   return (
-    <tr>
-      <th>{item}</th>
-      <td>{data}</td>
-    </tr>
+    <div className="text-white text-sm">
+      <span className="text-white">{item}</span> &ensp;{" "}
+      <span className="text-white">{data}</span>
+    </div>
   );
 };
 
@@ -95,19 +97,6 @@ const Title = ({
 }) => {
   return (
     <div>
-      <IconButton
-        aria-label="help"
-        color="primary"
-        size="small"
-        onClick={handleOpenHelp}
-      >
-        <HelpIcon
-          style={{
-            fontSize: "20",
-          }}
-        />
-      </IconButton>
-
       <Snackbar
         open={openHelp}
         autoHideDuration={5000}
@@ -119,46 +108,42 @@ const Title = ({
         </Alert>
       </Snackbar>
 
-      <h1 style={{ textAlign: "center", padding: "1rem" }}>
-        Welcome, Commander {user}!
+      <h1 className="p-4 text-center text-4xl">
+        Welcome, Commander{" "}
+        <span className="text-yellow-300 text-4xl">{user}</span>!
       </h1>
       <br />
 
-      <h6 style={{ textAlign: "center", fontSize: "1.5rem" }}>
-        Stonks: {troops}
-      </h6>
+      <h6 className="text-2xl text-center">Stonks: {troops}</h6>
 
-      <h6 style={{ textAlign: "center", fontSize: "1rem" }}>
-        <span style={{ color: "red" }}>{nextTroops} stonks arriving in</span>
-      </h6>
-      <h6 style={{ textAlign: "center", fontSize: "1rem" }}>
-        <span style={{ color: "red" }}>{ETA(interval, startTime)}</span>
+      <h6 className="text-center text-xl text-red-700">
+        {nextTroops} stonks arriving in {ETA(interval, startTime)}
       </h6>
       <br />
     </div>
   );
 };
 
-const PlayerBox = ({ classes, playerColours, hidden, allegiances }) => {
+const PlayerBox = ({ playerColours, hidden, allegiances }) => {
   return !hidden ? (
     <div>
       {/* <Paper className={classes.players}> */}
       <SidebarGeneral width={300} height={"100vh"} title="Players">
-        <div style={{ padding: "1rem" }}>
-          <h1>Players</h1>
-        </div>
-        <Typography variant="subtitle2">
+        <br />
+        <h1>
           {"Game ID: " +
             document.cookie
               .split("; ")
               .map((s) => s.split("="))
               .filter((arr) => arr[0] === "id")[0][1]}
-        </Typography>
+        </h1>
+        <hr className="mx-4 py-2" />
+        <h1 className="pb-2 text-4xl">Players</h1>
         {Object.keys(playerColours).map(function (player) {
           var colour = playerColours[allegiances[player]];
           return (
-            <div key={player} style={{ padding: "1%" }}>
-              <p style={{ fontSize: "25px", textAlign: "center" }}>
+            <div key={player}>
+              <p className="py-1 text-center">
                 <span style={{ color: colour }}>{player}</span>
               </p>
             </div>

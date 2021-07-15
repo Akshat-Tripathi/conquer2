@@ -45,8 +45,8 @@ func defaultRngHelper(srcTroops, destTroops int) (int, int) {
 		n = destTroops
 	}
 
+	destTroops = destTroops - srcTroops
 	srcTroops = 0
-	destTroops = 0
 
 	for i := 0; i < n; i++ {
 		if attack[i] <= defend[i] {

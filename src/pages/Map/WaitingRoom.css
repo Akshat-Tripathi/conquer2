@@ -1,96 +1,20 @@
 .backdrop {
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	background-image: url("../../media/conquer2.jpg");
-	min-width: 100%;
-	min-height: 100%;
-	-webkit-filter: blur(18px);
-	-o-filter: blur(18px);
-	filter: blur(18px);
-	z-index: -100;
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-ms-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
-}
-
-/* NEW STUFF */
-
-.wr-title {
-	text-align: center;
-	align-self: center;
-	color: orange;
-	grid-area: title;
-}
-
-.lobby-grid {
-	display: grid;
-	text-align: center;
-	grid-template-columns: repeat(3, 1fr);
-	grid-template-rows: 1fr repeat(3, 2fr);
-	height: 100vh;
-	width: 100vw;
-	grid-gap: 1rem;
-	grid-template-areas: 
-	'. title loading'
-	'. tipbox .'
-	'plist . .'
-	'plist chat rup';
-}
-
-.players-list {
-	grid-area: plist;
-	background-color: black;
-	opacity: 0.6;
-	border-radius: 0 20px 0 0;
-}
-
-.players-list-title {
-	display: flex;
-	flex-direction: column;
-	padding: 1rem;
-}
-.ready-up-button {
-	grid-area: rup;
-	background-color: black;
-	opacity: 0.6;
-	border-radius: 30px 0 0 0;
-	padding: 40px
-}
-
-.readyup-icons {
- align-content: center;
- display: flex;
- flex-direction: column;
-}
-
-.chat {
-	grid-area: chat;
-}
-
-.tips-n-tricks {
-	grid-area: tipbox;
-	margin: 5%;
-	justify-self: center;
-	border-radius: 20px;
-	width: 40vw;
-	background-color: black;
-	opacity: 0.6;
-	display: grid;
-	grid-template-columns: 1fr 2fr;
-	color: orange;
-	text-align: center;
-	align-items: center;
-}
-
-.spinny-thingy {
-	grid-area: loading;
-	padding: 20px;
-	align-items: center;
-	justify-self: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("../../media/conquer2.jpg");
+  min-width: 100%;
+  min-height: 100%;
+  -webkit-filter: blur(18px);
+  -o-filter: blur(18px);
+  filter: blur(18px);
+  z-index: -100;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -ms-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 .lds-hourglass {
@@ -99,6 +23,7 @@
   width: 80px;
   height: 80px;
 }
+
 .lds-hourglass:after {
   content: " ";
   display: block;
@@ -111,6 +36,7 @@
   border-color: orange transparent orange transparent;
   animation: lds-hourglass 1.2s infinite;
 }
+
 @keyframes lds-hourglass {
   0% {
     transform: rotate(0);
@@ -126,42 +52,11 @@
 }
 
 @media screen and (max-width: 900px) {
-	.lobby-grid {
-		grid-template-areas: 'loading' 'title' 'tipbox' 'plist' 'rup';
-		text-align: center;
-		grid-template-columns: 2fr;
-		grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
-		grid-row-gap: 1rem;
-	}
-
-	.wr-title {
-		align-self: unset;
-	}
-
-	.tips-n-tricks {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-		border-radius: 0 0 0 0;
-	}
-
-	.players-list {
-		border-radius: 0 0 0 0;
-	}
-
-	.ready-up-button {
-		padding: 0;
-		border-radius: 0 0 0 0;
-	}
+  .lobby-grid {
+    grid-template-areas: "loading" "title" "tipbox" "plist" "rup";
+    text-align: center;
+    grid-template-columns: 2fr;
+    grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+    grid-row-gap: 1rem;
+  }
 }
-
-
-/* --X-- NEW STUFF --X-- */
-
-.players {
-	font-weight: bold;
-	text-shadow: white 0px 0px 10px;
-}
-
-
-

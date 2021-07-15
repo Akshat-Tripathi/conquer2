@@ -15,7 +15,7 @@ import (
 
 var upgrader websocket.Upgrader
 
-//DefaultGame is a realtime game, comparable to the RealTimeGame struct of v2
+// DefaultGame is a realtime game, comparable to the RealTimeGame struct of v2
 type DefaultGame struct {
 	situation
 	*sockets.Sockets
@@ -30,8 +30,8 @@ type DefaultGame struct {
 
 var _ Game = (*DefaultGame)(nil)
 
-//NewDefaultGame creates a new DefaultGame from context
-//PRE: ctx must be valid
+// NewDefaultGame creates a new DefaultGame from context
+// PRE: ctx must be valid
 func NewDefaultGame(ctx Context) *DefaultGame {
 	d := &DefaultGame{}
 	d.context = ctx
@@ -84,7 +84,7 @@ func NewDefaultGame(ctx Context) *DefaultGame {
 	return d
 }
 
-//routePlayer will either add a new player, connect an existing player or reject the player
+// routePlayer will either add a new player, connect an existing player or reject the player
 func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (routed bool, reason string) {
 	if int(d.numPlayers) == d.context.MaxPlayers {
 		d.processor.StopAccepting()
@@ -98,12 +98,12 @@ func (d *DefaultGame) routePlayer(name, password string, ctx *gin.Context) (rout
 		fallthrough
 	case gs.PlayerAlreadyExists:
 		d.NewPlayer(ctx.Writer, ctx.Request, name)
-		//Send initial state
+		// Send initial state
 		d.sendInitialState(name)
 		d.Listen(name)
 		return true, ""
 	}
-	//case playerRejected
+	// case playerRejected
 	return false, "Invalid login details"
 }
 
@@ -155,9 +155,9 @@ func (d *DefaultGame) sendInitialStateFunc(playerName string) {
 	}
 }
 
-//Run returns the websocket handler
+// Run returns the websocket handler
 func (d *DefaultGame) Run() func(ctx *gin.Context) {
-	//Kept this signature in case anything else needs to be done
+	// Kept this signature in case anything else needs to be done
 	return func(ctx *gin.Context) {
 		username, err := ctx.Cookie("username")
 		if err != nil {
@@ -183,8 +183,8 @@ func redirect(w http.ResponseWriter, r *http.Request, msg string) {
 	sockets.CloseWithMessage(conn, msg)
 }
 
-//AddReservation adds a player to the reserved list of the game
-//This was created to handle adding players to public games but can also be used for creating tournaments
+// AddReservation adds a player to the reserved list of the game
+// This was created to handle adding players to public games but can also be used for creating tournaments
 func (d *DefaultGame) AddReservation(player, password string) bool {
 	if int(d.numPlayers)+len(d.lobby.reservedPlayers) == d.context.MaxPlayers {
 		return false
@@ -192,7 +192,7 @@ func (d *DefaultGame) AddReservation(player, password string) bool {
 	return d.lobby.addReservation(player, password)
 }
 
-//end is used to destroy all structs associated with the game
+// end is used to destroy all structs associated with the game
 func (d *DefaultGame) end(winner string) {
 	d.Close()
 	d.processor.Destroy()
@@ -207,7 +207,7 @@ func (d *DefaultGame) end(winner string) {
 	}
 }
 
-//GetContext returns the context information
+// GetContext returns the context information
 func (d *DefaultGame) GetContext() Context {
 	return d.context
 }
