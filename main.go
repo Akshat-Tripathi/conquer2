@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -24,7 +23,8 @@ const (
 )
 
 func main() {
-	port := os.Getenv("PORT")
+	// port := os.Getenv("PORT")
+	port := "5000"
 	if port == "5000" {
 		port = "80"
 	}
