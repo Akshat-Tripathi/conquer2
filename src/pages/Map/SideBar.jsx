@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SpyDetails, PlayerBox, Title } from "./Texts";
-import { Options, OptionsDeploy, DonateForm } from "./ActionButtons";
+import { Options, OptionsDeploy, DonateForm, repeatAction } from "./ActionButtons";
 import VectorMap from "./VectorMap";
 import { Paper, Grid } from "@material-ui/core";
 import useStyles from "./SideBarStyles";
@@ -32,6 +32,8 @@ function SideBar({ isUnrelated, base }) {
       return !bool;
     })
   );
+
+  useHotkeys("r", () => repeatAction(GameContext.gameSocket), {keyup: true});
 
   useHotkeys("c", () =>
     setHideUnrelated((bool) => {
@@ -188,6 +190,16 @@ function SideBar({ isUnrelated, base }) {
     }
   };
 
+  const fillFromBase = (p) => {
+    let troops = GameContext.troops;
+    setnumTroops(Math.round(troops * p));
+  }
+
+  const fillFromCountry = (p, fromCountryISO) => {
+    let troops = GameContext.countryStates[fromCountryISO].Troops - 1;
+    setnumTroops(Math.round(troops * p));
+  }
+
   const handleAssist = () => {
     setshowAssist(!showAssist);
     if (!showAssist) {
@@ -218,6 +230,7 @@ function SideBar({ isUnrelated, base }) {
 
   //FIXME: Use useState hook here to avoid lag ?
   const handleNumTroops = (event) => {
+    console.log(event.target.value);
     setnumTroops(event.target.value);
   };
 
@@ -304,6 +317,7 @@ function SideBar({ isUnrelated, base }) {
                   handleDonate={handleDonate}
                   handletargetPlayer={handletargetPlayer}
                   handleNumTroops={handleNumTroops}
+                  fillTroops={fillFromBase}
                   showDonate={showDonate}
                   numTroops={numTroops}
                   targetPlayer={targetPlayer}
@@ -326,6 +340,7 @@ function SideBar({ isUnrelated, base }) {
                   handleNumTroops={handleNumTroops}
                   handleMove={handleMove}
                   handleAssist={handleAssist}
+                  fillTroops={(p) => fillFromCountry(p, fromCountryISO)}
                   showMove={showMove}
                   showAssist={showAssist}
                   fromCountryISO={fromCountryISO}
@@ -342,6 +357,7 @@ function SideBar({ isUnrelated, base }) {
                   classes={classes}
                   numTroops={numTroops}
                   handleNumTroops={handleNumTroops}
+                  fillTroops={fillFromBase}
                   fromCountry={fromCountry}
                   handleDeploy={handleDeploy}
                   showDeploy={showDeploy}
