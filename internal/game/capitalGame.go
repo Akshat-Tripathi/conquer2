@@ -5,18 +5,18 @@ import (
 	stateprocessors "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
-//CapitalGame is a realtime game where all players have a capital
+// CapitalGame is a realtime game where all players have a capital
 type CapitalGame struct {
-	DefaultGame
+	*DefaultGame
 }
 
 var _ Game = (*CapitalGame)(nil)
 
-//NewCapitalGame creates a new CapitalGame from context
-//PRE: ctx is valid
+// NewCapitalGame creates a new CapitalGame from context
+// PRE: ctx is valid
 func NewCapitalGame(ctx Context) *CapitalGame {
 	cg := &CapitalGame{}
-	cg.DefaultGame = *NewDefaultGame(ctx)
+	cg.DefaultGame = NewDefaultGame(ctx)
 	cg.processor = stateprocessors.NewCapitalProcessor(*cg.processor.(*stateprocessors.DefaultProcessor))
 
 	cg.sendInitialState = cg.sendInitialStateFunc
