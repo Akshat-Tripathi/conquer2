@@ -2,7 +2,7 @@ package stateprocessors
 
 import "math/rand"
 
-//This enum is used when adding players
+// This enum is used when adding players
 const (
 	PlayerAdded = iota + 1
 	PlayerAlreadyExists
@@ -10,7 +10,7 @@ const (
 	GameFull
 )
 
-//DefaultProcessor a state processor
+// DefaultProcessor a state processor
 type DefaultProcessor struct {
 	state
 	canAcceptPlayers bool
@@ -23,11 +23,12 @@ type DefaultProcessor struct {
 	validateDonate   func(src, dest *PlayerState, troops int) bool
 	validateDeploy   func(src *PlayerState, dest *CountryState, player string, troops int) bool
 	validateMove     func(src *CountryState, player string, troops int) bool
+	validateAlliance func(src, dest *PlayerState, cost int) bool
 }
 
 var _ StateProcessor = (*DefaultProcessor)(nil)
 
-//NewDefaultProcessor creates a new DefaultProcessor
+// NewDefaultProcessor creates a new DefaultProcessor
 func NewDefaultProcessor(countries []string) *DefaultProcessor {
 	d := &DefaultProcessor{}
 	d.countryNames = countries
@@ -42,6 +43,7 @@ func NewDefaultProcessor(countries []string) *DefaultProcessor {
 	d.validateDeploy = d.deployValid
 	d.validateDonate = d.donateValid
 	d.validateMove = d.moveValid
+	d.validateAlliance = d.allianceValid
 	return d
 }
 
@@ -93,7 +95,7 @@ func (d *DefaultProcessor) withLockedPlayers(src, dest string, op func(src, dest
 	return op(source, destination)
 }
 
-//Attack attacks
+// Attack attacks
 func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, won, conquered bool, nSrc, nDest int, playerLost string) {
 	srcCountry, ok := d.countries[src]
 	if !ok {
@@ -127,7 +129,7 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 		}
 
 		if destCountry.Troops == 0 && srcCountry.Troops > 0 {
-			//Conquered
+			// Conquered
 			destCountry.Troops = 1
 			srcCountry.Troops--
 			var playerLost string
@@ -158,7 +160,7 @@ func (d *DefaultProcessor) Attack(src, dest, player string, times int) (valid, w
 	return false, false, false, 0, 0, ""
 }
 
-//Donate validates a donation
+// Donate validates a donation
 func (d *DefaultProcessor) Donate(src, dest string, troops int) bool {
 	return d.withLockedPlayers(src, dest, func(src, dest *PlayerState) bool {
 		if !d.validateDonate(src, dest, troops) {
@@ -170,7 +172,7 @@ func (d *DefaultProcessor) Donate(src, dest string, troops int) bool {
 	})
 }
 
-//Assist allows a player to move troops into territory owned by another player
+// Assist allows a player to move troops into territory owned by another player
 func (d *DefaultProcessor) Assist(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
 		if !d.validateMove(src, player, troops) || src.Player == dest.Player {
@@ -182,7 +184,7 @@ func (d *DefaultProcessor) Assist(src, dest string, troops int, player string) b
 	})
 }
 
-//Move allows intra-empire movement
+// Move allows intra-empire movement
 func (d *DefaultProcessor) Move(src, dest string, troops int, player string) bool {
 	return d.withLockedCountries(src, dest, func(src, dest *CountryState) bool {
 		if !d.validateMove(src, player, troops) || src.Player != dest.Player {
@@ -194,7 +196,7 @@ func (d *DefaultProcessor) Move(src, dest string, troops int, player string) boo
 	})
 }
 
-//Deploy allows players to move troops from their bases to their countries
+// Deploy allows players to move troops from their bases to their countries
 func (d *DefaultProcessor) Deploy(dest string, troops int, player string) bool {
 	source, ok := d.players[player]
 	if !ok {
@@ -216,8 +218,19 @@ func (d *DefaultProcessor) Deploy(dest string, troops int, player string) bool {
 	return true
 }
 
-//AddPlayer returns a status code
-//PRE: There will be countries available to assign
+func (d *DefaultProcessor) Ally(src, dest string, cost int) bool {
+	return d.withLockedPlayers(src, dest, func(src, dest *PlayerState) bool {
+		if !d.validateAlliance(src, dest, cost) {
+			return false
+		}
+		src.Troops -= cost
+		dest.Troops -= cost
+		return true
+	})
+}
+
+// AddPlayer returns a status code
+// PRE: There will be countries available to assign
 func (d *DefaultProcessor) AddPlayer(name, password, colour string, troops, countries int) int8 {
 	if player, ok := d.players[name]; ok {
 		if player.Password == password {
@@ -234,7 +247,7 @@ func (d *DefaultProcessor) AddPlayer(name, password, colour string, troops, coun
 		Countries: countries,
 		Password:  password,
 	}
-	//Assign initial countries
+	// Assign initial countries
 	d.assignCountries(countries, name)
 	return PlayerAdded
 }
@@ -267,8 +280,8 @@ func (d *DefaultProcessor) assignCountries(countries int, name string) string {
 	return countryName
 }
 
-//GetCountry returns an copy of country
-//PRE: the country exists
+// GetCountry returns an copy of country
+// PRE: the country exists
 func (d *DefaultProcessor) GetCountry(country string) CountryState {
 	cState, ok := d.countries[country]
 	if !ok {
@@ -277,7 +290,7 @@ func (d *DefaultProcessor) GetCountry(country string) CountryState {
 	return *cState
 }
 
-//ToggleAttack - does what the name suggests
+// ToggleAttack - does what the name suggests
 func (d *DefaultProcessor) ToggleAttack() {
 	d.attackDisabled = !d.attackDisabled
 }
@@ -285,7 +298,7 @@ func (d *DefaultProcessor) ToggleAttack() {
 func (d *DefaultProcessor) attackValid(src, dest *CountryState, player string, times int) bool {
 	if d.attackDisabled && dest.Player != "" {
 		if dest.Troops == 0 {
-			//Prevents you from wiping the other player out entirely
+			// Prevents you from wiping the other player out entirely
 			if func() bool {
 				other := d.players[player]
 				other.RLock()
@@ -302,15 +315,15 @@ func (d *DefaultProcessor) attackValid(src, dest *CountryState, player string, t
 	if times <= 0 {
 		return false
 	}
-	//Must own src
+	// Must own src
 	if src.Player != player {
 		return false
 	}
-	//Can't attack self
+	// Can't attack self
 	if src.Player == dest.Player {
 		return false
 	}
-	//Must have at least 2 troops to attack
+	// Must have at least 2 troops to attack
 	if src.Troops < 2 {
 		return false
 	}
@@ -321,15 +334,15 @@ func (d *DefaultProcessor) donateValid(src, dest *PlayerState, troops int) bool 
 	if d.donateDisabled {
 		return false
 	}
-	//troops must be > 0
+	// troops must be > 0
 	if troops < 0 {
 		return false
 	}
-	//Must have troops
+	// Must have troops
 	if src.Troops < troops {
 		return false
 	}
-	//Can't donate to self
+	// Can't donate to self
 	if dest.Colour == src.Colour {
 		return false
 	}
@@ -340,11 +353,11 @@ func (d *DefaultProcessor) moveValid(src *CountryState, player string, troops in
 	if d.moveDisabled {
 		return false
 	}
-	//troops must be > 0
+	// troops must be > 0
 	if troops < 0 {
 		return false
 	}
-	//Must have troops
+	// Must have troops
 	if src.Troops <= troops {
 		return false
 	}
@@ -358,22 +371,37 @@ func (d *DefaultProcessor) deployValid(src *PlayerState, dest *CountryState, pla
 	if d.dropDisabled {
 		return false
 	}
-	//troops must be > 0
+	// troops must be > 0
 	if troops < 0 {
 		return false
 	}
-	//Must have troops
+	// Must have troops
 	if src.Troops < troops {
 		return false
 	}
-	//Must own dest
+	// Must own dest
 	if dest.Player != player {
 		return false
 	}
 	return true
 }
 
-//ProcessTroops returns the number of troops each player should receive
+func (d *DefaultProcessor) allianceValid(src, dest *PlayerState, cost int) bool {
+	// Can't ally with self
+	if src == dest {
+		return false
+	}
+	// Must have enough money
+	if src.Troops < cost {
+		return false
+	}
+	if dest.Troops < cost {
+		return false
+	}
+	return true
+}
+
+// ProcessTroops returns the number of troops each player should receive
 func (d *DefaultProcessor) ProcessTroops() map[string]int {
 	playerTroops := make(map[string]int)
 	delta := 0
@@ -390,7 +418,14 @@ func (d *DefaultProcessor) ProcessTroops() map[string]int {
 	return playerTroops
 }
 
-//StopAccepting should be used to indicate if a game is full
+// StopAccepting should be used to indicate if a game is full
 func (d *DefaultProcessor) StopAccepting() {
 	d.canAcceptPlayers = false
+}
+
+func (d *DefaultProcessor) AddTroops(player string, troops int) {
+	p := d.players[player]
+	p.Lock()
+	defer p.Unlock()
+	p.Troops += troops
 }

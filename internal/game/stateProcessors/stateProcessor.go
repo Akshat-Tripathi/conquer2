@@ -5,6 +5,7 @@ type validator interface {
 	donateValid(src, dest *PlayerState, troops int) bool
 	deployValid(src *PlayerState, dest *CountryState, player string, troops int) bool
 	moveValid(src *CountryState, player string, troops int) bool
+	allianceValid(src, dest *PlayerState, cost int) bool
 }
 
 type executor interface {
@@ -13,9 +14,10 @@ type executor interface {
 	Assist(src, dest string, troops int, player string) bool
 	Move(src, dest string, troops int, player string) bool
 	Deploy(dest string, troops int, player string) bool
+	Ally(src, dest string, cost int) bool
 }
 
-//StateProcessor is an interface defining what all stateprocessors are capable of
+// StateProcessor is an interface defining what all stateprocessors are capable of
 type StateProcessor interface {
 	executor
 	validator
@@ -26,6 +28,7 @@ type StateProcessor interface {
 	RangePlayers(func(name string, player *PlayerState))
 
 	AddPlayer(name, password, colour string, troops, countries int) int8
+	AddTroops(name string, troops int)
 	StopAccepting()
 
 	ToggleAttack()

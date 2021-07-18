@@ -1,6 +1,8 @@
 package game
 
 import (
+	"strings"
+
 	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
@@ -17,6 +19,10 @@ const (
 	deploySrc
 	moveDest
 	moveSrc
+	ally
+	proposeAlliance
+	denyAlliance
+	breakAlliance
 )
 
 func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool) {
@@ -29,10 +35,13 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Player: name,
 	})
 	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length() && len(d.lobby.reservedPlayers) == 0
-	//return int(d.numPlayers) == d.lobby.length()
 }
 
 func (d *DefaultGame) process(name string, action common.Action) (done bool) {
+	if strings.Contains(action.ActionType, "alliance") {
+		d.processAlliance(name, action)
+		return false
+	}
 	switch action.ActionType {
 	case "attack":
 		if !d.areNeighbours(action.Src, action.Dest) {
@@ -160,6 +169,10 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 
 func (cg *CampaignGame) process(name string, action common.Action) bool {
 	cg.persistentGame.timer.Reset(herokuTimeOut)
+	if strings.Contains(action.ActionType, "alliance") {
+		cg.processAlliance(name, action)
+		return false
+	}
 	switch action.ActionType {
 	case "attack":
 		if !cg.areNeighbours(action.Src, action.Dest) {
@@ -171,6 +184,7 @@ func (cg *CampaignGame) process(name string, action common.Action) bool {
 		if !valid {
 			return false
 		}
+		cg.alliances.breakAlliance(name, oldPlayer, false)
 		if conquered {
 			if cg.countViewPoints(oldPlayer, action.Dest) == 0 {
 				cg.SendToPlayer(oldPlayer, common.UpdateMessage{
@@ -303,4 +317,41 @@ func (cg *CampaignGame) process(name string, action common.Action) bool {
 		Country: action.Dest,
 	})
 	return false
+}
+
+func (d *DefaultGame) processAlliance(name string, action common.Action) {
+	if d.alliances.areAllied(action.Src, action.Dest) {
+		return
+	}
+	player1 := action.Src
+	player2 := action.Dest
+	actionType := action.ActionType[len("alliance"):]
+	switch actionType {
+	case "accept":
+		if name == player2 {
+			d.alliances.addAlliance(player1, player2, action.Troops)
+		}
+	case "decline":
+		if name == player2 {
+			d.SendToPlayer(player1, common.UpdateMessage{
+				Type:   "deny",
+				Player: player2,
+				ID:     denyAlliance,
+			})
+			d.SendToPlayer(player2, common.UpdateMessage{
+				Type:   "deny",
+				Player: player1,
+				ID:     denyAlliance,
+			})
+		}
+	case "propose":
+		if name == player1 {
+			d.SendToPlayer(player2, common.UpdateMessage{
+				Type:   "propose",
+				Player: player1,
+				ID:     proposeAlliance,
+				Troops: action.Troops,
+			})
+		}
+	}
 }
