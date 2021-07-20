@@ -558,4 +558,31 @@ let deploy = takeAction((numTroops, fromCountryISO, socket) => {
     );
 })
 
+let proposeAlliance = takeAction((targetPlayer, cost, user, socket) => {
+    return new action(
+        parseInt(cost, 10),
+        "propose",
+        user,
+        targetPlayer
+    );
+})
+
+let declineAlliance = takeAction((targetPlayer, user, socket) => {
+    return new action(
+        0,
+        "decline",
+        targetPlayer,
+        user
+    );
+})
+
+let acceptAlliance = takeAction((targetPlayer, user, socket) => {
+    return new action(
+        0,
+        "accept",
+        targetPlayer,
+        user
+    );
+})
+
 export { Options, DeployForm as OptionsDeploy, DonateForm, action, repeatAction };
