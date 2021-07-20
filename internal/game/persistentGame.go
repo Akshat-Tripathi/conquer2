@@ -10,9 +10,9 @@ import (
 
 const herokuTimeOut = time.Minute * 30
 
-//persistentGame is a type of game which can store its state
-//It overrides: Init, Run, process and End
-//Since this type of game shouldn't ever be used directly, it doesn't have a lobby or fsm
+// persistentGame is a type of game which can store its state
+// It overrides: Init, Run, process and End
+// Since this type of game shouldn't ever be used directly, it doesn't have a lobby or fsm
 type persistentGame struct {
 	*DefaultGame
 	*persistence
@@ -26,23 +26,15 @@ func newPersistentGame(ctx Context) *persistentGame {
 
 	pg.timer = time.NewTimer(herokuTimeOut)
 
-	//This indicates that the context has already been loaded
-	ctxAlreadyInit := ctx.MaxPlayers > 0
-
-	if ctx.Client != nil {
-		ctxAlreadyInit = true
-		pg.persistence = &persistence{
-			docs: ctx.Client.Collection(ctx.ID),
-		}
+	pg.persistence = &persistence{
+		docs: ctx.Client.Collection(ctx.ID),
 	}
 
-	if !ctxAlreadyInit {
-		pg.loadContext(&ctx)
-	}
+	alreadyExists := pg.loadContext(&ctx)
 
 	pg.DefaultGame = NewDefaultGame(ctx)
 
-	if !ctxAlreadyInit {
+	if alreadyExists {
 		pg.numPlayers = int32(pg.loadPlayers(pg.processor))
 		pg.loadCountries(pg.processor)
 	}

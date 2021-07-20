@@ -266,6 +266,9 @@ func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*fire
 	games := make(map[string]game.Game)
 	if err == nil {
 		for _, refs := range allRefs {
+			if refs.ID == "Winners" {
+				continue
+			}
 			g := game.NewCampaignGame(game.Context{
 				ID:            refs.ID,
 				Colours:       colours,
@@ -273,6 +276,8 @@ func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*fire
 				MaxPlayers:    20,
 				EventListener: events,
 			})
+			g.NextState()
+			// g.
 			games[refs.ID] = g
 			r.GET("/game/"+refs.ID+"/ws", g.Run())
 		}

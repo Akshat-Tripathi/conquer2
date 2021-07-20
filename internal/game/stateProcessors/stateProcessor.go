@@ -15,7 +15,7 @@ type executor interface {
 	Deploy(dest string, troops int, player string) bool
 }
 
-//StateProcessor is an interface defining what all stateprocessors are capable of
+// StateProcessor is an interface defining what all stateprocessors are capable of
 type StateProcessor interface {
 	executor
 	validator
