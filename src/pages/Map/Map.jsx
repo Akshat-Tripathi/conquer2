@@ -42,6 +42,7 @@ var GameContext = {
   countryStates: {},
   capitals: {},
   allegiances: {},
+  alliances: [],
   playerColours: {},
   players: [],
   user: "",
@@ -249,16 +250,29 @@ class GameMap extends Component {
           );
           break;
         case "propose":
-          // TODO
-          break;
-        case "deny":
-          // TODO
-          break;
-        case "accept":
-          // TODO
+          GameContext.alliances.push({
+            isProposal: true,
+            name: action.Player,
+            cost: action.Troops
+          });
           break;
         case "break":
-          // TODO
+          GameContext.troops += action.Troops;
+        case "deny":
+          GameContext.alliances = GameContext.alliances.filter(
+            (alliance) => alliance.name !== action.Player
+          );
+          break;
+        case "ally":
+          GameContext.alliances = GameContext.alliances.filter(
+            (alliance) => alliance.name !== action.Player
+          );
+          GameContext.troops -= action.Troops;
+          GameContext.alliances.push({
+            isProposal: false,
+            name: action.Player,
+            cost: action.Troops
+          })
           break;
       }
       this.forceUpdate();
