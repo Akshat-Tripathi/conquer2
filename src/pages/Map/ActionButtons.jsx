@@ -231,7 +231,6 @@ const AssistForm = ({
     fromCountryISO,
     toCountryISO,
     socket,
-    user,
     reset,
 }) => {
     return !showAssist ? (
@@ -312,7 +311,6 @@ const MoveForm = ({
     fromCountryISO,
     toCountryISO,
     socket,
-    user,
     reset,
 }) => {
     return !showMove ? (
@@ -396,7 +394,6 @@ const DeployForm = ({
     showDeploy,
     fromCountryISO,
     socket,
-    user,
     reset,
 }) => {
     function handleClick(e) {
@@ -483,6 +480,119 @@ const DeployForm = ({
                 </div>
             )}
         </div>
+    );
+};
+
+const AllianceForm = ({
+    handleAlliance,
+    classes,
+    handleNumTroops,
+    handletargetPlayer,
+    fillTroops,
+    targetPlayer,
+    showAlliance,
+    numTroops,
+    socket,
+    user,
+    players,
+    reset,
+    alliances,
+}) => {
+    return !showAlliance ? (
+        <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={handleAlliance}
+            style={{ textAlign: "center", alignItems: "center" }}
+        >
+            MAKE ALLIANCE
+        </Button>
+    ) : (
+        <table cellSpacing="5px" style={{ minWidth: "100%" }}>
+            <tr>
+                <FormControl className={classes.input}>
+                    <Select
+                        name="allyWith"
+                        required
+                        variant="outlined"
+                        value={targetPlayer}
+                        onChange={handletargetPlayer}
+                        style={{
+                            color: "red",
+                            backgroundColor: "white",
+                            borderRadius: "20px",
+                            height: "3rem",
+                        }}
+                    >
+                        {players.map(function (p) {
+                            if (p !== user) {
+                                return <MenuItem value={p}>{p}</MenuItem>;
+                            }
+                        })}
+                    </Select>
+
+                    <FormHelperText style={{ color: "white", textAlign: "center" }}>
+                        Select Player to Ally with
+                    </FormHelperText>
+                </FormControl>
+            </tr>
+            <tr>
+                <FormControl classes={classes.input}>
+                    <Input
+                        autoFocus
+                        type="number"
+                        onKeyPress={(e) => {
+                            if (e.key === "f" || e.key === "F") {
+                                fillTroops(1);
+                            } else if (e.key === "h" || e.key === "H") {
+                                fillTroops(0.5);
+                            }
+                        }}
+                        min="0"
+                        name="AllianceCost"
+                        required
+                        variant="outlined"
+                        label="Number of Stonks to invest in the alliance"
+                        value={numTroops > 0 ? numTroops : null}
+                        onChange={handleNumTroops}
+                        style={{
+                            color: "red",
+                            backgroundColor: "white",
+                            height: "3rem",
+                            borderRadius: "20px",
+                            padding: "5px",
+                        }}
+                    />
+
+                    <FormHelperText style={{ color: "white", textAlign: "center" }}>
+                        Select Number of Stonks to Invest in the Alliance
+                    </FormHelperText>
+                </FormControl>
+            </tr>
+            <tr>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    className={classes.button}
+                    onClick={() => {
+                        proposeAlliance(numTroops, targetPlayer, user, socket);
+                        reset();
+                    }}
+                >
+                    PROPOSE ALLIANCE
+                </Button>
+            </tr>
+            <IconButton aria-label="return" color="secondary" onClick={handleAlliance}>
+                <ArrowBackIcon
+                    style={{
+                        fontSize: "30",
+                    }}
+                />
+                <Typography variant="subtitle2">Back</Typography>
+            </IconButton>
+        </table>
     );
 };
 
@@ -585,4 +695,4 @@ let acceptAlliance = takeAction((targetPlayer, user, socket) => {
     );
 })
 
-export { Options, DeployForm as OptionsDeploy, DonateForm, action, repeatAction };
+export { Options, DeployForm as OptionsDeploy, DonateForm, AllianceForm, action, repeatAction };
