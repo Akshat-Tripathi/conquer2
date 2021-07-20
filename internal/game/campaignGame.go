@@ -6,16 +6,16 @@ import (
 	gs "github.com/Akshat-Tripathi/conquer2/internal/game/stateProcessors"
 )
 
-//CampaignGame is a subclass of DefaultGame which is a slower game lasting 2 weeks
-//Overrides: Init, sendInitialStateFunc
+// CampaignGame is a subclass of DefaultGame which is a slower game lasting 2 weeks
+// Overrides: Init, sendInitialStateFunc
 type CampaignGame struct {
 	*persistentGame
 }
 
 var _ Game = (*CampaignGame)(nil)
 
-//NewCampaignGame creates a new CampaignGame from context
-//PRE: ctx is valid
+// NewCampaignGame creates a new CampaignGame from context
+// PRE: ctx is valid
 func NewCampaignGame(ctx Context) *CampaignGame {
 	cg := &CampaignGame{}
 
@@ -66,11 +66,6 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 	})
 	cg.Start()
 	cg.lobby = newLobby()
-
-	//If Init is being called on an existing game
-	if cg.numPlayers > 0 {
-		cg.NextState()
-	}
 
 	return cg
 }
