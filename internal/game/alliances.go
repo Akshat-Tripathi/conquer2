@@ -41,7 +41,12 @@ func makeKey(player1, player2 string) string {
 func (a *alliances) addAlliance(player1, player2 string, cost int) {
 	a.Lock()
 	defer a.Unlock()
-	a.alliances[makeKey(player1, player2)] = struct {
+	key := makeKey(player1, player2)
+	if alliance, ok := a.alliances[key]; ok {
+		cost += alliance.cost
+		alliance.timer.Stop()
+	}
+	a.alliances[key] = struct {
 		cost  int
 		timer *time.Timer
 	}{
