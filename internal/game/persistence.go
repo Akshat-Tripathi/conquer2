@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -16,21 +17,24 @@ type persistence struct {
 func loadSnapshot(id string, docs *firestore.CollectionRef) *firestore.DocumentSnapshot {
 	snapshot, err := docs.Doc(id).Get(context.Background())
 	if err != nil {
-		//log.Println(err)
+		// log.Println(err)
 		return nil
 	}
 	return snapshot
 }
 
-func (p *persistence) loadContext(ctx *Context) {
+func (p *persistence) loadContext(ctx *Context) bool {
 	snapshot := loadSnapshot("ctx", p.docs)
 	if snapshot == nil {
-		return
+		log.Println("No context found")
+		return false
 	}
 	err := snapshot.DataTo(ctx)
 	if err != nil {
 		log.Println(err)
+		return false
 	}
+	return true
 }
 
 func (p *persistence) loadPlayers(processor gs.StateProcessor) int {
@@ -41,7 +45,7 @@ func (p *persistence) loadPlayers(processor gs.StateProcessor) int {
 	players := snapshot.Data()["Players"].([]interface{})
 	playerCountries := make(map[string]int)
 
-	//Load players
+	// Load players
 	for _, player := range players {
 		stateSnapshot := loadSnapshot("."+player.(string), p.docs)
 		if stateSnapshot != nil {
@@ -63,6 +67,13 @@ func (p *persistence) loadPlayers(processor gs.StateProcessor) int {
 		}
 		player.Countries = countries
 	})
+
+	// Calculate number of updates missed
+	fmt.Println(snapshot.UpdateTime)
+	missedUpdates := int(time.Now().Sub(snapshot.UpdateTime).Hours() / 8)
+	for i := 0; i < missedUpdates; i++ {
+		processor.ProcessTroops()
+	}
 	return len(players)
 }
 

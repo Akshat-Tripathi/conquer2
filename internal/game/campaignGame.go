@@ -67,11 +67,6 @@ func NewCampaignGame(ctx Context) *CampaignGame {
 	cg.Start()
 	cg.lobby = newLobby()
 
-	// If Init is being called on an existing game
-	if cg.numPlayers > 0 {
-		cg.NextState()
-	}
-
 	return cg
 }
 

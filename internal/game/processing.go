@@ -170,11 +170,11 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 }
 
 func (cg *CampaignGame) process(name string, action common.Action) bool {
-	cg.persistentGame.timer.Reset(herokuTimeOut)
-	if strings.Contains(action.ActionType, "alliance") {
+	cg.persistentGame.Reset()
+  if strings.Contains(action.ActionType, "alliance") {
 		cg.processAlliance(name, action)
 		return false
-	}
+  }
 	switch action.ActionType {
 	case "attack":
 		if !cg.areNeighbours(action.Src, action.Dest) {

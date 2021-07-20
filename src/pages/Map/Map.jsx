@@ -234,10 +234,10 @@ class GameMap extends Component {
           break;
         case "newCapital":
           GameContext.capitals[action.Player] = action.Country;
-
-          //If the country hasn't been registed, register it
+          
+          //If the country hasn't been registered, register it
           if (!GameContext.countryStates[action.Country]) {
-            GameContext.countryStates[action.Country] = new countryState(action.Troops, action.Player);
+            GameContext.countryStates[action.Country] = new countryState(action.Troops , action.Player);
           }
 
           GameContext.allegiances[action.Player] =
