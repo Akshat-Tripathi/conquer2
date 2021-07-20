@@ -351,7 +351,18 @@ function SideBar({ isUnrelated, base }) {
                     user={GameContext.user}
                     players={GameContext.players}
                     reset={reset}
-                    alliances={[]}
+                    alliances={[
+                      {
+                        isProposal: true,
+                        name: "Zuko",
+                        cost: 5,
+                      },
+                      {
+                        isProposal: false,
+                        name: "Zukov",
+                        cost: 5,
+                      },
+                    ]}
                   />
                 </div>)}
 

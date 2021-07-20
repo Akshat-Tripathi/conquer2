@@ -176,7 +176,7 @@ class GameMap extends Component {
           if (
             ok ||
             getOwner(GameContext.countryStates[action.Country].Player) !==
-              getOwner(action.Player)
+            getOwner(action.Player)
           ) {
             if (
               Object.keys(GameContext.capitals).some(
@@ -233,12 +233,12 @@ class GameMap extends Component {
           break;
         case "newCapital":
           GameContext.capitals[action.Player] = action.Country;
-          
+
           //If the country hasn't been registed, register it
           if (!GameContext.countryStates[action.Country]) {
-            GameContext.countryStates[action.Country] = new countryState(action.Troops , action.Player);
+            GameContext.countryStates[action.Country] = new countryState(action.Troops, action.Player);
           }
-          
+
           GameContext.allegiances[action.Player] =
             GameContext.countryStates[action.Country].Player;
           break;
@@ -247,6 +247,18 @@ class GameMap extends Component {
           window.location.replace(
             "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           );
+          break;
+        case "propose":
+          // TODO
+          break;
+        case "deny":
+          // TODO
+          break;
+        case "accept":
+          // TODO
+          break;
+        case "break":
+          // TODO
           break;
       }
       this.forceUpdate();
