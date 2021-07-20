@@ -10,7 +10,7 @@ import {
     FormControl,
 } from "@material-ui/core";
 
-//import { players, fromCountryISO, toCountryISO, user, socket, countryStates } from './Map';
+//import { players, fromCountryISO, toCountryISO, socket, countryStates } from './Map';
 
 const Options = ({
     classes,
@@ -51,7 +51,7 @@ const Options = ({
                                     color="secondary"
                                     className={classes.button}
                                     onClick={() => {
-                                        attack(fromCountryISO, toCountryISO, user, socket);
+                                        attack(fromCountryISO, toCountryISO, socket);
                                         reset();
                                     }}
                                 >
@@ -64,7 +64,7 @@ const Options = ({
                                     color="secondary"
                                     className={classes.button}
                                     onClick={() => {
-                                        megaAttack(fromCountryISO, toCountryISO, user, socket);
+                                        megaAttack(fromCountryISO, toCountryISO, socket);
                                         reset();
                                     }}
                                 >
@@ -202,7 +202,7 @@ const DonateForm = ({
                     color="primary"
                     className={classes.button}
                     onClick={() => {
-                        donate(numTroops, targetPlayer, user, socket);
+                        donate(numTroops, targetPlayer, socket);
                         reset();
                     }}
                 >
@@ -276,7 +276,7 @@ const AssistForm = ({
                 color="primary"
                 className={classes.button}
                 onClick={() => {
-                    assist(numTroops, fromCountryISO, toCountryISO, user, socket);
+                    assist(numTroops, fromCountryISO, toCountryISO, socket);
                     reset();
                 }}
             >
@@ -360,7 +360,7 @@ const MoveForm = ({
                 color="primary"
                 className={classes.button}
                 onClick={() => {
-                    move(numTroops, fromCountryISO, toCountryISO, user, socket);
+                    move(numTroops, fromCountryISO, toCountryISO, socket);
                     reset();
                 }}
             >
@@ -401,7 +401,7 @@ const DeployForm = ({
 }) => {
     function handleClick(e) {
         e.preventDefault();
-        deploy(numTroops, fromCountryISO, user, socket);
+        deploy(numTroops, fromCountryISO, socket);
         reset();
     }
     return (
@@ -487,12 +487,11 @@ const DeployForm = ({
 };
 
 class action {
-    constructor(Troops, ActionType, Src, Dest, Player) {
+    constructor(Troops, ActionType, Src, Dest) {
         this.Troops = Troops;
         this.ActionType = ActionType;
         this.Src = Src;
         this.Dest = Dest;
-        this.Player = Player;
     }
 }
 
@@ -510,56 +509,52 @@ function takeAction(wrapped) {
 let repeatAction = takeAction((socket) => lastAction);
 
 
-let attack = takeAction((fromCountryISO, toCountryISO, user, socket) => {
-    return new action(1, "attack", fromCountryISO, toCountryISO, user);
+let attack = takeAction((fromCountryISO, toCountryISO, socket) => {
+    return new action(1, "attack", fromCountryISO, toCountryISO);
 })
 
 
-let megaAttack = takeAction((fromCountryISO, toCountryISO, user, socket) => {
-    return new action(10, "attack", fromCountryISO, toCountryISO, user);
+let megaAttack = takeAction((fromCountryISO, toCountryISO, socket) => {
+    return new action(10, "attack", fromCountryISO, toCountryISO);
 })
 
 
-let donate = takeAction((numTroops, targetPlayer, user, socket) => {
+let donate = takeAction((numTroops, targetPlayer, socket) => {
     return new action(
         parseInt(numTroops, 10),
         "donate",
         "",
         targetPlayer,
-        user
     );
 })
 
 
-let move = takeAction((numTroops, fromCountryISO, toCountryISO, user, socket) => {
+let move = takeAction((numTroops, fromCountryISO, toCountryISO, socket) => {
     return new action(
         parseInt(numTroops, 10),
         "move",
         fromCountryISO,
-        toCountryISO,
-        user
+        toCountryISO
     );
 })
 
 
-let assist = takeAction((numTroops, fromCountryISO, toCountryISO, user, socket) => {
+let assist = takeAction((numTroops, fromCountryISO, toCountryISO, socket) => {
     return new action(
         parseInt(numTroops, 10),
         "assist",
         fromCountryISO,
-        toCountryISO,
-        user
+        toCountryISO
     );
 })
 
 
-let deploy = takeAction((numTroops, fromCountryISO, user, socket) => {
+let deploy = takeAction((numTroops, fromCountryISO, socket) => {
     return new action(
         parseInt(numTroops, 10),
         "deploy",
         "",
-        fromCountryISO,
-        user
+        fromCountryISO
     );
 })
 
