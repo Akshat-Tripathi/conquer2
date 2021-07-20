@@ -29,7 +29,7 @@ func (d *DefaultGame) lobbyProcess(name string, action common.Action) (done bool
 		Player: name,
 	})
 	return d.numPlayers > 1 && int(d.numPlayers) == d.lobby.length() && len(d.lobby.reservedPlayers) == 0
-	//return int(d.numPlayers) == d.lobby.length()
+	// return int(d.numPlayers) == d.lobby.length()
 }
 
 func (d *DefaultGame) process(name string, action common.Action) (done bool) {
@@ -159,7 +159,7 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 }
 
 func (cg *CampaignGame) process(name string, action common.Action) bool {
-	cg.persistentGame.timer.Reset(herokuTimeOut)
+	cg.persistentGame.Reset()
 	switch action.ActionType {
 	case "attack":
 		if !cg.areNeighbours(action.Src, action.Dest) {

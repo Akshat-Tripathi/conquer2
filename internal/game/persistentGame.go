@@ -4,11 +4,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/Akshat-Tripathi/conquer2/internal/game/common"
 	"github.com/gin-gonic/gin"
 )
 
-const herokuTimeOut = time.Minute * 30
+const herokuTimeOut = time.Minute * 25
 
 // persistentGame is a type of game which can store its state
 // It overrides: Init, Run, process and End
@@ -44,18 +43,20 @@ func newPersistentGame(ctx Context) *persistentGame {
 
 func (pg *persistentGame) Run() func(ctx *gin.Context) {
 	go func() {
-		<-pg.timer.C
-		log.Println("timer fired")
-		pg.storeContext(pg.context)
-		pg.store(pg.processor)
+		for {
+			<-pg.timer.C
+			log.Println("timer fired")
+			pg.storeContext(pg.context)
+			pg.store(pg.processor)
+			pg.timer.Reset(herokuTimeOut)
+		}
 	}()
 	return pg.DefaultGame.Run()
 }
 
-func (pg *persistentGame) process(name string, action common.Action) {
-	log.Println("timer reset")
+func (pg *persistentGame) Reset() {
+	log.Println("Timer reset")
 	pg.timer.Reset(herokuTimeOut)
-	pg.DefaultGame.process(name, action)
 }
 
 func (pg *persistentGame) end(winner string) {
