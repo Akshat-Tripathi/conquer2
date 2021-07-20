@@ -90,8 +90,8 @@ func (a *alliances) breakAlliance(player1, player2 string, expired bool) {
 		if expired {
 			alliance.timer.Stop()
 		} else {
-			cost2 *= 2
 			cost1 = 0
+			cost2 *= 2
 		}
 
 		a.processor.AddTroops(player1, cost1)

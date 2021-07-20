@@ -47,11 +47,13 @@ func (d *DefaultGame) process(name string, action common.Action) (done bool) {
 		if !d.areNeighbours(action.Src, action.Dest) {
 			return false
 		}
+		oldPlayer := d.processor.GetCountry(action.Dest).Player
 		valid, won, conquered, deltaSrc, deltaDest, playerLost :=
 			d.processor.Attack(action.Src, action.Dest, name, action.Troops)
 		if !valid {
 			return false
 		}
+		d.alliances.breakAlliance(name, oldPlayer, false)
 		if conquered {
 			d.SendToAll(common.UpdateMessage{
 				Type:    "updateCountry",
