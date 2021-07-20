@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SpyDetails, PlayerBox, Title } from "./Texts";
-import { Options, OptionsDeploy, DonateForm, repeatAction } from "./ActionButtons";
+import { Options, OptionsDeploy, DonateForm, AllianceForm, repeatAction } from "./ActionButtons";
 import VectorMap from "./VectorMap";
 import { Paper, Grid } from "@material-ui/core";
 import useStyles from "./SideBarStyles";
@@ -33,7 +33,7 @@ function SideBar({ isUnrelated, base }) {
     })
   );
 
-  useHotkeys("r", () => repeatAction(GameContext.gameSocket), {keyup: true});
+  useHotkeys("r", () => repeatAction(GameContext.gameSocket), { keyup: true });
 
   useHotkeys("c", () =>
     setHideUnrelated((bool) => {
@@ -64,6 +64,7 @@ function SideBar({ isUnrelated, base }) {
 
   //Show drop downs?
   const [showDonate, setshowDonate] = useState(false);
+  const [showAlliance, setshowAlliance] = useState(false);
   const [showAssist, setshowAssist] = useState(false);
   const [showMove, setshowMove] = useState(false);
   const [showDeploy, setshowDeploy] = useState(false);
@@ -207,6 +208,13 @@ function SideBar({ isUnrelated, base }) {
     }
   };
 
+  const handleAlliance = () => {
+    setshowAlliance(!showAlliance);
+    if (!showAlliance) {
+      setnumTroops(0);
+    }
+  }
+
   const handleMove = () => {
     setshowMove(!showMove);
     if (!showMove) {
@@ -239,7 +247,7 @@ function SideBar({ isUnrelated, base }) {
   };
 
   const handleColorFill = (geo) => {
-    while (!countriesLoaded) {}
+    while (!countriesLoaded) { }
     const { NAME, ISO_A2 } = geo.properties;
 
     var iso_a2 = convertISO(NAME, ISO_A2);
@@ -254,7 +262,7 @@ function SideBar({ isUnrelated, base }) {
         if (GameContext.countryStates[iso_a2].Player !== "") {
           col =
             GameContext.playerColours[
-              getOwner(GameContext.countryStates[iso_a2].Player)
+            getOwner(GameContext.countryStates[iso_a2].Player)
             ];
         }
       }
@@ -312,21 +320,40 @@ function SideBar({ isUnrelated, base }) {
             <div style={{ marginTop: "50px", width: "100%" }}>
               {/* Show Donation options when clicked on Donate Button */}
               {fromCountry === "" && (
-                <DonateForm
-                  classes={classes}
-                  handleDonate={handleDonate}
-                  handletargetPlayer={handletargetPlayer}
-                  handleNumTroops={handleNumTroops}
-                  fillTroops={fillFromBase}
-                  showDonate={showDonate}
-                  numTroops={numTroops}
-                  targetPlayer={targetPlayer}
-                  socket={GameContext.gameSocket}
-                  user={GameContext.user}
-                  players={GameContext.players}
-                  reset={reset}
-                />
-              )}
+                <div>
+                  <div>
+                    <DonateForm
+                      classes={classes}
+                      handleDonate={handleDonate}
+                      handletargetPlayer={handletargetPlayer}
+                      handleNumTroops={handleNumTroops}
+                      fillTroops={fillFromBase}
+                      showDonate={showDonate}
+                      numTroops={numTroops}
+                      targetPlayer={targetPlayer}
+                      socket={GameContext.gameSocket}
+                      user={GameContext.user}
+                      players={GameContext.players}
+                      reset={reset}
+                    />
+                  </div>
+
+                  <AllianceForm
+                    classes={classes}
+                    handleAlliance={handleAlliance}
+                    handletargetPlayer={handletargetPlayer}
+                    handleNumTroops={handleNumTroops}
+                    fillTroops={fillFromBase}
+                    showAlliance={showAlliance}
+                    numTroops={numTroops}
+                    targetPlayer={targetPlayer}
+                    socket={GameContext.gameSocket}
+                    user={GameContext.user}
+                    players={GameContext.players}
+                    reset={reset}
+                    alliances={GameContext.alliances}
+                  />
+                </div>)}
 
               {/* Only show Attack and move/assist options when two countries clicked */}
               {toCountry !== "" && (

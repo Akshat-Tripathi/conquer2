@@ -24,6 +24,7 @@ type DefaultGame struct {
 	numPlayers int32
 	cron       *cron.Cron
 	lobby      *lobby
+	alliances  *alliances
 
 	sendInitialState func(string)
 }
@@ -75,6 +76,7 @@ func NewDefaultGame(ctx Context) *DefaultGame {
 		i++
 	}
 	d.processor = gs.NewDefaultProcessor(countries)
+	d.alliances = newAlliances(d.Sockets, d.processor)
 	maxCountries := len(countries) / ctx.MaxPlayers
 	if ctx.StartingCountries > maxCountries {
 		d.context.StartingCountries = maxCountries

@@ -42,6 +42,7 @@ var GameContext = {
   countryStates: {},
   capitals: {},
   allegiances: {},
+  alliances: [],
   playerColours: {},
   players: [],
   user: "",
@@ -176,7 +177,7 @@ class GameMap extends Component {
           if (
             ok ||
             getOwner(GameContext.countryStates[action.Country].Player) !==
-              getOwner(action.Player)
+            getOwner(action.Player)
           ) {
             if (
               Object.keys(GameContext.capitals).some(
@@ -234,11 +235,11 @@ class GameMap extends Component {
         case "newCapital":
           GameContext.capitals[action.Player] = action.Country;
           
-          //If the country hasn't been registed, register it
+          //If the country hasn't been registered, register it
           if (!GameContext.countryStates[action.Country]) {
             GameContext.countryStates[action.Country] = new countryState(action.Troops , action.Player);
           }
-          
+
           GameContext.allegiances[action.Player] =
             GameContext.countryStates[action.Country].Player;
           break;
@@ -247,6 +248,31 @@ class GameMap extends Component {
           window.location.replace(
             "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           );
+          break;
+        case "propose":
+          GameContext.alliances.push({
+            isProposal: true,
+            name: action.Player,
+            cost: action.Troops
+          });
+          break;
+        case "break":
+          GameContext.troops += action.Troops;
+        case "deny":
+          GameContext.alliances = GameContext.alliances.filter(
+            (alliance) => alliance.name !== action.Player
+          );
+          break;
+        case "ally":
+          GameContext.alliances = GameContext.alliances.filter(
+            (alliance) => alliance.name !== action.Player
+          );
+          GameContext.troops -= action.Troops;
+          GameContext.alliances.push({
+            isProposal: false,
+            name: action.Player,
+            cost: action.Troops
+          })
           break;
       }
       this.forceUpdate();
