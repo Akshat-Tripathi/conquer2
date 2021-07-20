@@ -2,6 +2,7 @@ package game
 
 import (
 	"log"
+	"sync/atomic"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ type persistentGame struct {
 	*DefaultGame
 	*persistence
 	timer *time.Timer
+	dirty uint32
 }
 
 var _ Game = (*persistentGame)(nil)
@@ -46,8 +48,10 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 		for {
 			<-pg.timer.C
 			log.Println("timer fired")
-			pg.storeContext(pg.context)
-			pg.store(pg.processor)
+			if pg.dirty > 0 {
+				pg.storeContext(pg.context)
+				pg.store(pg.processor)
+			}
 			pg.timer.Reset(herokuTimeOut)
 		}
 	}()
@@ -57,6 +61,7 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 func (pg *persistentGame) Reset() {
 	log.Println("Timer reset")
 	pg.timer.Reset(herokuTimeOut)
+	atomic.AddUint32(&pg.dirty, 1)
 }
 
 func (pg *persistentGame) end(winner string) {
