@@ -69,8 +69,8 @@ func (p *persistence) loadPlayers(processor gs.StateProcessor) int {
 	})
 
 	// Calculate number of updates missed
-	fmt.Println(snapshot.UpdateTime)
-	missedUpdates := int(time.Now().Sub(snapshot.UpdateTime).Hours() / 8)
+	fmt.Println(snapshot.UpdateTime.Local())
+	missedUpdates := int(time.Now().Sub(snapshot.UpdateTime).Hours() / 1)
 	for i := 0; i < missedUpdates; i++ {
 		processor.ProcessTroops()
 	}

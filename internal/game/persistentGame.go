@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const herokuTimeOut = time.Minute * 25
+const herokuTimeOut = time.Minute * 10
 
 // persistentGame is a type of game which can store its state
 // It overrides: Init, Run, process and End
@@ -51,6 +51,7 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 			if pg.dirty > 0 {
 				pg.storeContext(pg.context)
 				pg.store(pg.processor)
+				atomic.StoreUint32(&pg.dirty, 0)
 			}
 			pg.timer.Reset(herokuTimeOut)
 		}
@@ -61,7 +62,7 @@ func (pg *persistentGame) Run() func(ctx *gin.Context) {
 func (pg *persistentGame) Reset() {
 	log.Println("Timer reset")
 	pg.timer.Reset(herokuTimeOut)
-	atomic.AddUint32(&pg.dirty, 1)
+	atomic.StoreUint32(&pg.dirty, 1)
 }
 
 func (pg *persistentGame) end(winner string) {
