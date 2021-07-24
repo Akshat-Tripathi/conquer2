@@ -1,16 +1,31 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import "./Media.css";
 import CanvasJSReact from "../../assets/canvasjs.react";
-
-import Map from "../../media/conquer2.jpg";
-import Meme from "../../media/DominoMemes/meme1.jpeg";
-import { Link } from "react-router-dom";
-import { Button } from "@material-ui/core";
-
+import { db } from "../../firebase";
 import NewMapPhoto from "../../media/conquer2.jpg";
 import MemeImage from "../../media/DominoMemes/meme4.jpeg";
 
 function Media() {
+  const [latestWinners, setLatestWinners] = useState(null);
+
+  useEffect(() => {
+    db.collection("Winners")
+      .orderBy("Date")
+      .limit(3)
+      .get()
+      .then((querySnapshot) => {
+        var winners = [];
+        querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          winners.push(doc.data());
+        });
+        setLatestWinners(winners);
+      })
+      .catch((error) => {
+        console.log("Error getting winners: ", error);
+      });
+  }, []);
+
   return (
     <div className="media">
       <div className="media-title">
@@ -26,29 +41,18 @@ function Media() {
           </div>
         </div>
         <div className="col-span-1 col-start-3 p-4">
-			<h6 className="text-2xl font-bold">
-				Latest Victors
-			</h6>
-			<hr className="p-2"/>
+          <h6 className="text-2xl font-bold">Latest Victors</h6>
+          <hr className="p-2" />
           <table cellSpacing="5">
-            <WinnerEntry
-              gameid="000fee"
-              first="Some Latin Name here"
-              second="Constantinople"
-              third="shash will bash u"
-            />
-            <WinnerEntry
-              gameid="001281"
-              first="Belisarius"
-              second="Taeyeon Dynasty"
-              third="Champlain"
-            />
-            <WinnerEntry
-              gameid="000000"
-              first="Oinky Kong"
-              second="CharlesChickens"
-              third="John Seen ya"
-            />
+            {latestWinners &&
+              latestWinners.map((game) => (
+                <WinnerEntry
+                  gameid={game.gameId}
+                  first={game.first}
+                  second={game.second}
+                  third={game.third}
+                />
+              ))}
             <br />
           </table>
         </div>
@@ -77,33 +81,24 @@ const WinnerEntry = ({ gameid, first, second, third }) => {
     <div>
       <tr>
         <th>
-            <p className="text-xl font-bold">Game ID: {gameid}</p>
+          <p className="text-xl font-bold">Game ID: {gameid}</p>
         </th>
       </tr>
       <tr>
         <td>
-          <i
-            className="fas fa-medal text-3xl"
-            style={{ color: "#ffdf00"}}
-          />
+          <i className="fas fa-medal text-3xl" style={{ color: "#ffdf00" }} />
         </td>
         <td className="italic"> {first} </td>
       </tr>
       <tr>
         <td>
-          <i
-            className="fas fa-medal text-3xl"
-            style={{ color: "#a7a7ad"}}
-          />
+          <i className="fas fa-medal text-3xl" style={{ color: "#a7a7ad" }} />
         </td>
         <td className="italic"> {second} </td>
       </tr>
       <tr>
         <td>
-          <i
-            className="fas fa-medal text-3xl"
-            style={{ color: "#824A02"}}
-          />
+          <i className="fas fa-medal text-3xl" style={{ color: "#824A02" }} />
         </td>
         <td className="italic"> {third} </td>
       </tr>
@@ -147,7 +142,7 @@ class Graph extends Component {
     };
 
     return (
-      <div>
+      <div className="p-4 bg-yellow-600">
         <CanvasJSChart
           options={options}
           /* onRef={ref => tdis.chart = ref} */
