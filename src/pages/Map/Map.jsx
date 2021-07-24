@@ -99,7 +99,8 @@ function getOwner(player) {
   while (player != GameContext.allegiances[player]) {
     player = GameContext.allegiances[player];
     if (player === undefined || player === "") {
-      alert("glitch");
+      console.log("Glitch");
+      console.trace();
     }
   }
   return player;
