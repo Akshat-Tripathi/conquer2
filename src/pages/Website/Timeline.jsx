@@ -6,7 +6,7 @@ function Timeline() {
 		<div className="timeline-wrapper">
 			<h1 style={{ fontSize: '40px' }}>The Wonderful History Of Conquer</h1>
 			<div className="timeline">
-				<div className="container left">
+				<div className="container-timeline left">
 					<div className="timeline-time">
 						<h3>Summer 2019</h3>
 						<h4 style={{ color: '#ff4520' }}>
@@ -18,7 +18,7 @@ function Timeline() {
 						</p>
 					</div>
 				</div>
-				<div className="container right">
+				<div className="container-timeline right">
 					<div className="timeline-time">
 						<h3>Winter 2019</h3>
 						<h4 style={{ color: '#ff4520' }}>
@@ -31,7 +31,7 @@ function Timeline() {
 						</p>
 					</div>
 				</div>
-				<div className="container left">
+				<div className="container-timeline left">
 					<div className="timeline-time">
 						<h3>Spring 2020</h3>
 						<h4 style={{ color: '#ff4520' }}>
@@ -44,7 +44,7 @@ function Timeline() {
 						</p>
 					</div>
 				</div>
-				<div className="container right">
+				<div className="container-timeline right">
 					<div className="timeline-time">
 						<h3>Summer 2020</h3>
 						<h4 style={{ color: '#ff4520' }}>
