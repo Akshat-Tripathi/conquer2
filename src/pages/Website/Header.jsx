@@ -26,17 +26,17 @@ function Header() {
   window.addEventListener("resize", showButton);
 
   return (
-    <nav className="navbar">
+    <nav className="navbar min-h-full flex justify-center align-middle text-xl whitespace-nowrap">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
           <i
-            class="fas fa-globe-americas"
+            className="fas fa-globe-americas text-orange-600"
             style={{ color: "#ff4520", fontSize: "50px" }}
           />
           &ensp;
-          <span style={{ fontFamily: "Lobster", color: "#fff" }}>
+          <h6 style={{ fontFamily: "Lobster"}} className="text-white whitespace-nowrap">
             CONQUER 2.0
-          </span>
+          </h6>
         </Link>
         <div className="menu-icon" onClick={handleClick}>
           <i className={click ? "fas fa-times" : "fas fa-bars"} />
