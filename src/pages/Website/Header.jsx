@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Logo from "../../media/conquer2logo.png";
 import "./Header.css";
 
 function Header() {
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
+
+  const history = useHistory();
 
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
@@ -24,6 +26,10 @@ function Header() {
   }, []);
 
   window.addEventListener("resize", showButton);
+
+  const goToSignUpPage = () => {
+    history.push("/signup")
+  }
 
   return (
     <nav className="navbar min-h-full flex justify-center align-middle text-xl whitespace-nowrap">
@@ -64,7 +70,7 @@ function Header() {
 
           <li>
             <Link
-              to="/sign-up"
+              to="/signup"
               className="nav-links-mobile"
               onClick={closeMobileMenu}
             >
@@ -72,7 +78,7 @@ function Header() {
             </Link>
           </li>
         </ul>
-        {button && <Button buttonStyle="btn--outline">SIGN UP</Button>}
+        {button && <Button buttonStyle="btn--outline" onClick={goToSignUpPage}>SIGN UP</Button>}
       </div>
     </nav>
   );

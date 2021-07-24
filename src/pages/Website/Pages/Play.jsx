@@ -2,6 +2,7 @@ import React from 'react';
 import './Play.css';
 import Logo from '../../../media/conquer2logo.png';
 import StartGameBox from '../StartGameBox';
+import Preloader from '../ComingSoon/Preloader/Preloader';
 
 function Play() {
 	return (
@@ -14,6 +15,7 @@ function Play() {
 				<StartGameBox />
 				{/* Sign In here */}
 			</div>
+			<Preloader/>
 		</div>
 	);
 }
