@@ -22,7 +22,7 @@ function Media() {
       <div className="xl:grid grid-cols-3 grid-gap-4">
         <div className="col-span-2 col-start-1 p-4">
           <div className="flex flex-row">
-            <img src={NewMapPhoto} className="object-cover" />
+            <img src={NewMapPhoto} className="object-cover rounded-2xl" />
           </div>
         </div>
         <div className="col-span-1 col-start-3 p-4">
@@ -47,13 +47,13 @@ function Media() {
               gameid="000000"
               first="Oinky Kong"
               second="CharlesChickens"
-              third="John See ya"
+              third="John Seen ya"
             />
             <br />
           </table>
         </div>
         <div className="col-span-1 col-start-1 p-4">
-          <img src={MemeImage} className="" />
+          <img src={MemeImage} className="rounded-xl" />
         </div>
         <div className="col-span-1 col-start-2 p-4">
           <iframe
@@ -61,7 +61,7 @@ function Media() {
             frameborder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowfullscreen
-            className="object-fit h-full w-full"
+            className="object-fit h-full w-full rounded-xl"
           />
         </div>
         <div className="col-span-1 col-start-3 w-full h-full p-4">
