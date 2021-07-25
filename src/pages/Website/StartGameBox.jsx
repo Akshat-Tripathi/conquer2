@@ -217,6 +217,7 @@ const NewJoinGame = ({ setModeToZero }) => {
                   type="password"
                   name="password"
                   required
+                  crypt="bcrypt"  work="cost:11" salt="username"
                 />
               </div>
             </div>

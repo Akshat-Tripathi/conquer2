@@ -37,7 +37,12 @@ function Media() {
       <div className="xl:grid grid-cols-3 grid-gap-4">
         <div className="col-span-2 col-start-1 p-4">
           <div className="flex flex-row">
-            <img src={NewMapPhoto} className="object-cover rounded-2xl" />
+            <img
+              src={NewMapPhoto}
+              className="object-cover rounded-2xl"
+              title="The World Map For Conquer"
+              alt="New Map"
+            />
           </div>
         </div>
         <div className="col-span-1 col-start-3 p-4">
@@ -57,7 +62,11 @@ function Media() {
           </table>
         </div>
         <div className="col-span-1 col-start-1 p-4">
-          <img src={MemeImage} className="rounded-xl" />
+          <img
+            src={MemeImage}
+            className="rounded-xl"
+            title="Proudly created by Domino Memes"
+          />
         </div>
         <div className="col-span-1 col-start-2 p-4">
           <iframe
