@@ -266,7 +266,7 @@ func loadGames(colours []string, r *gin.Engine, events chan<- game.Event) (*fire
 	games := make(map[string]game.Game)
 	if err == nil {
 		for _, refs := range allRefs {
-			if refs.ID == "Winners" {
+			if refs.ID == "Winners" || refs.ID == "Subscriptions" {
 				continue
 			}
 			g := game.NewCampaignGame(game.Context{
