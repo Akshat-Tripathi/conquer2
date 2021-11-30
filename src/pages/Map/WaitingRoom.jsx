@@ -5,9 +5,6 @@ import { GiThumbUp, GiInfo } from "react-icons/gi";
 import { action } from "../Map/ActionButtons";
 import { FcCheckmark, FcCancel } from "react-icons/fc";
 import { useSpring, animated as a, useTransition } from "react-spring";
-import { playerReady } from "./Map";
-// import { connect, loaddetails } from '../../websockets/index.js';
-import Typist from "react-typist";
 import "./WaitingRoom.css";
 import ChatPopup from "./ChatPopup";
 
@@ -24,7 +21,7 @@ function handleVote({ socket, user }) {
   // const readyup = new action(null, 'readyUp', null, null, this.props.user);
   // const readyup = new readyPlayer(this.props.user, true);
 
-  var readyup = new action(0, "imreadym9", "", "", user);
+  const readyup = new action(0, "imreadym9", "", "", user);
   socket.send(JSON.stringify(readyup));
 }
 
@@ -34,8 +31,7 @@ const ResponsiveWaitingRoom = ({
   socket,
   playerReady,
 }) => {
-  var playerColours = playerColours;
-  var ImReady = playerReady[user];
+  const ImReady = playerReady[user];
 
   return (
     <div className="">
@@ -43,87 +39,76 @@ const ResponsiveWaitingRoom = ({
       <div className="backdrop" />
 
       {/* Title */}
-      <div className="text-center align-middle grid grid-cols-1">
-        <h1 className="text-yellow-400 text-5xl font-bold p-4">
-          Waiting for all players...
-        </h1>
+      <div className="text-center align-middle md:grid md:grid-cols-5 flex md:flex-none flex-col p-8">
+        <div className="col-span-3 col-start-2">
+          <h1 className="text-yellow-400 text-5xl font-bold p-4">
+            Waiting for all players...
+          </h1>
 
-        {/* Game ID */}
-        <p className="text-white">
-          {"Game ID: " +
-            document.cookie
-              .split("; ")
-              .map((s) => s.split("="))
-              .filter((arr) => arr[0] == "id")[0][1]}
-        </p>
+          {/* Retrieve Game ID from Browser Cookies */}
+          <p className="text-white">
+            {"Game ID: " +
+              document.cookie
+                .split("; ")
+                .map((s) => s.split("="))
+                .filter((arr) => arr[0] == "id")[0][1]}
+          </p>
 
-        {/* Tips box */}
-        <div className="m-4 w-96 h-64 text-yellow-400 mx-auto">
-          <div className="bg-black bg-center opacity-75 text-center p-4 rounded-xl grid gap-2 grid-cols-3">
-            <div className="">
-              <GiInfo className="text-7xl" />
-            </div>
-            <div className="text-left text-sm col-span-2">
-              <AssistancesSlider />
+          {/* Tips box */}
+          <div className="m-4 w-96 h-64 text-yellow-400 mx-auto">
+            <div className="bg-black bg-center opacity-75 text-center p-4 rounded-xl grid gap-2 grid-cols-3">
+              <div className="">
+                <GiInfo className="text-7xl" />
+              </div>
+              <div className="text-left text-sm col-span-2">
+                <AssistancesSlider />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Hourglass */}
-      <div className="p-8 absolute top-0 right-0">
-        <div className="lds-hourglass" />
-      </div>
-
-      {/* Players box */}
-      <div className="">
-        <div className="absolute bottom-0 left-0 bg-black opacity-90 w-64 h-96 text-center rounded-tr-3xl">
-          <div className="players-list-title">
-            <h3 className="text-white text-2xl font-bold p-2">
-              Joined Players{" "}
-            </h3>
-          </div>
-
-          <div className="text-center text-white p-2">
-            {Object.keys(playerColours).map(function (player) {
-              var isReady = playerReady[player];
-              var colour = playerColours[player];
-              return (
-                <div className="player-name" key={player}>
-                  <div
-                    style={{ verticalAlign: "middle", marginBottom: "1%" }}
-                    className="text-center p-1"
-                  >
-                    <span style={{ color: colour }}>
-                      {player}
-                      &ensp;
-                      <ReadyIcon isReady={isReady} />
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* Hourglass */}
+        <div className="p-8 absolute top-0 right-0 hidden md:block">
+          <div className="lds-hourglass" />
         </div>
-      </div>
 
-      {/* Chat Popup */}
-      <div className="chat">
-        <ChatPopup />
-      </div>
+        {/* Players box */}
+        <div
+          className="bg-black md:col-start-1 md:col-span-1 md:left-0 md:bottom-0 md:absolute 
+        md:w-64 md:h-96 md:rounded-tr-xl p-8 sm:rounded-xl hidden md:block"
+        >
+          {PlayerBoxMdScreen(playerColours, playerReady)}
+        </div>
 
-      {/* Ready Up Box */}
-      <div className="">
+        <div
+          className="block md:hidden bg-black rounded-xl"
+        >
+          Hello
+        </div>
+
+        {/* Chat Popup */}
+        <div className="chat">
+          <ChatPopup />
+        </div>
+
+        {/* Ready Up Box */}
         <ReadyUp ImReady={ImReady} socket={socket} user={user} />
       </div>
     </div>
   );
 };
 
+/**
+ * Represents the ready up button and ready button when
+ * clicked to indicate a player is ready to start from the lobby.
+ */
 const ReadyUp = ({ ImReady, socket, user }) => {
   return (
     <div className="">
-      <div className="absolute bottom-0 right-0 h-64 w-64 bg-black opacity-90 text-center p-8 rounded-tl-3xl">
+      <div
+        className="absolute md:bottom-0 md:right-0 md:h-64 md:w-64 bg-black 
+      opacity-90 text-center p-8 rounded-tl-3xl sm:flex md:flex-none sm: flex-col"
+      >
         {!ImReady ? (
           <div className="text-center">
             <IconButton
@@ -169,12 +154,15 @@ const ReadyUp = ({ ImReady, socket, user }) => {
   );
 };
 
-const ReadyIcon = ({ isReady }) => {
-  if (isReady === true) {
-    return <FcCheckmark />;
-  }
-  return <FcCancel />;
-};
+const ReadyIcon = (isReady) => (
+  <div>
+    {isReady ? (
+      <i className="fas fa-check text-center text-green-600"></i>
+    ) : (
+      <FcCancel />
+    )}
+  </div>
+);
 
 const AssistancesSlider = () => {
   const [key, setKey] = useState(0);
@@ -203,6 +191,7 @@ const AssistancesSlider = () => {
   );
 };
 
+//TODO: Simplify the way we add text/assistances?
 const Assistances = [
   "Press Q to remove dashboards while you're playing to see the map more clearly!",
   "Make sure to check what countries are bordering your countries when moving troops",
@@ -212,5 +201,40 @@ const Assistances = [
   "Take note of France. It can be your friend from two continents, or your worst nightmare!",
   "Remember in peacetime: the more land you have, the more troops you get! ",
 ];
+
+function PlayerBoxMdScreen(playerColours, playerReady) {
+  return (
+    <div className="">
+      <div className="absolute md:bottom-0 md:left-0 bg-black opacity-90 w-64 h-96 text-center rounded-tr-3xl p-4">
+        <div className="players-list-title">
+          <h3 className="text-white text-2xl font-bold p-2">Joined Players </h3>
+        </div>
+
+        <div className="content-center flex flex-col">
+          {Object.keys(playerColours).map(function (player) {
+            var isReady = playerReady[player];
+            var colour = playerColours[player];
+            return (
+              <div
+                className="flex flex-row flex-auto text-center align-middle flex-no-wrap content-center flex-grow"
+                key={player}
+              >
+                <div className="text-center pl-4">
+                  <p
+                    style={{ color: colour }}
+                    className="text-center align-middle font-bold text-lg"
+                  >
+                    {player} &ensp;
+                  </p>
+                </div>
+                <div className="">{ReadyIcon(isReady)}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default ResponsiveWaitingRoom;
