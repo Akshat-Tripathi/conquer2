@@ -16,6 +16,7 @@ import DominoMemes from './pages/Website/Pages/DominoMemes';
 import Play from './pages/Website/Pages/Play';
 import SideBar from './pages/Map/SideBar';
 import { Sidebar } from './pages/Map/Components/Sidebar';
+import ComingSoon from './pages/Website/ComingSoon/ComingSoon';
 
 class App extends React.Component {
 	render() {
@@ -25,10 +26,11 @@ class App extends React.Component {
 					<Switch>
 						{/* Website */}
 						<Route exact path="/" component={Home} />
-						<Route path="/home" component={OldHome} />
 						<Route path="/memes" component={DominoMemes} />
-						<Route path="/forums" component={Forums} />
+						<Route path="/forums" component={ComingSoon} />
 						<Route path="/play" component={Play} />
+						<Route path="/tutorial" component={ComingSoon} />
+						<Route path="/signup" component={ComingSoon} />
 
 						{/* Game */}
 						<Route path="/map" component={GameMap} />

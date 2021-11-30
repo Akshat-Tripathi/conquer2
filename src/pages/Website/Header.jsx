@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Logo from "../../media/conquer2logo.png";
 import "./Header.css";
 
 function Header() {
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
+
+  const history = useHistory();
 
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
@@ -25,18 +27,22 @@ function Header() {
 
   window.addEventListener("resize", showButton);
 
+  const goToSignUpPage = () => {
+    history.push("/signup")
+  }
+
   return (
-    <nav className="navbar">
+    <nav className="navbar min-h-full flex justify-center align-middle text-xl whitespace-nowrap">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
           <i
-            class="fas fa-globe-americas"
+            className="fas fa-globe-americas text-orange-600"
             style={{ color: "#ff4520", fontSize: "50px" }}
           />
           &ensp;
-          <span style={{ fontFamily: "Lobster", color: "#fff" }}>
+          <h6 style={{ fontFamily: "Lobster"}} className="text-white whitespace-nowrap">
             CONQUER 2.0
-          </span>
+          </h6>
         </Link>
         <div className="menu-icon" onClick={handleClick}>
           <i className={click ? "fas fa-times" : "fas fa-bars"} />
@@ -64,7 +70,7 @@ function Header() {
 
           <li>
             <Link
-              to="/sign-up"
+              to="/signup"
               className="nav-links-mobile"
               onClick={closeMobileMenu}
             >
@@ -72,7 +78,7 @@ function Header() {
             </Link>
           </li>
         </ul>
-        {button && <Button buttonStyle="btn--outline">SIGN UP</Button>}
+        {button && <Button buttonStyle="btn--outline" onClick={goToSignUpPage}>SIGN UP</Button>}
       </div>
     </nav>
   );

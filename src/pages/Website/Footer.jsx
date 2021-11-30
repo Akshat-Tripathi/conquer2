@@ -1,9 +1,77 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import "./Footer.css";
 import { Button } from "./Button";
 import { Link } from "react-router-dom";
+import { db } from "../../firebase";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import { makeStyles } from "@material-ui/core/styles";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+    "& > * + *": {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
 function Footer() {
+  const emailEl = useRef(null);
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarType, setSnackbarType] = useState("");
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const SnackbarToShow = () => {
+    if (open) {
+      return (
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={snackbarType}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      );
+    }
+    return <div />;
+  };
+
+  const handleSubscriptionRequest = (e) => {
+    e.preventDefault();
+    db.collection("Subscriptions")
+      .doc(emailEl.current.value)
+      .set({
+        email: emailEl.current.value,
+        Date: new Date(),
+      })
+      .then((_) => {
+        setSnackbarType("success");
+        setSnackbarMessage("Successfully Subscribed!");
+        setOpen(true);
+      })
+      .catch((err) => {
+        setSnackbarType("error");
+        setSnackbarMessage("Error! " + snackbarMessage);
+        setOpen(true);
+      });
+  };
+
   return (
     <div className="footer-container">
       <section className="footer-subscription">
@@ -16,14 +84,20 @@ function Footer() {
             <small className="text-xs"> (lol not really)</small>
           </p>
           <div className="input-areas">
-            <form>
+            {SnackbarToShow()}
+            <form onSubmit={handleSubscriptionRequest}>
               <input
                 className="footer-input"
                 name="email"
                 type="email"
                 placeholder="Your Email"
+                ref={emailEl}
               />
-              <Button buttonStyle="btn--outline" style={{ color: "#fff" }}>
+              <Button
+                buttonStyle="btn--outline"
+                style={{ color: "#fff" }}
+                onClick={handleSubscriptionRequest}
+              >
                 Subscribe
               </Button>
             </form>

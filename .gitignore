@@ -10,3 +10,7 @@ internal/game/*.json
 package-lock.json
 *.exe
 conquer2.exe
+.env
+.gitignore
+.DS_Store
+
